@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý thời gian hiệu quả</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #f4f6fb;
+      color: #222;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 900px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px 24px 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    header small {
+      display: block;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .clock {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .tagline {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    .top-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-outline:hover {
+      background: #eff6ff;
+    }
+
+    .notice {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .notice span {
+      font-weight: 600;
+    }
+
+    section {
+      margin-top: 16px;
+    }
+
+    .card {
+      border-radius: 12px;
+      padding: 14px 14px 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #555;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3);
+    }
+
+    .tasks-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .tasks-header h2 {
+      font-size: 1rem;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.8rem;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .tasks-empty {
+      font-size: 0.9rem;
+      color: #888;
+      padding: 8px 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+
+    th, td {
+      padding: 6px 4px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #6b7280;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .badge-today {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .badge-late {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .badge-done {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      margin-right: 4px;
+    }
+
+    .status-pending {
+      background: #fbbf24;
+    }
+
+    .status-done {
+      background: #22c55e;
+    }
+
+    .status-overdue {
+      background: #ef4444;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-small {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 999px;
+    }
+
+    .btn-success {
+      background: #22c55e;
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #16a34a;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .focus-tips {
+      font-size: 0.8rem;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    /* Pomodoro */
+    .pomodoro-display {
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 8px 0 10px;
+    }
+
+    .pomodoro-status {
+      font-size: 0.8rem;
+      text-align: center;
+      color: #555;
+    }
+
+    .pomodoro-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    /* Reward dropdown */
+    .reward-dropdown {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .reward-trigger {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #666;
+      width: 100%;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .reward-trigger:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .reward-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1000;
+      min-width: 100%;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      margin-top: 2px;
+    }
+
+    .reward-menu.show {
+      display: block;
+    }
+
+    .reward-menu-item {
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-bottom: 1px solid #e5e7eb;
+      transition: background 0.15s;
+    }
+
+    .reward-menu-item:last-child {
+      border-bottom: none;
+    }
+
+    .reward-menu-item:hover {
+      background: #eff6ff;
+    }
+
+    .reward-custom-input-wrapper {
+      padding: 8px 10px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .reward-custom-input-wrapper input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>TimeFocus – Quản lý thời gian</h1>
+      <p class="tagline">Giảm trì hoãn từng bước nhỏ, mỗi việc một thời điểm.</p>
+    </div>
+    <div class="clock" id="clock"></div>
+  </header>
+
+  <div class="top-row">
+    <button id="enableNotifyBtn" class="btn-outline">🔔 Bật thông báo trình duyệt</button>
+    <span class="notice">
+      Trạng thái thông báo: <span id="notifyStatus">Chưa kiểm tra</span>
+    </span>
+  </div>
+
+  <!-- FORM THÊM CÔNG VIỆC -->
+  <section class="card">
+    <div class="card-title">Thêm công việc cần tập trung</div>
+    <form id="taskForm">
+      <div>
+        <label for="title">Tên công việc</label>
+        <input type="text" id="title" placeholder="VD: Ôn CS115, làm assignment 3" required>
+      </div>
+      <div>
+        <label for="date">Ngày</label>
+        <input type="date" id="date" required>
+      </div>
+      <div>
+        <label for="startTime">Giờ bắt đầu</label>
+        <input type="time" id="startTime" required>
+      </div>
+      <div class="reward-dropdown">
+        <label style="font-size: 0.75rem; font-weight: 600; color: #555; display: block; margin-bottom: 4px;">🏆 Phần thưởng</label>
+        <button type="button" class="reward-trigger" id="rewardTrigger">Chọn phần thưởng</button>
+        <div class="reward-menu" id="rewardMenu">
+          <div class="reward-menu-item" data-reward="🎮 Chơi 1 ván game">🎮 Chơi 1 ván game</div>
+          <div class="reward-menu-item" data-reward="☕ Nghỉ 10 phút">☕ Nghỉ 10 phút</div>
+          <div class="reward-menu-item" data-reward="📺 Xem video yêu thích">📺 Xem video yêu thích</div>
+          <div class="reward-menu-item" data-reward="🍿 Ăn snack">🍿 Ăn snack</div>
+          <div class="reward-menu-item" data-reward="🎵 Nghe nhạc 15 phút">🎵 Nghe nhạc 15 phút</div>
+          <div class="reward-menu-item" data-reward="🚶 Đi bộ ngoài trời">🚶 Đi bộ ngoài trời</div>
+          <div class="reward-custom-input-wrapper">
+            <input type="text" id="customRewardInput" placeholder="Hoặc nhập phần thưởng khác..." style="width: 100%;">
+          </div>
+        </div>
+      </div>
+      <div>
+        <label for="endTime">Giờ kết thúc</label>
+        <input type="time" id="endTime">
+      </div>
+      <div>
+        <label for="reminder">Nhắc trước (phút)</label>
+        <input type="number" id="reminder" min="0" value="10">
+      </div>
+      <button type="submit" class="btn-primary" style="align-self: end; padding: 8px 14px;">+ Thêm công việc</button>
+    </form>
+    <p class="focus-tips">
+      Gợi ý: chia việc lớn thành các block 25–50 phút, chỉ tập trung một việc trong khung giờ đó.
+    </p>
+  </section>
+
+  <!-- POMODORO TIMER -->
+  <section class="card">
+    <div class="card-title">Phiên tập trung 25 phút (Pomodoro)</div>
+    <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
+    <div class="pomodoro-status" id="pomodoroStatus">
+      Sẵn sàng. Chọn thời lượng và bấm Bắt đầu.
+    </div>
+    <div class="pomodoro-controls">
+      <button class="btn-small btn-outline" id="pomodoro25Btn">25 phút</button>
+      <button class="btn-small btn-outline" id="pomodoro50Btn">50 phút</button>
+      <button class="btn-small btn-primary" id="pomodoroStartBtn">▶ Bắt đầu</button>
+      <button class="btn-small btn-outline" id="pomodoroPauseBtn">⏸ Tạm dừng</button>
+      <button class="btn-small btn-outline" id="pomodoroResetBtn">⟲ Reset</button>
+    </div>
+  </section>
+
+  <!-- DANH SÁCH CÔNG VIỆC -->
+  <section class="card">
+    <div class="tasks-header">
+      <h2>Công việc đã lên lịch</h2>
+      <small id="taskSummary"></small>
+    </div>
+    <div class="filter-row">
+      <span>Lọc:</span>
+      <button class="btn-small btn-outline" data-filter="today">Hôm nay</button>
+      <button class="btn-small btn-outline" data-filter="all">Tất cả</button>
+      <button class="btn-small btn-outline" data-filter="pending">Chưa xong</button>
+      <button class="btn-small btn-outline" data-filter="done">Đã xong</button>
+    </div>
+    <div id="tasksContainer"></div>
+  </section>
+</div>
+
+<script>
+  // ==========================
+  // Helpers thời gian – format
+  // ==========================
+
+  function updateClock() {
+    const clockEl = document.getElementById('clock');
+    const now = new Date();
+    const opts = {
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    };
+    clockEl.textContent = now.toLocaleString('vi-VN', opts);
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  function todayStr() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function buildDateTime(dateStr, timeStr) {
+    if (!dateStr || !timeStr) return null;
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const [h, m] = timeStr.split(':').map(Number);
+    return new Date(year, month - 1, day, h, m);
+  }
+
+  // ==========================
+  // Lưu trữ công việc (localStorage)
+  // ==========================
+
+  const STORAGE_KEY = 'timefocus_tasks_v1';
+  let tasks = [];
+
+  function loadTasks() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      tasks = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.error('Lỗi đọc localStorage', e);
+      tasks = [];
+    }
+  }
+
+  function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }
+
+  // ==========================
+  // Render danh sách công việc
+  // ==========================
+
+  let currentFilter = 'today';
+
+  function renderTasks() {
+    const container = document.getElementById('tasksContainer');
+    if (!tasks.length) {
+      container.innerHTML = '<p class="tasks-empty">Chưa có công việc nào. Hãy tạo ít nhất 1 việc nhỏ cho hôm nay.</p>';
+      document.getElementById('taskSummary').textContent = '';
+      return;
+    }
+
+    const tdy = todayStr();
+    let filtered = tasks.slice();
+
+    if (currentFilter === 'today') {
+      filtered = filtered.filter(t => t.date === tdy);
+    } else if (currentFilter === 'pending') {
+      filtered = filtered.filter(t => !t.done);
+    } else if (currentFilter === 'done') {
+      filtered = filtered.filter(t => t.done);
+    }
+
+    filtered.sort((a, b) => {
+      const ad = (a.date || '') + ' ' + (a.startTime || '');
+      const bd = (b.date || '') + ' ' + (b.startTime || '');
+      return ad.localeCompare(bd);
+    });
+
+    if (!filtered.length) {
+      container.innerHTML = '<p class="tasks-empty">Không có công việc phù hợp với bộ lọc hiện tại.</p>';
+    } else {
+      let html = '<table><thead><tr>' +
+        '<th>Công việc</th>' +
+        '<th>Ngày</th>' +
+        '<th>Bắt đầu</th>' +
+        '<th>🏆</th>' +
+        '<th>Kết thúc</th>' +
+        '<th>Nhắc trước</th>' +
+        '<th>Trạng thái</th>' +
+        '<th>Hành động</th>' +
+        '</tr></thead><tbody>';
+
+      const now = new Date();
+
+      for (const t of filtered) {
+        const isToday = t.date === tdy;
+        const start = buildDateTime(t.date, t.startTime);
+        const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
+
+        let statusLabel = 'Chưa bắt đầu';
+        let statusClass = 'status-pending';
+        let badge = '';
+
+        if (t.done) {
+          statusLabel = 'Đã xong';
+          statusClass = 'status-done';
+          badge = '<span class="badge badge-done">Đã hoàn thành</span>';
+        } else if (end && now > end) {
+          statusLabel = 'Trễ hạn';
+          statusClass = 'status-overdue';
+          badge = '<span class="badge badge-late">Quá hạn</span>';
+        } else if (isToday) {
+          badge = '<span class="badge badge-today">Hôm nay</span>';
+        }
+
+        // Tính phần thưởng dựa trên thời lượng công việc
+        let reward = 0;
+        if (start && end) {
+          const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
+          reward = Math.ceil(durationMinutes / 10); // 10 phút = 1 điểm
+        }
+
+        html += `<tr>
+          <td>
+            <div>${t.title}</div>
+            ${badge ? `<div style="margin-top:2px;">${badge}</div>` : ''}
+          </td>
+          <td>${t.date || '-'}</td>
+          <td>${t.startTime || '-'}</td>
+          <td>
+            <div style="font-size: 0.75rem; text-align: center; padding: 2px 4px; background: #f0f0f0; border-radius: 4px; cursor: help;" title="${t.reward || 'Chưa chọn'}">
+              ${t.reward ? t.reward.substring(0, 10) + (t.reward.length > 10 ? '...' : '') : '-'}
+            </div>
+          </td>
+          <td>${t.endTime || '-'}</td>
+          <td>${t.reminderMinutes} phút</td>
+          <td>
+            <span class="status-dot ${statusClass}"></span>${statusLabel}
+          </td>
+          <td>
+            <div class="task-actions">
+              <button class="btn-small btn-success" onclick="markDone(${t.id})">Xong</button>
+              <button class="btn-small btn-danger" onclick="deleteTask(${t.id})">Xoá</button>
+            </div>
+          </td>
+        </tr>`;
+      }
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    const total = tasks.length;
+    const doneCount = tasks.filter(t => t.done).length;
+    const pendingToday = tasks.filter(t => t.date === todayStr() && !t.done).length;
+    document.getElementById('taskSummary').textContent =
+      `${doneCount}/${total} đã xong • ${pendingToday} việc hôm nay`;
+  }
+
+  function markDone(id) {
+    tasks = tasks.map(t => t.id === id ? { ...t, done: true } : t);
+    saveTasks();
+    renderTasks();
+  }
+
+  function deleteTask(id) {
+    if (!confirm('Xoá công việc này?')) return;
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+    renderTasks();
+  }
+
+  window.markDone = markDone;
+  window.deleteTask = deleteTask;
+
+  // ==========================
+  // Xử lý form thêm công việc
+  // ==========================
+
+  const taskForm = document.getElementById('taskForm');
+  const dateInput = document.getElementById('date');
+  dateInput.value = todayStr();
+
+  // Xử lý dropdown phần thưởng
+  let selectedReward = '';
+  const rewardTrigger = document.getElementById('rewardTrigger');
+  const rewardMenu = document.getElementById('rewardMenu');
+  const customRewardInput = document.getElementById('customRewardInput');
+  const rewardItems = document.querySelectorAll('.reward-menu-item:not(.reward-custom-input-wrapper)');
+
+  rewardTrigger.addEventListener('click', (e) => {
+    e.preventDefault();
+    rewardMenu.classList.toggle('show');
+  });
+
+  rewardItems.forEach(item => {
+    item.addEventListener('click', () => {
+      selectedReward = item.getAttribute('data-reward');
+      rewardTrigger.textContent = item.getAttribute('data-reward');
+      customRewardInput.value = '';
+      rewardMenu.classList.remove('show');
+    });
+  });
+
+  customRewardInput.addEventListener('keyup', () => {
+    if (customRewardInput.value.trim()) {
+      selectedReward = customRewardInput.value.trim();
+      rewardTrigger.textContent = customRewardInput.value.trim();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!rewardTrigger.contains(e.target) && !rewardMenu.contains(e.target)) {
+      rewardMenu.classList.remove('show');
+    }
+  });
+
+  taskForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const title = document.getElementById('title').value.trim();
+    const date = document.getElementById('date').value;
+    const startTime = document.getElementById('startTime').value;
+    const endTime = document.getElementById('endTime').value;
+    const reminderVal = document.getElementById('reminder').value;
+
+    if (!title || !date || !startTime) {
+      alert('Vui lòng nhập ít nhất: tên, ngày, và giờ bắt đầu.');
+      return;
+    }
+
+    if (!selectedReward && !customRewardInput.value.trim()) {
+      alert('Vui lòng chọn hoặc nhập phần thưởng.');
+      return;
+    }
+
+    const reminderMinutes = Math.max(0, Number(reminderVal) || 0);
+    const finalReward = selectedReward || customRewardInput.value.trim();
+
+    const newTask = {
+      id: Date.now(),
+      title,
+      date,
+      startTime,
+      endTime: endTime || '',
+      reminderMinutes,
+      reward: finalReward,
+      done: false,
+      notified: false
+    };
+
+    tasks.push(newTask);
+    saveTasks();
+    renderTasks();
+
+    document.getElementById('title').value = '';
+    document.getElementById('startTime').value = '';
+    document.getElementById('endTime').value = '';
+    document.getElementById('reminder').value = '10';
+    customRewardInput.value = '';
+    selectedReward = '';
+    rewardTrigger.textContent = 'Chọn phần thưởng';
+  });
+
+  // ==========================
+  // Thông báo trình duyệt
+  // ==========================
+
+  const notifyStatusEl = document.getElementById('notifyStatus');
+  const enableNotifyBtn = document.getElementById('enableNotifyBtn');
+
+  function updateNotifyStatus() {
+    if (!('Notification' in window)) {
+      notifyStatusEl.textContent = 'Trình duyệt không hỗ trợ Notification API.';
+      enableNotifyBtn.disabled = true;
+      return;
+    }
+    if (Notification.permission === 'granted') {
+      notifyStatusEl.textContent = 'Đã bật (granted)';
+    } else if (Notification.permission === 'denied') {
+      notifyStatusEl.textContent = 'Đã bị chặn (denied). Hãy kiểm tra cài đặt trình duyệt.';
+    } else {
+      notifyStatusEl.textContent = 'Chưa xin quyền (default).';
+    }
+  }
+
+  enableNotifyBtn.addEventListener('click', function () {
+    if (!('Notification' in window)) {
+      alert('Trình duyệt của bạn không hỗ trợ thông báo.');
+      return;
+    }
+    Notification.requestPermission().then(updateNotifyStatus);
+  });
+
+  updateNotifyStatus();
+
+  function sendNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body });
+    } else {
+      alert(title + '\n\n' + body);
+    }
+  }
+
+  function showTaskNotification(task) {
+    const title = 'Nhắc việc: ' + task.title;
+    const body =
+      (task.date ? `Ngày: ${task.date}\n` : '') +
+      (task.startTime ? `Giờ bắt đầu: ${task.startTime}\n` : '') +
+      `Bạn đã đặt nhắc trước ${task.reminderMinutes} phút.`;
+
+    sendNotification(title, body);
+  }
+
+  // ==========================
+  // Kiểm tra để gửi thông báo
+  // ==========================
+
+  function checkNotifications() {
+    const now = new Date();
+
+    tasks.forEach(task => {
+      if (task.done) return;
+      if (task.notified) return;
+      if (!task.date || !task.startTime) return;
+
+      const start = buildDateTime(task.date, task.startTime);
+      if (!start) return;
+
+      const reminderTime = new Date(start.getTime() - task.reminderMinutes * 60000);
+      const diff = now.getTime() - reminderTime.getTime();
+
+      if (diff >= 0 && diff <= 60 * 1000) {
+        showTaskNotification(task);
+        task.notified = true;
+      }
+    });
+
+    saveTasks();
+  }
+
+  setInterval(checkNotifications, 30 * 1000);
+
+  // ==========================
+  // Bộ lọc
+  // ==========================
+
+  const filterButtons = document.querySelectorAll('.filter-row button[data-filter]');
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentFilter = btn.getAttribute('data-filter');
+      renderTasks();
+    });
+  });
+
+  // ==========================
+  // Pomodoro 25–50 phút
+  // ==========================
+
+  let pomodoroDuration = 25 * 60;      // tổng giây
+  let pomodoroRemaining = pomodoroDuration;
+  let pomodoroTimer = null;
+  let pomodoroRunning = false;
+
+  const pomodoroDisplay = document.getElementById('pomodoroDisplay');
+  const pomodoroStatus = document.getElementById('pomodoroStatus');
+
+  function formatSeconds(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function renderPomodoro() {
+    pomodoroDisplay.textContent = formatSeconds(pomodoroRemaining);
+  }
+
+  function setPomodoroDuration(minutes) {
+    pomodoroDuration = minutes * 60;
+    pomodoroRemaining = pomodoroDuration;
+    pomodoroRunning = false;
+    if (pomodoroTimer) {
+      clearInterval(pomodoroTimer);
+      pomodoroTimer = null;
+    }
+    renderPomodoro();
+    pomodoroStatus.textContent = `Đã đặt ${minutes} phút. Bấm Bắt đầu để tập trung.`;
+  }
+
+  function startPomodoro() {
+    if (pomodoroRunning) return;
+    pomodoroRunning = true;
+    pomodoroStatus.textContent = 'Đang tập trung... Đừng chạm điện thoại / mạng xã hội.';
+
+    if (pomodoroTimer) clearInterval(pomodoroTimer);
+
+    pomodoroTimer = setInterval(() => {
+      if (pomodoroRemaining > 0) {
+        pomodoroRemaining--;
+        renderPomodoro();
+        if (pomodoroRemaining <= 0) {
+          clearInterval(pomodoroTimer);
+          pomodoroTimer = null;
+          pomodoroRunning = false;
+          pomodoroStatus.textContent = 'Hoàn thành! Nghỉ 5 phút rồi bắt đầu phiên mới.';
+          const minutes = pomodoroDuration / 60;
+          sendNotification('Hết phiên tập trung', `Bạn vừa hoàn thành ${minutes} phút tập trung. Nghỉ một chút nhé.`);
+        }
+      }
+    }, 1000);
+  }
+
+  function pausePomodoro() {
+    if (!pomodoroRunning) return;
+    pomodoroRunning = false;
+    if (pomodoroTimer) {
+      clearInterval(pomodoroTimer);
+      pomodoroTimer = null;
+    }
+    pomodoroStatus.textContent = 'Đã tạm dừng. Khi sẵn sàng, bấm Bắt đầu lại.';
+  }
+
+  function resetPomodoro() {
+    pomodoroRemaining = pomodoroDuration;
+    pomodoroRunning = false;
+    if (pomodoroTimer) {
+      clearInterval(pomodoroTimer);
+      pomodoroTimer = null;
+    }
+    renderPomodoro();
+    pomodoroStatus.textContent = 'Đã reset. Bấm Bắt đầu để bắt đầu lại phiên tập trung.';
+  }
+
+  document.getElementById('pomodoro25Btn').addEventListener('click', () => setPomodoroDuration(25));
+  document.getElementById('pomodoro50Btn').addEventListener('click', () => setPomodoroDuration(50));
+  document.getElementById('pomodoroStartBtn').addEventListener('click', startPomodoro);
+  document.getElementById('pomodoroPauseBtn').addEventListener('click', pausePomodoro);
+  document.getElementById('pomodoroResetBtn').addEventListener('click', resetPomodoro);
+
+  // Khởi tạo hiển thị ban đầu
+  renderPomodoro();
+
+  // ==========================
+  // Khởi tạo chung
+  // ==========================
+
+  loadTasks();
+  renderTasks();
+
+</script>
+</body>
+</html>
