@@ -429,6 +429,10 @@
         <label for="startTime">Giờ bắt đầu</label>
         <input type="time" id="startTime" required>
       </div>
+      <div>
+        <label for="endTime">Giờ kết thúc</label>
+        <input type="time" id="endTime">
+      </div>
       <div class="reward-dropdown">
         <label style="font-size: 0.75rem; font-weight: 600; color: #555; display: block; margin-bottom: 4px;">🏆 Phần thưởng</label>
         <button type="button" class="reward-trigger" id="rewardTrigger">Chọn phần thưởng</button>
@@ -443,10 +447,6 @@
             <input type="text" id="customRewardInput" placeholder="Hoặc nhập phần thưởng khác..." style="width: 100%;">
           </div>
         </div>
-      </div>
-      <div>
-        <label for="endTime">Giờ kết thúc</label>
-        <input type="time" id="endTime">
       </div>
       <div>
         <label for="reminder">Nhắc trước (phút)</label>
@@ -586,8 +586,8 @@
         '<th>Công việc</th>' +
         '<th>Ngày</th>' +
         '<th>Bắt đầu</th>' +
-        '<th>🏆</th>' +
         '<th>Kết thúc</th>' +
+        '<th>🏆</th>' +
         '<th>Nhắc trước</th>' +
         '<th>Trạng thái</th>' +
         '<th>Hành động</th>' +
@@ -630,12 +630,12 @@
           </td>
           <td>${t.date || '-'}</td>
           <td>${t.startTime || '-'}</td>
+          <td>${t.endTime || '-'}</td>
           <td>
             <div style="font-size: 0.75rem; text-align: center; padding: 2px 4px; background: #f0f0f0; border-radius: 4px; cursor: help;" title="${t.reward || 'Chưa chọn'}">
               ${t.reward ? t.reward.substring(0, 10) + (t.reward.length > 10 ? '...' : '') : '-'}
             </div>
           </td>
-          <td>${t.endTime || '-'}</td>
           <td>${t.reminderMinutes} phút</td>
           <td>
             <span class="status-dot ${statusClass}"></span>${statusLabel}
