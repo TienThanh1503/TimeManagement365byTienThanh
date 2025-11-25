@@ -84,6 +84,34 @@
       font-weight: 500;
     }
 
+        /* --- CẬP NHẬT CSS CHO CỘT HÀNH ĐỘNG --- */
+    .task-actions {
+      display: flex;
+      gap: 4px; /* Khoảng cách giữa các nút */
+      justify-content: center;
+    }
+
+    /* Chỉnh lại nút nhỏ để chứa icon */
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      padding: 0 !important;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-start {
+      background: #eab308; /* Màu vàng cam */
+      color: white;
+      box-shadow: 0 2px 5px rgba(234, 179, 8, 0.3);
+    }
+    .btn-start:hover { background: #ca8a04; }
     .clock {
       font-weight: 800;
       font-size: clamp(0.9rem, 3vw, 1.2rem);
@@ -341,33 +369,38 @@
       50% { transform: translate(20px, 20px); }
     }
 
+        /* --- FORM 3 DÒNG (ĐÃ FIX) --- */
+        form {
+          display: grid;
+          grid-template-columns: repeat(12, 1fr); /* Đổi sang 12 cột */
+          gap: 16px;
+          align-items: end;
+          padding: 4px;
+        }
 
-      form {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr); /* Chia lưới 12 phần */
-        gap: 12px 16px;
-        align-items: end;
-      }
+        /* Dòng 1: Tên công việc (tràn hết bề ngang) */
+        form > div:nth-child(1) { grid-column: span 12; } 
 
-      /* Dòng 1 */
-      form > div:nth-child(1) { grid-column: span 5; } /* Tên công việc rộng 5/12 */
-      form > div:nth-child(2) { grid-column: span 3; } /* Ngày */
-      form > div:nth-child(3) { grid-column: span 2; } /* Bắt đầu */
-      form > div:nth-child(4) { grid-column: span 2; } /* Kết thúc */
+        /* Dòng 2: Ngày - Bắt đầu - Kết thúc */
+        form > div:nth-child(2) { grid-column: span 4; } 
+        form > div:nth-child(3) { grid-column: span 4; } 
+        form > div:nth-child(4) { grid-column: span 4; } 
 
-      /* Dòng 2 */
-      form > div:nth-child(5) { grid-column: span 6; } /* Phần thưởng rộng 6/12 -> Hiển thị đủ chữ */
-      form > div:nth-child(6) { grid-column: span 2; } /* Nhắc trước */
-      form > button[type="submit"] { 
-        grid-column: span 4; /* Nút thêm rộng 4/12 */
-        width: 100%;
-      }
+        /* Dòng 3: Phần thưởng - Nhắc trước - Nút Thêm */
+        form > div:nth-child(5) { grid-column: span 5; } 
+        form > div:nth-child(6) { grid-column: span 3; } 
+        form > button[type="submit"] { 
+          grid-column: span 4; 
+          width: 100%;
+          height: 42px; /* Cố định chiều cao nút cho đẹp */
+        }
 
-/* Mobile: Về lại 1 cột dọc */
-@media (max-width: 768px) {
-  form { grid-template-columns: 1fr; }
-  form > div, form > button[type="submit"] { grid-column: span 1; }
-}
+        /* Mobile: Quay về 1 cột */
+        @media (max-width: 768px) {
+          form { grid-template-columns: 1fr; gap: 10px; }
+          form > div, form > button[type="submit"] { grid-column: span 1 !important; }
+        }
+        /* --------------------------- */
 
     label {
       font-size: clamp(0.65rem, 1.2vw, 0.85rem);
@@ -717,35 +750,6 @@
       transition: var(--transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
       font-weight: 600;
     }
-    /* --- THÊM ĐOẠN NÀY ĐỂ FIX LỆCH VÀ CHIỀU CAO --- */
-
-      /* Ép tất cả input và nút cao bằng nhau (42px) */
-      form input, 
-      form select,
-      .reward-trigger,
-      form button[type="submit"] {
-        height: 42px !important; 
-        box-sizing: border-box;
-      }
-
-      /* Chỉnh lại nút Reward cho đẹp */
-      .reward-trigger {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between; /* Căn chữ sang trái */
-        background: #fff;
-        border: 2px solid #e5e7eb;
-        border-radius: 10px; /* Bo góc giống input */
-        padding: 0 12px;
-        font-size: 0.9rem;
-        color: #333;
-      }
-
-      .reward-trigger:hover {
-        border-color: #2563eb;
-        background: #f8fafc;
-      }
 
     .reward-trigger:hover {
       border-color: #2563eb;
@@ -1327,8 +1331,909 @@
         backdrop-filter: blur(20px) saturate(180%);
       }
     }
-  </style>
-  </style>
+    /* --- LÀM ĐẸP FORM INPUT (DÁN VÀO CUỐI THẺ STYLE) --- */
+
+    /* 1. Trang trí Label (Tiêu đề ô) */
+    form label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #475569; /* Màu xám đá đậm đà hơn */
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+    }
+    /* Thêm icon nhỏ trước label ngày giờ cho sinh động (tuỳ chọn) */
+    label[for="date"]::before { content: '📅 '; margin-right: 4px; }
+    label[for="startTime"]::before { content: '⏰ '; margin-right: 4px; }
+    label[for="endTime"]::before { content: '🏁 '; margin-right: 4px; }
+
+    /* 2. Trang trí ô nhập liệu (Input) & Nút chọn quà */
+    form input, 
+    form select, 
+    .reward-trigger {
+      background-color: #f8fafc !important; /* Nền xám xanh cực nhạt */
+      border: 1px solid #cbd5e1 !important; /* Viền xám mềm */
+      border-radius: 10px !important; /* Bo góc tròn trịa hơn */
+      color: #334155 !important;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02); /* Đổ bóng siêu nhẹ */
+      transition: all 0.2s ease-in-out !important;
+    }
+
+    /* 3. Hiệu ứng khi bấm vào (Focus) */
+    form input:focus, 
+    form select:focus, 
+    .reward-trigger:focus {
+      background-color: #ffffff !important; /* Chuyển thành nền trắng tinh */
+      border-color: #3b82f6 !important; /* Viền xanh dương sáng */
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important; /* Hiệu ứng Glow lan tỏa */
+      transform: translateY(-1px); /* Nhấc nhẹ lên 1 chút */
+      outline: none;
+    }
+
+    /* 4. Riêng nút Thêm công việc */
+    form button[type="submit"] {
+      background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); /* Gradient tím xanh trendy */
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+    }
+    
+    form button[type="submit"]:hover {
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+      transform: translateY(-2px);
+    }
+    /* ================================================= */
+    /* --- GÓI NÂNG CẤP GIAO DIỆN LUNG LINH (ULTIMATE) --- */
+    /* ================================================= */
+
+    /* 1. Hiệu ứng Kính (Glassmorphism) cho khung chứa */
+    .app {
+      background: rgba(255, 255, 255, 0.85) !important; /* Trong suốt nhẹ */
+      backdrop-filter: blur(20px) !important; /* Làm mờ nền sau */
+      border: 1px solid rgba(255, 255, 255, 0.6) !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important; /* Bóng đổ sâu hơn */
+    }
+
+    /* 2. Hiệu ứng cho các Card (Từng khối nội dung) */
+    .card {
+      background: #ffffff !important;
+      border: none !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important; /* Bóng nổi 3D */
+      transform: translateY(0);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; /* Hiệu ứng nảy */
+    }
+
+    .card:hover {
+      transform: translateY(-5px) !important; /* Bay lên nhẹ khi di chuột */
+      box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1) !important; /* Bóng màu xanh nhẹ */
+    }
+
+    /* 3. Nâng cấp Input (Ô nhập liệu) - Siêu mượt */
+    form input, form select, .reward-trigger {
+      background: #f1f5f9 !important;
+      border: 2px solid transparent !important; /* Ẩn viền đi */
+      transition: all 0.3s ease !important;
+      font-weight: 600 !important;
+    }
+
+    form input:hover, form select:hover, .reward-trigger:hover {
+      background: #e2e8f0 !important; /* Đổi màu nền nhẹ khi lướt qua */
+    }
+
+    form input:focus, form select:focus, .reward-trigger:focus {
+      background: #fff !important;
+      border-color: #6366f1 !important; /* Viền tím mộng mơ */
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2) !important; /* Vòng sáng tỏa ra */
+      transform: scale(1.02) !important; /* Phóng to nhẹ */
+    }
+
+    /* 4. Nút bấm "Thêm công việc" - Hiệu ứng Gradient động */
+    form button[type="submit"] {
+      background: linear-gradient(45deg, #4f46e5, #8b5cf6, #ec4899) !important; /* Gradient 3 màu */
+      background-size: 200% 200% !important;
+      animation: gradientMove 3s ease infinite !important; /* Màu chuyển động liên tục */
+      border-radius: 12px !important;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4) !important;
+      border: none !important;
+      font-weight: 800 !important;
+      letter-spacing: 1px !important;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    form button[type="submit"]:hover {
+      transform: translateY(-3px) scale(1.02) !important;
+      box-shadow: 0 15px 30px rgba(236, 72, 153, 0.5) !important; /* Bóng hồng rực rỡ */
+    }
+
+    form button[type="submit"]:active {
+      transform: scale(0.95) !important; /* Hiệu ứng nhấn xuống */
+    }
+
+    /* 5. Label (Nhãn) - Thêm icon động */
+    form label {
+      color: #334155 !important;
+      font-size: 0.75rem !important;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: color 0.3s;
+    }
+    
+    /* Khi focus vào input, label đổi màu theo */
+    form div:focus-within label {
+      color: #6366f1 !important;
+    }
+
+    /* 6. Phần Gợi ý (Focus Tips) - Làm đẹp */
+    .focus-tips {
+      background: linear-gradient(to right, #eff6ff, #fff) !important;
+      border-left: 4px solid #6366f1 !important;
+      color: #475569 !important;
+      font-style: italic;
+      border-radius: 0 8px 8px 0 !important;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02) !important;
+    }
+    
+    /* 7. Hiệu ứng xuất hiện (Fade In) lúc mới vào trang */
+    .card {
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+    
+    /* Mỗi card xuất hiện chậm hơn card trước 1 chút */
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* ================================================= */
+    /* --- FIX LỖI MENU BỊ CHE (DÁN VÀO CUỐI CÙNG) --- */
+    /* ================================================= */
+
+    /* 1. Đưa cụm dropdown lên lớp cao nhất trong form */
+    .reward-dropdown {
+      position: relative;
+      z-index: 100 !important; 
+    }
+
+    /* 2. Menu xổ xuống phải nằm trên tất cả mọi thứ */
+    .reward-menu {
+      z-index: 9999 !important;
+      position: absolute;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; /* Bóng đổ đậm cho nổi */
+    }
+
+    /* 3. QUAN TRỌNG: Sửa lỗi xếp chồng của Card */
+    .card {
+      overflow: visible !important; /* Cho phép menu trồi ra khỏi khung */
+      transform: none !important; /* Tắt transform tĩnh để không bị nhốt menu */
+      z-index: 1;
+    }
+
+    /* 4. Chỉ bật hiệu ứng bay lên + nổi lên trên khi di chuột */
+    .card:hover {
+      transform: translateY(-5px) !important;
+      z-index: 50 !important; /* Khi di chuột, card này sẽ đè lên card khác */
+      position: relative;
+    }
+    /* ================================================= */
+    /* --- HIỆU ỨNG HOVER: CHỈ CHUỘT VÀO LÀ "BAY" --- */
+    /* ================================================= */
+
+    /* Áp dụng cho: Ô nhập liệu, Menu chọn, Nút chọn quà */
+    form input:hover, 
+    form select:hover, 
+    .reward-trigger:hover {
+      background-color: #ffffff !important;       /* Chuyển sang nền trắng tinh */
+      border-color: #6366f1 !important;           /* Viền chuyển màu tím */
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2) !important; /* Bóng đổ màu tím nhạt tạo độ sâu */
+      transform: translateY(-3px) scale(1.02) !important; /* Bay lên 3px và phóng to nhẹ */
+      z-index: 50; /* Đảm bảo nó nổi lên trên các ô bên cạnh */
+      cursor: text;
+    }
+
+    /* Riêng nút chọn quà thì hiện con trỏ tay */
+    .reward-trigger:hover {
+      cursor: pointer;
+    }
+
+    /* Hiệu ứng mượt mà khi di chuột ra/vào */
+    form input, form select, .reward-trigger {
+      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    }
+    /* ================================================= */
+    /* --- ĐỒNG BỘ GIAO DIỆN CHO "NHIỆM VỤ QUAN TRỌNG" --- */
+    /* ================================================= */
+
+    /* 1. Ô nhập liệu (Input) - Áp dụng hiệu ứng bay và phát sáng */
+    .important-tasks-form input {
+      background: #f1f5f9 !important;
+      border: 2px solid transparent !important;
+      border-radius: 10px !important;
+      transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+      font-weight: 600 !important;
+      height: 44px !important; /* Tăng chiều cao chút cho đẹp */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Khi di chuột vào ô nhập */
+    .important-tasks-form input:hover {
+      background: #ffffff !important;
+      border-color: #6366f1 !important;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2) !important;
+      transform: translateY(-3px) scale(1.02) !important;
+      z-index: 50;
+    }
+
+    /* Khi bấm gõ chữ */
+    .important-tasks-form input:focus {
+      background: #fff !important;
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2) !important;
+      outline: none;
+    }
+
+    /* 2. Nút "Thêm" (+ Thêm) - Áp dụng màu Gradient động */
+    .important-tasks-form button {
+      background: linear-gradient(45deg, #4f46e5, #8b5cf6, #ec4899) !important;
+      background-size: 200% 200% !important;
+      animation: gradientMove 3s ease infinite !important;
+      border-radius: 12px !important;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4) !important;
+      border: none !important;
+      font-weight: 800 !important;
+      color: white !important;
+      height: 44px !important; /* Cân bằng chiều cao với ô nhập */
+      padding: 0 24px !important;
+      transition: all 0.3s ease !important;
+    }
+
+    /* Khi di chuột vào nút */
+    .important-tasks-form button:hover {
+      transform: translateY(-3px) scale(1.05) !important;
+      box-shadow: 0 15px 30px rgba(236, 72, 153, 0.5) !important;
+    }
+
+    /* Căn chỉnh lại khoảng cách cho đẹp */
+    .important-tasks-form {
+      gap: 12px !important;
+      padding: 4px;
+    }
+    /* ================================================= */
+    /* --- NÂNG CẤP POMODORO: PHONG CÁCH "FOCUS MODE" --- */
+    /* ================================================= */
+
+    /* 1. Khung chứa chính: Đổi nền trắng thành Gradient Tím-Hồng cực chất */
+    .card-pomodoro {
+      background: linear-gradient(135deg, #2e1065 0%, #7c3aed 50%, #db2777 100%) !important;
+      border: none !important;
+      box-shadow: 0 20px 50px rgba(124, 58, 237, 0.4) !important; /* Bóng tím tỏa ra */
+      color: white !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 2. Hiệu ứng nền động (Animation) */
+    .card-pomodoro::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+      animation: rotateBg 10s linear infinite; /* Xoay vòng tròn ánh sáng */
+    }
+
+    @keyframes rotateBg {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* 3. Tiêu đề Card */
+    .card-pomodoro .card-title {
+      color: rgba(255, 255, 255, 0.9) !important;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9rem !important;
+      position: relative; z-index: 2;
+    }
+
+    /* 4. Số đồng hồ to đùng: Làm hiệu ứng Neon sáng rực */
+    .pomodoro-display {
+      font-size: 4.5rem !important; /* To hơn nữa */
+      font-weight: 900 !important;
+      color: #fff !important;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 20, 147, 0.8) !important; /* Đổ bóng Neon hồng */
+      margin: 10px 0 20px 0 !important;
+      position: relative; z-index: 2;
+      font-family: 'Courier New', monospace !important; /* Phông chữ số điện tử */
+    }
+
+    /* 5. Dòng trạng thái nhỏ bên dưới */
+    .pomodoro-status {
+      color: rgba(255, 255, 255, 0.8) !important;
+      font-style: italic;
+      font-weight: 500;
+      position: relative; z-index: 2;
+    }
+
+    /* 6. Các nút điều khiển: Làm kiểu "Kính mờ" (Glass) trên nền tối */
+    .pomodoro-controls button {
+      background: rgba(255, 255, 255, 0.15) !important;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      color: white !important;
+      border-radius: 50px !important; /* Bo tròn viên thuốc */
+      padding: 8px 16px !important;
+      font-weight: 600 !important;
+      transition: all 0.3s ease !important;
+      box-shadow: none !important;
+      position: relative; z-index: 2;
+    }
+
+    /* Riêng nút Bắt đầu (Play) cho nổi nhất */
+    .pomodoro-controls #pomodoroStartBtn {
+      background: #fff !important;
+      color: #db2777 !important; /* Chữ màu hồng đậm */
+      font-weight: 800 !important;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
+    }
+
+    /* Hiệu ứng khi di chuột vào nút */
+    .pomodoro-controls button:hover {
+      transform: translateY(-3px) scale(1.1);
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .pomodoro-controls #pomodoroStartBtn:hover {
+      background: #fff !important;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.8) !important;
+    }
+    /* ================================================= */
+    /* --- FIX LỖI TRÀN NỀN & ẨN NÚT PAUSE CŨ --- */
+    /* ================================================= */
+
+    /* 1. Nhốt hiệu ứng xoay vào trong khung, không cho tràn ra */
+    .card-pomodoro {
+      overflow: hidden !important; /* Cắt bỏ phần thừa */
+      position: relative !important;
+      z-index: 1; /* Đảm bảo thứ tự xếp chồng đúng */
+    }
+
+    /* 2. Ẩn nút Tạm dừng cũ đi (vì ta sẽ dùng nút Bắt đầu để làm việc này) */
+    #pomodoroPauseBtn {
+      display: none !important;
+    }
+
+    /* 3. Nút Bắt đầu khi biến thành Tạm dừng (đổi màu cho dễ nhận biết) */
+    #pomodoroStartBtn.is-running {
+      background: rgba(255, 255, 255, 0.2) !important;
+      color: #fff !important;
+      box-shadow: none !important;
+      border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    #pomodoroStartBtn.is-running:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+    }
+    /* ================================================= */
+    /* --- NÂNG CẤP BẢNG DANH SÁCH (TABLE ULTIMATE) --- */
+    /* ================================================= */
+
+    /* 1. Tùy chỉnh thanh cuộn (Scrollbar) cho đẹp và gọn */
+    div[style*="overflow-x: auto"]::-webkit-scrollbar {
+      height: 8px; /* Thanh ngang nhỏ lại */
+      width: 8px;
+    }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+      background: #f1f5f9; /* Màu nền thanh cuộn */
+      border-radius: 4px;
+    }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+      background: #cbd5e1; /* Màu thanh kéo */
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8; /* Đậm hơn khi di chuột */
+    }
+
+    /* 2. Làm đẹp tiêu đề bảng (Header) */
+    table thead th {
+      background-color: #f8fafc !important; /* Màu xám xanh rất nhạt */
+      color: #64748b !important;
+      font-weight: 800 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e2e8f0 !important;
+      padding: 16px !important; /* Tăng khoảng cách cho thoáng */
+    }
+
+    /* 3. Làm đẹp từng dòng (Row) */
+    table tbody tr {
+      background: white;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* Hiệu ứng khi di chuột vào dòng */
+    table tbody tr:hover {
+      background-color: #fff !important;
+      transform: scale(1.01) !important; /* Phóng to nhẹ */
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important; /* Nổi lên 3D */
+      z-index: 10;
+      position: relative;
+      border-radius: 8px;
+    }
+
+    /* 4. Các ô dữ liệu (Cell) */
+    table td {
+      padding: 14px 16px !important; /* Thoáng hơn */
+      color: #334155;
+      font-weight: 500;
+      font-size: 0.9rem !important;
+    }
+
+    /* 5. Làm đẹp các nhãn trạng thái (Badge) */
+    .badge {
+      padding: 6px 12px !important;
+      border-radius: 30px !important; /* Bo tròn như viên thuốc */
+      font-size: 0.7rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    /* Chỉnh màu badge Đang thực hiện cho đẹp hơn */
+    .badge-in-progress {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%) !important;
+      color: #4338ca !important;
+      border: 1px solid #a5b4fc !important;
+    }
+    
+    .badge-done {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+        color: #166534 !important;
+    }
+
+    /* 6. Làm đẹp các nút Lọc (Filter Buttons) ở trên */
+    .filter-row button {
+      border-radius: 20px !important; /* Bo tròn */
+      padding: 6px 16px !important;
+      background: #fff !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #64748b !important;
+      font-weight: 600 !important;
+      transition: all 0.2s;
+    }
+
+    .filter-row button:hover {
+      background: #eff6ff !important;
+      color: #2563eb !important;
+      border-color: #bfdbfe !important;
+      transform: translateY(-2px);
+    }
+
+    /* Tiêu đề phần "Công việc đã lên lịch" */
+    .tasks-header h2 {
+        font-size: 1.2rem !important;
+        font-weight: 800 !important;
+        background: linear-gradient(90deg, #1e293b, #475569);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+    /* ================================================= */
+    /* --- FIX LỖI HIỂN THỊ & LÀM ĐẸP NÚT BẤM (FINAL) --- */
+    /* ================================================= */
+
+    /* --- 1. FIX LỖI PHẦN THƯỞNG BỊ CẮT CHỮ --- */
+
+    /* 1.1. Tại ô chọn trên Form (reward-trigger) */
+    .reward-trigger {
+      white-space: normal !important; /* Cho phép xuống dòng */
+      text-overflow: clip !important; /* Bỏ dấu ... đi */
+      height: auto !important; /* Chiều cao tự động giãn */
+      min-height: 42px; /* Đảm bảo tối thiểu bằng các ô khác */
+      display: flex !important;
+      align-items: center;
+      padding: 8px 12px !important; /* Căn chỉnh lại lề */
+      line-height: 1.3; /* Giãn dòng cho dễ đọc nếu có 2 dòng */
+    }
+
+    /* 1.2. Tại cột Phần thưởng trong Bảng */
+    /* Tìm đến thẻ div bên trong cột thứ 5 (cột phần thưởng) */
+    table tbody tr td:nth-child(5) div {
+      white-space: normal !important; /* Cho phép xuống dòng */
+      word-break: break-word; /* Ngắt từ nếu quá dài */
+      max-width: 100%; 
+      text-align: left !important; /* Canh trái cho đẹp */
+      padding: 6px 10px !important; /* Tăng khoảng cách */
+      background: #f1f5f9 !important; /* Nền xám đẹp hơn */
+      border-radius: 8px !important; /* Bo góc mềm mại */
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; /* Đổ bóng nhẹ */
+      display: inline-block; /* Để box co giãn theo nội dung */
+    }
+
+
+    /* --- 2. LÀM ĐẸP NÚT HÀNH ĐỘNG (▶ ✓ ✕) LUNG LINH --- */
+
+    /* Kiểu dáng chung cho nút tròn */
+    .btn-small {
+      width: 38px !important; /* To hơn chút cho dễ bấm */
+      height: 38px !important;
+      border-radius: 50% !important; /* Hình tròn hoàn hảo */
+      font-size: 1.2rem !important; /* Icon to rõ */
+      border: none !important;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      /* Hiệu ứng nảy khi di chuột rất mượt */
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Hiệu ứng khi di chuột vào nút */
+    .btn-small:hover {
+      transform: scale(1.15) rotate(5deg) !important; /* Phóng to và xoay nhẹ */
+      filter: brightness(1.1); /* Sáng hơn chút */
+    }
+
+    /* Màu sắc và hiệu ứng phát sáng (Glow) riêng cho từng nút */
+
+    /* Nút Bắt đầu (Vàng cam) */
+    .btn-start {
+      background: linear-gradient(135deg, #fbbf24, #d97706) !important;
+      box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5) !important; /* Glow vàng */
+    }
+
+    /* Nút Hoàn thành (Xanh lá) */
+    .btn-success {
+      background: linear-gradient(135deg, #34d399, #059669) !important;
+      box-shadow: 0 4px 15px rgba(52, 211, 153, 0.5) !important; /* Glow xanh lá */
+    }
+
+    /* Nút Xóa (Đỏ) */
+    .btn-danger {
+      background: linear-gradient(135deg, #f87171, #dc2626) !important;
+      box-shadow: 0 4px 15px rgba(248, 113, 113, 0.5) !important; /* Glow đỏ */
+    }
+        /* ================================================= */
+    /* --- FIX LỖI Ô PHẦN THƯỞNG BỊ BÉ (FINAL V2) --- */
+    /* ================================================= */
+
+    /* 1. Ép cột thứ 5 trong bảng phải tự giãn nở, không được cố định 90px nữa */
+    table td:nth-child(5) {
+      width: auto !important; 
+      min-width: 120px; /* Đảm bảo độ rộng tối thiểu */
+      max-width: 250px; /* Không cho to quá mức */
+      white-space: normal !important;
+    }
+
+    /* 2. Trang trí cái hộp reward-box mới tạo */
+    .reward-box {
+      background: #f1f5f9;
+      color: #334155;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      text-align: left; /* Canh trái cho dễ đọc */
+      display: inline-block;
+      width: 100%;
+      
+      /* Xử lý xuống dòng mượt mà */
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+      
+      /* Đổ bóng nhẹ cho đẹp */
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+    /* ================================================= */
+    /* --- FIX LỖI NÚT BỊ BIẾN THÀNH HÌNH TRÒN (FIX GẤP) --- */
+    /* ================================================= */
+
+    /* 1. Trả lại hình dáng dài (Viên thuốc) cho nút Pomodoro và Bộ lọc */
+    .pomodoro-controls button,
+    .filter-row button {
+      width: auto !important; /* Tự động giãn theo độ dài chữ */
+      height: auto !important;
+      min-height: 36px;
+      border-radius: 50px !important; /* Bo tròn kiểu viên thuốc */
+      padding: 6px 20px !important; /* Cách lề rộng rãi để hiện hết chữ */
+      aspect-ratio: auto !important; /* Bỏ tỉ lệ hình vuông */
+      
+      /* Căn chỉnh chữ */
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem !important;
+    }
+
+    /* 2. Chỉ ép hình tròn cho các nút Hành động (trong bảng) thôi */
+    .task-actions .btn-small {
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 50% !important;
+      padding: 0 !important;
+    }
+    
+    /* 3. Riêng nút Bắt đầu to đùng của Pomodoro */
+    #pomodoroStartBtn {
+        padding: 10px 30px !important;
+        font-size: 1.1rem !important;
+    }
+    /* ================================================= */
+    /* --- FIX LỖI NÚT POMODORO BỊ TO VÀ NGHIÊNG --- */
+    /* ================================================= */
+
+    /* 1. Thiết lập chung cho cả 4 nút trong khu vực Pomodoro */
+    .pomodoro-controls button {
+      /* Kích thước gọn gàng hơn */
+      height: 38px !important; 
+      padding: 0 16px !important;
+      font-size: 0.9rem !important;
+      min-width: 80px !important; /* Đảm bảo độ rộng tối thiểu */
+      
+      /* TẮT HIỆU ỨNG XOAY/NGHIÊNG */
+      transform: none !important; 
+      rotate: 0deg !important;
+      
+      /* Căn chỉnh */
+      margin: 0 4px !important; /* Khoảng cách giữa các nút */
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50px !important; /* Bo tròn viên thuốc */
+    }
+
+    /* 2. Riêng nút "Bắt đầu/Tạm dừng" (Nút chính giữa) */
+    #pomodoroStartBtn {
+      /* Cho to hơn các nút phụ một chút xíu thôi */
+      height: 42px !important;
+      padding: 0 24px !important;
+      font-size: 1rem !important;
+      font-weight: 800 !important;
+      min-width: 120px !important;
+    }
+
+    /* 3. Hiệu ứng khi di chuột (Hover) - CHỈ BAY LÊN NHẸ, KHÔNG NGHIÊNG */
+    .pomodoro-controls button:hover {
+      transform: translateY(-2px) !important; /* Chỉ nhích lên trên 2px */
+      rotate: 0deg !important; /* Tuyệt đối không xoay */
+      scale: 1 !important; /* Không phóng to đùng */
+      filter: brightness(1.1); /* Sáng hơn chút */
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    }
+    /* ================================================= */
+    /* --- FIX CUỐI CÙNG: CHỈNH NÚT THẲNG & GỌN GÀNG --- */
+    /* ================================================= */
+
+    /* 1. Sửa nút Lọc (Filter): Tắt xoay, chỉnh lại padding */
+    .filter-row button {
+      transform: none !important; /* Bắt buộc không xoay */
+      rotate: 0deg !important;
+      margin: 0 4px !important; /* Khoảng cách giữa các nút lọc */
+      padding: 6px 16px !important;
+      height: 32px !important; /* Chiều cao cố định cho gọn */
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Hiệu ứng khi di chuột vào nút lọc (chỉ nổi lên, không xoay) */
+    .filter-row button:hover {
+      transform: translateY(-2px) !important;
+      rotate: 0deg !important;
+    }
+
+    /* 2. Sửa nút Pomodoro: Gọn lại và gần nhau hơn */
+    .pomodoro-controls {
+      gap: 8px !important; /* Kéo các nút lại gần nhau (đang là mặc định browser) */
+      align-items: center !important;
+    }
+
+    .pomodoro-controls button {
+      /* Kích thước chuẩn */
+      min-width: 70px !important; /* Bé lại xíu */
+      height: 36px !important;
+      padding: 0 12px !important; /* Giảm đệm 2 bên */
+      font-size: 0.9rem !important;
+      margin: 0 !important; /* Bỏ margin thừa */
+      
+      /* Tắt xoay tuyệt đối */
+      transform: none !important;
+      rotate: 0deg !important;
+    }
+
+    /* 3. Riêng nút Bắt đầu / Tạm dừng (Nút giữa) */
+    #pomodoroStartBtn {
+      min-width: 100px !important; /* Chỉ to hơn 2 nút kia chút xíu */
+      height: 40px !important;
+      padding: 0 20px !important;
+      font-weight: 700 !important;
+      font-size: 0.95rem !important;
+    }
+
+    /* Khi di chuột vào nút Pomodoro (Chỉ bay lên, cấm xoay) */
+    .pomodoro-controls button:hover {
+      transform: translateY(-2px) !important;
+      rotate: 0deg !important; 
+    }
+    /* ================================================= */
+    /* --- FIX LỖI POPUP KHÔNG HIỆN (Z-INDEX CAO NHẤT) --- */
+    /* ================================================= */
+    .notice-modal {
+      z-index: 2147483647 !important; /* Số lớn nhất hệ mặt trời để đè tất cả */
+      background: rgba(0, 0, 0, 0.6) !important;
+      backdrop-filter: blur(5px);
+    }
+
+    .notice-modal-content {
+      z-index: 2147483648 !important;
+      background: #fff !important;
+      transform: scale(1) !important; /* Reset hiệu ứng méo nếu có */
+      position: relative !important;
+    }
+    
+    /* Quan trọng: Để hiển thị được */
+    .notice-modal.show {
+        display: flex !important;
+    }
+    /* ================================================= */
+    /* --- FIX DANH SÁCH CUỘN DỌC & GHIM TIÊU ĐỀ --- */
+    /* ================================================= */
+
+    /* 1. Tạo khung chứa có thanh cuộn */
+    .table-wrapper {
+      max-height: 400px; /* Chiều cao cố định (khoảng 4-5 dòng) */
+      overflow-y: auto;  /* Cho phép cuộn dọc */
+      overflow-x: auto;  /* Cho phép cuộn ngang trên mobile */
+      border-radius: 12px;
+      box-shadow: inset 0 -10px 20px -10px rgba(0,0,0,0.05); /* Bóng mờ phía dưới */
+      border: 1px solid #e5e7eb;
+      background: #fff;
+    }
+
+    /* 2. GHIM TIÊU ĐỀ (Sticky Header) - Để khi cuộn tiêu đề không bị mất */
+    table thead th {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 20 !important; /* Đè lên nội dung khi cuộn */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Bóng nhẹ ngăn cách */
+      background-color: #f8fafc !important; /* Màu nền đục để che chữ trôi qua */
+    }
+
+    /* 3. Làm đẹp thanh cuộn riêng cho bảng này */
+    .table-wrapper::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .table-wrapper::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    /* ================================================= */
+    /* --- BỘ LỌC NÂNG CAO (FILTER DROPDOWN) --- */
+    /* ================================================= */
+
+    .filter-container {
+      position: relative;
+      margin-bottom: 12px;
+      z-index: 200; /* Đảm bảo menu đè lên bảng */
+    }
+
+    /* Nút mở bộ lọc */
+    .filter-toggle-btn {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-weight: 700;
+      color: #475569;
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .filter-toggle-btn:hover, .filter-toggle-btn.active {
+      background: #eff6ff; border-color: #3b82f6; color: #2563eb;
+    }
+
+    /* Khung Menu Lọc (Ẩn/Hiện) */
+    .filter-dropdown {
+      display: none; /* Mặc định ẩn */
+      position: absolute;
+      top: 110%; left: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.5);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 500px;
+      animation: slideDownFilter 0.3s ease;
+    }
+    .filter-dropdown.show { display: block; }
+
+    @keyframes slideDownFilter {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Bố cục 2 cột bên trong */
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    /* Mobile thì dồn về 1 cột */
+    @media (max-width: 600px) {
+        .filter-grid { grid-template-columns: 1fr; gap: 16px; }
+    }
+
+    .filter-column h4 {
+      margin: 0 0 12px 0; font-size: 0.85rem; text-transform: uppercase; color: #94a3b8;
+    }
+
+    /* Các nút chọn (Chips) */
+    .filter-options { display: flex; flex-direction: column; gap: 8px; }
+    
+    .filter-chip {
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      text-align: left;
+    }
+    .filter-chip:hover { background: #e2e8f0; }
+    
+    /* Trạng thái được chọn */
+    .filter-chip.active {
+      background: #eff6ff;
+      color: #2563eb;
+      border-color: #bfdbfe;
+      font-weight: 700;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+    }
+    .filter-chip.active::before { content: '✓ '; }
+
+    /* Input chọn ngày cụ thể */
+    .specific-date-wrapper { display: flex; flex-direction: column; gap: 4px; }
+    #filterSpecificDate {
+      height: 36px; padding: 4px 8px; font-size: 0.85rem;
+      border: 1px solid #cbd5e1; border-radius: 6px;
+    }
+  </style>  
 </head>
 <body>
 <div class="app">
@@ -1345,6 +2250,7 @@
   </div>
 
   <!-- NOTIFICATION MODAL -->
+   
   <div id="noticeModal" class="notice-modal">
     <div class="notice-modal-content">
       <button class="notice-close-btn" id="noticeCloseBtn">✕</button>
@@ -1353,6 +2259,7 @@
       <div id="noticeButtonGroup" class="notice-button-group"></div>
     </div>
   </div>
+  
 
   <!-- FORM THÊM CÔNG VIỆC -->
   <section class="card">
@@ -1375,8 +2282,8 @@
         <input type="time" id="endTime">
       </div>
       <div class="reward-dropdown">
-      <label>🏆 Phần thưởng</label> 
-      <button type="button" class="reward-trigger" id="rewardTrigger">Chọn phần thưởng ▾</button>
+        <label style="font-size: 0.75rem; font-weight: 600; color: #555; display: block; margin-bottom: 4px;">🏆 Phần thưởng</label>
+        <button type="button" class="reward-trigger" id="rewardTrigger">Chọn phần thưởng</button>
         <div class="reward-menu" id="rewardMenu">
           <div class="reward-menu-item" data-reward="🎮 Chơi 1 ván game">🎮 Chơi 1 ván game</div>
           <div class="reward-menu-item" data-reward="☕ Nghỉ 10 phút">☕ Nghỉ 10 phút</div>
@@ -1424,24 +2331,48 @@
     </div>
   </section>
 
-  <!-- TOP TASKS NGÀY HÔM NAY -->
-  <section class="card">
-    <div class="card-title">⭐ Top nhiệm vụ hôm nay</div>
-    <div class="top-tasks-container" id="topTasksContainer"></div>
-  </section>
-
   <!-- DANH SÁCH CÔNG VIỆC -->
   <section class="card">
     <div class="tasks-header">
       <h2>Công việc đã lên lịch</h2>
       <small id="taskSummary"></small>
     </div>
-    <div class="filter-row">
-      <span>Lọc:</span>
-      <button class="btn-small btn-outline" data-filter="today">Hôm nay</button>
-      <button class="btn-small btn-outline" data-filter="all">Tất cả</button>
-      <button class="btn-small btn-outline" data-filter="pending">Chưa xong</button>
-      <button class="btn-small btn-outline" data-filter="done">Đã xong</button>
+    <div class="filter-container">
+      <button id="filterToggleBtn" class="filter-toggle-btn">
+        ⚡ Bộ lọc công việc
+        <span id="activeFilterCount" class="filter-badge" style="display:none">0</span>
+      </button>
+      
+      <div id="filterDropdown" class="filter-dropdown">
+        <div class="filter-grid">
+          
+          <div class="filter-column">
+            <h4>📅 Thời gian</h4>
+            <div class="filter-options" id="dateFilters">
+              <label class="filter-chip active" data-val="today">Hôm nay</label>
+              <label class="filter-chip" data-val="week">Tuần này</label>
+              <label class="filter-chip" data-val="month">Tháng này</label>
+              <label class="filter-chip" data-val="all">Tất cả</label>
+              
+              <div class="specific-date-wrapper">
+                <label class="filter-chip" data-val="specific">Ngày cụ thể:</label>
+                <input type="date" id="filterSpecificDate" disabled>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-column">
+            <h4>🚩 Trạng thái</h4>
+            <div class="filter-options" id="statusFilters">
+              <label class="filter-chip active" data-val="all">Tất cả</label>
+              <label class="filter-chip" data-val="pending">Chưa làm</label>
+              <label class="filter-chip" data-val="in-progress">Đang làm</label>
+              <label class="filter-chip" data-val="done">Đã xong</label>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
     <div id="tasksContainer"></div>
   </section>
@@ -1529,41 +2460,173 @@
   // ==========================
 
   let currentFilter = 'today';
+  /* ============================================================ */
+  /* --- 3. LOGIC XỬ LÝ BỘ LỌC (DÁN CÁI NÀY VÀO ĐỂ NÚT CHẠY) --- */
+  /* ============================================================ */
+  
+  // 1. Cấu hình mặc định
+  let filterConfig = {
+    dateType: 'today', 
+    dateValue: todayStr(), 
+    status: 'all' 
+  };
 
+  // 2. Lấy các phần tử từ HTML
+  const filterToggleBtn = document.getElementById('filterToggleBtn');
+  const filterDropdown = document.getElementById('filterDropdown');
+  const dateOptions = document.querySelectorAll('#dateFilters .filter-chip');
+  const statusOptions = document.querySelectorAll('#statusFilters .filter-chip');
+  const specificDateInput = document.getElementById('filterSpecificDate');
+
+  // 3. Bắt sự kiện Click nút "Bộ lọc"
+  if (filterToggleBtn) {
+      filterToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Chặn sự kiện lan ra ngoài
+        filterDropdown.classList.toggle('show'); // Bật/tắt menu
+        filterToggleBtn.classList.toggle('active');
+      });
+  }
+
+  // 4. Đóng menu khi click ra ngoài
+  document.addEventListener('click', (e) => {
+    if (filterDropdown && filterToggleBtn) {
+        if (!filterDropdown.contains(e.target) && e.target !== filterToggleBtn) {
+            filterDropdown.classList.remove('show');
+            filterToggleBtn.classList.remove('active');
+        }
+    }
+  });
+
+  // 5. Xử lý chọn Thời gian (Hôm nay, Tuần này...)
+  if (dateOptions) {
+      dateOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            const val = opt.dataset.val;
+            if (val === 'specific') return; // Nếu chọn ngày cụ thể thì bỏ qua ở đây
+
+            // Đổi màu nút đang chọn
+            dateOptions.forEach(d => d.classList.remove('active'));
+            opt.classList.add('active');
+            if(specificDateInput) specificDateInput.disabled = true;
+
+            // Cập nhật cấu hình và vẽ lại bảng
+            filterConfig.dateType = val;
+            renderTasks();
+        });
+      });
+  }
+
+  // 6. Xử lý chọn Ngày cụ thể (Input Date)
+  const specificLabel = document.querySelector('.filter-chip[data-val="specific"]');
+  if (specificLabel && specificDateInput) {
+      specificLabel.addEventListener('click', () => {
+          dateOptions.forEach(d => d.classList.remove('active'));
+          specificLabel.classList.add('active');
+          specificDateInput.disabled = false;
+          specificDateInput.focus();
+          
+          filterConfig.dateType = 'specific';
+          if(specificDateInput.value) {
+              filterConfig.dateValue = specificDateInput.value;
+              renderTasks();
+          }
+      });
+
+      specificDateInput.addEventListener('change', (e) => {
+          filterConfig.dateValue = e.target.value;
+          renderTasks();
+      });
+  }
+
+  // 7. Xử lý chọn Trạng thái
+  if (statusOptions) {
+      statusOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            statusOptions.forEach(s => s.classList.remove('active'));
+            opt.classList.add('active');
+            
+            filterConfig.status = opt.dataset.val;
+            renderTasks();
+        });
+      });
+  }
+
+  // 8. Các hàm tính toán ngày tháng bổ trợ
+  function isDateInThisWeek(d) {
+    const today = new Date();
+    const currentDay = today.getDay(); 
+    const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1); 
+    const monday = new Date(today.setDate(diff));
+    monday.setHours(0,0,0,0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23,59,59,999);
+    const check = new Date(d);
+    return check >= monday && check <= sunday;
+  }
+
+  function isDateInThisMonth(d) {
+    const today = new Date();
+    const check = new Date(d);
+    return check.getMonth() === today.getMonth() && check.getFullYear() === today.getFullYear();
+  }
+  // --- CẬP NHẬT HÀM RENDER ĐỂ HIỂU BỘ LỌC MỚI ---
   function renderTasks() {
     const container = document.getElementById('tasksContainer');
     if (!tasks.length) {
-      container.innerHTML = '<p class="tasks-empty">Chưa có công việc nào. Hãy tạo ít nhất 1 việc nhỏ cho hôm nay.</p>';
-      document.getElementById('taskSummary').textContent = '';
+      container.innerHTML = '<p class="tasks-empty">Chưa có công việc nào.</p>';
       return;
     }
 
-    const tdy = todayStr();
-    let filtered = tasks.slice();
+    // --- LOGIC LỌC DỮ LIỆU MỚI ---
+    let filtered = tasks.filter(t => {
+        // Lọc thời gian
+        let dateMatch = false;
+        if (filterConfig.dateType === 'all') dateMatch = true;
+        else if (filterConfig.dateType === 'today') dateMatch = t.date === todayStr();
+        else if (filterConfig.dateType === 'specific') dateMatch = t.date === filterConfig.dateValue;
+        else if (filterConfig.dateType === 'week') dateMatch = isDateInThisWeek(t.date);
+        else if (filterConfig.dateType === 'month') dateMatch = isDateInThisMonth(t.date);
 
-    if (currentFilter === 'today') {
-      filtered = filtered.filter(t => t.date === tdy);
-    } else if (currentFilter === 'pending') {
-      filtered = filtered.filter(t => !t.done);
-    } else if (currentFilter === 'done') {
-      filtered = filtered.filter(t => t.done);
-    }
+        // Lọc trạng thái
+        let statusMatch = false;
+        const now = new Date();
+        const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
+        const isOverdue = end && now > end;
 
+        if (filterConfig.status === 'all') statusMatch = true;
+        else if (filterConfig.status === 'done') statusMatch = t.done;
+        else if (filterConfig.status === 'pending') statusMatch = !t.done && !t.started && !isOverdue;
+        else if (filterConfig.status === 'in-progress') statusMatch = t.started && !t.done;
+
+        return dateMatch && statusMatch;
+    });
+
+    // Sắp xếp
     filtered.sort((a, b) => {
       const ad = (a.date || '') + ' ' + (a.startTime || '');
       const bd = (b.date || '') + ' ' + (b.startTime || '');
       return ad.localeCompare(bd);
     });
 
+    // Cập nhật chữ trên nút lọc
+    let filterLabel = "Bộ lọc: ";
+    filterLabel += (filterConfig.dateType === 'today') ? 'Hôm nay' : 
+                   (filterConfig.dateType === 'all') ? 'Tất cả ngày' : 
+                   (filterConfig.dateType === 'week') ? 'Tuần này' : 
+                   (filterConfig.dateType === 'month') ? 'Tháng này' : 'Ngày chọn';
+    
+    if(filterToggleBtn) filterToggleBtn.innerHTML = `⚡ ${filterLabel}`;
+
     if (!filtered.length) {
-      container.innerHTML = '<p class="tasks-empty">Không có công việc phù hợp với bộ lọc hiện tại.</p>';
+      container.innerHTML = '<p class="tasks-empty">Không có công việc phù hợp với bộ lọc.</p>';
     } else {
-      let html = '<div style="overflow-x: auto; -webkit-overflow-scrolling: touch;"><table><thead><tr>' +
+      let html = '<div class="table-wrapper"><table><thead><tr>' +
         '<th>Công việc</th>' +
         '<th>Ngày</th>' +
         '<th>Bắt đầu</th>' +
         '<th>Kết thúc</th>' +
-        '<th>🏆</th>' +
+        '<th>🏆 Phần thưởng</th>' +
         '<th>Nhắc trước</th>' +
         '<th>Trạng thái</th>' +
         '<th>Hành động</th>' +
@@ -1572,116 +2635,44 @@
       const now = new Date();
 
       for (const t of filtered) {
-        const isToday = t.date === tdy;
+        /* --- GIỮ NGUYÊN LOGIC HIỂN THỊ HTML CỦA BẠN Ở ĐÂY --- */
+        /* (Đoạn tạo HTML tr td actionButtons... bạn giữ nguyên như cũ nhé) */
         const start = buildDateTime(t.date, t.startTime);
         const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
+        
+        let statusContent = ''; 
+        if (t.done) statusContent = '<span class="badge badge-done">Đã hoàn thành</span>';
+        else if (t.started) statusContent = '<span class="badge badge-in-progress">ĐANG THỰC HIỆN</span>';
+        else if (end && now > end) statusContent = '<span class="badge badge-late">Quá hạn</span>';
+        else statusContent = '<span class="status-dot status-pending"></span>Chưa bắt đầu';
 
-        let statusLabel = 'Chưa bắt đầu';
-        let statusClass = 'status-pending';
-        let badge = '';
-
-        if (t.done) {
-          statusLabel = 'Đã xong';
-          statusClass = 'status-done';
-          badge = '<span class="badge badge-done">Đã hoàn thành</span>';
-        } else if (end && now > end) {
-          statusLabel = 'Quá hạn';
-          statusClass = 'status-overdue';
-          badge = '<span class="badge badge-late">Quá hạn</span>';
-        } else if (start && now >= start && (!end || now <= end)) {
-          // Đang làm (trong khoảng thời gian bắt đầu đến kết thúc)
-          statusLabel = 'Chưa bắt đầu';
-          statusClass = 'status-in-progress';
-          badge = '';
-        } else if (isToday) {
-          badge = '<span class="badge badge-today">Hôm nay</span>';
+        let actionButtons = '';
+        const isOverdue = end && now > end; 
+        if (!t.done) {
+           if (!isOverdue && !t.started) actionButtons += `<button class="btn-small btn-start" onclick="startTask(${t.id})" title="Bắt đầu">▶</button>`;
+           if (!isOverdue) actionButtons += `<button class="btn-small btn-success" onclick="markDone(${t.id})" title="Hoàn thành">✓</button>`;
         }
-
-        // Tính phần thưởng dựa trên thời lượng công việc
-        let reward = 0;
-        if (start && end) {
-          const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
-          reward = Math.ceil(durationMinutes / 10); // 10 phút = 1 điểm
-        }
-
-        // Chỉ hiển thị nút Xoá nếu chưa xong, ẩn nút Xong nếu đã xong
-        const actionButtons = t.done ? 
-          '' : 
-          `<button class="btn-small btn-success" onclick="markDone(${t.id})">Xong</button>`;
+        actionButtons += `<button class="btn-small btn-danger" onclick="deleteTask(${t.id})" title="Xóa">✕</button>`;
 
         html += `<tr>
-          <td>
-            <div>${t.title}</div>
-            ${badge ? `<div style="margin-top:2px;">${badge}</div>` : ''}
-          </td>
+          <td><div style="font-weight:600; color:#333;">${t.title}</div></td>
           <td>${t.date || '-'}</td>
           <td>${t.startTime || '-'}</td>
           <td>${t.endTime || '-'}</td>
-          <td>
-            <div style="font-size: 0.75rem; text-align: center; padding: 2px 4px; background: #f0f0f0; border-radius: 4px; cursor: help;" title="${t.reward || 'Chưa chọn'}">
-              ${t.reward ? t.reward.substring(0, 10) + (t.reward.length > 10 ? '...' : '') : '-'}
-            </div>
-          </td>
+          <td><div class="reward-box" title="${t.reward || 'Chưa chọn'}">${t.reward || '-'}</div></td>
           <td>${t.reminderMinutes} phút</td>
-          <td>
-            <span class="status-dot ${statusClass}"></span>${statusLabel}
-          </td>
-          <td>
-            <div class="task-actions">
-              ${actionButtons}
-            </div>
-          </td>
+          <td>${statusContent}</td>
+          <td><div class="task-actions">${actionButtons}</div></td>
         </tr>`;
       }
-
       html += '</tbody></table></div>';
       container.innerHTML = html;
     }
-
-    const total = tasks.length;
+    
+    // Cập nhật thống kê
     const doneCount = tasks.filter(t => t.done).length;
-    const pendingToday = tasks.filter(t => t.date === todayStr() && !t.done).length;
-    document.getElementById('taskSummary').textContent =
-      `${doneCount}/${total} đã xong • ${pendingToday} việc hôm nay`;
-    
-    renderTopTasks();
-  }
-
-  function renderTopTasks() {
-    const container = document.getElementById('topTasksContainer');
-    const tdy = todayStr();
-    
-    // Lấy các công việc hôm nay chưa xong, sắp xếp theo giờ bắt đầu
-    let todayTasks = tasks
-      .filter(t => t.date === tdy && !t.done)
-      .sort((a, b) => {
-        const ad = a.startTime || '';
-        const bd = b.startTime || '';
-        return ad.localeCompare(bd);
-      })
-      .slice(0, 3); // Lấy top 3
-    
-    if (!todayTasks.length) {
-      container.innerHTML = '<div class="top-tasks-empty">Không có nhiệm vụ hôm nay. Hãy thêm một công việc để bắt đầu! 🚀</div>';
-      return;
-    }
-    
-    let html = '';
-    todayTasks.forEach((task, index) => {
-      const icon = ['🥇', '🥈', '🥉'][index] || '⭐';
-      const duration = task.endTime ? ` • ${task.startTime} - ${task.endTime}` : ` • Từ ${task.startTime}`;
-      
-      html += `
-        <div class="top-task-card">
-          <div class="top-task-index">${icon} Ưu tiên ${index + 1}</div>
-          <div class="top-task-title">${task.title}</div>
-          <div class="top-task-time">⏰ ${duration}</div>
-          <div class="top-task-reward">🏆 ${task.reward || 'Chưa có phần thưởng'}</div>
-        </div>
-      `;
-    });
-    
-    container.innerHTML = html;
+    const sumEl = document.getElementById('taskSummary');
+    if(sumEl) sumEl.textContent = `Hiển thị: ${filtered.length} / Tổng: ${tasks.length}`;
   }
 
   function markDone(id) {
@@ -1699,7 +2690,79 @@
 
   window.markDone = markDone;
   window.deleteTask = deleteTask;
+  // --- HÀM XỬ LÝ NÚT BẮT ĐẦU ---
+  /* ================================================= */
+  /* ================================================= */
+  /* --- HÀM BẮT ĐẦU (TỰ TẠO POPUP NẾU KHÔNG TÌM THẤY) --- */
+  /* ================================================= */
+  function startTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
 
+    // 1. Cập nhật dữ liệu
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const timeString = `${h}:${m}`;
+
+    tasks = tasks.map(t => {
+      if (t.id === id) {
+        return { 
+          ...t, date: todayStr(), startTime: timeString, done: false, started: true 
+        };
+      }
+      return t;
+    });
+    
+    saveTasks();
+    renderTasks();
+
+    // 2. BIỆN PHÁP MẠNH: Tự tạo Popup bằng JS
+    // Xóa popup cũ nếu có để tránh trùng
+    const oldModal = document.getElementById('dynamic-modal');
+    if (oldModal) oldModal.remove();
+
+    // Tạo HTML cho Popup mới
+    const modalHtml = `
+      <div id="dynamic-modal" style="
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+          z-index: 999999; display: flex; align-items: center; justify-content: center;
+          animation: fadeIn 0.3s;
+      ">
+        <div style="
+            background: white; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            transform: scale(1); animation: popIn 0.3s;
+        ">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🚀</div>
+            <h2 style="margin: 0 0 10px; color: #2563eb;">ĐANG THỰC HIỆN</h2>
+            <div style="background: #f0f9ff; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
+                <div style="font-weight: bold; color: #333; font-size: 1.1rem; margin-bottom: 5px;">
+                    ${task.title}
+                </div>
+                <div style="color: #666; font-size: 0.9rem;">
+                    ⏰ Bắt đầu: <strong>${timeString}</strong><br>
+                    🏁 Dự kiến xong: <strong>${task.endTime || '...'}</strong>
+                </div>
+            </div>
+            <button onclick="document.getElementById('dynamic-modal').remove()" style="
+                background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                color: white; border: none; padding: 12px 30px;
+                border-radius: 50px; font-weight: bold; font-size: 1rem;
+                cursor: pointer; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            ">Đã rõ, chiến thôi!</button>
+        </div>
+      </div>
+    `;
+
+    // Chèn vào cuối body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  }
+  
+  // Đưa hàm ra ngoài
+  window.startTask = startTask;
   // ==========================
   // Xử lý form thêm công việc
   // ==========================
@@ -1779,13 +2842,32 @@
     saveTasks();
     renderTasks();
 
+    // ... (Đoạn code ở trên giữ nguyên) ...
+    
+    tasks.push(newTask);
+    saveTasks();
+    renderTasks();
+
+    /* --- ĐOẠN MỚI: RESET FORM SẠCH SẼ --- */
+    // 1. Xóa trắng các ô nhập liệu chính
     document.getElementById('title').value = '';
     document.getElementById('startTime').value = '';
     document.getElementById('endTime').value = '';
+    
+    // 2. Reset ô Nhắc nhở về mặc định (10 phút)
     document.getElementById('reminder').value = '10';
-    customRewardInput.value = '';
-    selectedReward = '';
-    rewardTrigger.textContent = 'Chọn phần thưởng';
+    
+    // 3. Reset phần Ngày về ngày hôm nay (cho tiện nhập tiếp)
+    document.getElementById('date').value = todayStr();
+
+    // 4. Reset phần Thưởng về trạng thái ban đầu
+    customRewardInput.value = ''; // Xóa ô nhập tay
+    selectedReward = '';          // Xóa biến lưu trữ
+    rewardTrigger.textContent = 'Chọn phần thưởng'; // Reset chữ trên nút chọn
+    /* ----------------------------------- */
+    
+    // (Tùy chọn) Đưa con trỏ chuột quay lại ô Tên công việc để nhập luôn
+    document.getElementById('title').focus();
   });
 
   // ==========================
@@ -1999,29 +3081,57 @@
   // Kiểm tra để gửi thông báo
   // ==========================
 
+  // --- HÀM KIỂM TRA THÔNG BÁO (ĐÃ CẬP NHẬT: BÁO QUÁ HẠN) ---
+  // --- HÀM KIỂM TRA THÔNG BÁO (NHẮC VIỆC & QUÁ HẠN) ---
   function checkNotifications() {
     const now = new Date();
+    let hasChanges = false;
 
     tasks.forEach(task => {
-      if (task.done) return;
-      if (task.notified) return;
+      if (task.done) return; // Xong rồi thì thôi
       if (!task.date || !task.startTime) return;
 
       const start = buildDateTime(task.date, task.startTime);
       if (!start) return;
 
-      const reminderTime = new Date(start.getTime() - task.reminderMinutes * 60000);
+      // 1. LOGIC NHẮC VIỆC (UPCOMING)
+      // Tính thời điểm cần nhắc. Ví dụ: Làm lúc 9:00, nhắc trước 10p -> Nhắc lúc 8:50
+      const reminderMinutes = task.reminderMinutes || 0;
+      const reminderTime = new Date(start.getTime() - reminderMinutes * 60000);
+      
+      // Khoảng cách từ bây giờ đến giờ nhắc
       const diff = now.getTime() - reminderTime.getTime();
 
-      if (diff >= 0 && diff <= 60 * 1000) {
-        showTaskNotification(task);
-        task.notified = true;
+      // Nếu giờ hiện tại vừa bước qua giờ nhắc (trong vòng 60 giây) VÀ chưa nhắc lần nào
+      if (diff >= 0 && diff <= 60000 && !task.notified) {
+         sendNotification(
+            "⏰ SẮP ĐẾN GIỜ LÀM!", 
+            `Chuẩn bị làm: "${task.title}" vào lúc ${task.startTime} (${reminderMinutes} phút nữa).`
+         );
+         task.notified = true; // Đánh dấu là đã nhắc rồi
+         hasChanges = true;
+      }
+
+      // 2. LOGIC QUÁ HẠN (OVERDUE) - Báo 1 lần khi vừa hết giờ
+      if (task.endTime && !task.overdueNotified) {
+         const end = buildDateTime(task.date, task.endTime);
+         if (end && now > end) {
+            sendNotification(
+                "⚠️ ĐÃ QUÁ HẠN!", 
+                `Công việc "${task.title}" đã kết thúc lúc ${task.endTime}.`
+            );
+            task.overdueNotified = true;
+            hasChanges = true;
+         }
       }
     });
 
-    saveTasks();
+    if (hasChanges) {
+        saveTasks();
+        // Không cần render lại để tránh giật giao diện, chỉ cần lưu trạng thái đã nhắc
+    }
   }
-
+  // -----------------------------------------------------------
   setInterval(checkNotifications, 30 * 1000);
 
   // ==========================
@@ -2037,18 +3147,21 @@
   });
 
   // ==========================
-  // Pomodoro 25–50 phút
+  // Pomodoro 25–50 phút (REAL-TIME FIX)
   // ==========================
 
-  let pomodoroDuration = 25 * 60;      // tổng giây
+  /* --- KHAI BÁO BIẾN --- */
+  let pomodoroDuration = 25 * 60; 
   let pomodoroRemaining = pomodoroDuration;
   let pomodoroTimer = null;
   let pomodoroRunning = false;
-  let pomodoroStartTime = null;        // thời điểm thực bắt đầu
+  let pomodoroStartTime = null; 
 
-  const pomodoroDisplay = document.getElementById('pomodoroDisplay');
-  const pomodoroStatus = document.getElementById('pomodoroStatus');
+  const startBtn = document.getElementById('pomodoroStartBtn');
+  const display = document.getElementById('pomodoroDisplay');
+  const statusEl = document.getElementById('pomodoroStatus');
 
+  /* --- CÁC HÀM XỬ LÝ --- */
   function formatSeconds(sec) {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -2056,98 +3169,184 @@
   }
 
   function renderPomodoro() {
-    pomodoroDisplay.textContent = formatSeconds(pomodoroRemaining);
+    const displayEl = document.getElementById('pomodoroDisplay');
+    if(displayEl) displayEl.textContent = formatSeconds(pomodoroRemaining);
   }
 
-  function setPomodoroDuration(minutes) {
-    pomodoroDuration = minutes * 60;
-    pomodoroRemaining = pomodoroDuration;
-    pomodoroRunning = false;
-    pomodoroStartTime = null;
-    if (pomodoroTimer) {
-      clearInterval(pomodoroTimer);
-      pomodoroTimer = null;
+  // Lưu trạng thái vào localStorage
+  function savePomodoroState() {
+    const state = {
+      running: pomodoroRunning,
+      startTime: pomodoroStartTime,
+      duration: pomodoroDuration,
+      remaining: pomodoroRemaining
+    };
+    localStorage.setItem('timefocus_pomodoro', JSON.stringify(state));
+  }
+
+  // Tải trạng thái khi mở lại web
+  function loadPomodoroState() {
+    const raw = localStorage.getItem('timefocus_pomodoro');
+    if (!raw) return;
+
+    const state = JSON.parse(raw);
+    pomodoroDuration = state.duration || 25 * 60;
+    
+    if (state.running && state.startTime) {
+       const now = new Date().getTime();
+       const elapsed = Math.floor((now - state.startTime) / 1000);
+       const currentRemaining = state.duration - elapsed;
+
+       if (currentRemaining > 0) {
+          pomodoroRunning = true;
+          pomodoroStartTime = state.startTime;
+          pomodoroRemaining = currentRemaining;
+          startTimerInterval();
+          updateButtonUI('pause');
+          statusEl.textContent = 'Đang khôi phục phiên tập trung...';
+       } else {
+          finishPomodoro();
+       }
+    } else if (!state.running && state.remaining < state.duration) {
+       pomodoroRunning = false;
+       pomodoroRemaining = state.remaining;
+       pomodoroStartTime = null;
+       updateButtonUI('resume');
+       statusEl.textContent = 'Bạn đang tạm dừng phiên trước đó.';
+       renderPomodoro();
     }
-    renderPomodoro();
-    pomodoroStatus.textContent = `Đã đặt ${minutes} phút. Bấm Bắt đầu để tập trung.`;
   }
 
-  function updatePomodoroDisplay() {
-    if (!pomodoroRunning || !pomodoroStartTime) return;
-    
-    const now = new Date().getTime();
-    const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
-    const remaining = Math.max(0, pomodoroDuration - elapsed);
-    
-    pomodoroRemaining = remaining;
-    renderPomodoro();
-    
-    if (remaining <= 0) {
-      clearInterval(pomodoroTimer);
-      pomodoroTimer = null;
-      pomodoroRunning = false;
-      pomodoroStartTime = null;
-      pomodoroStatus.textContent = 'Hoàn thành! Nghỉ 5 phút rồi bắt đầu phiên mới.';
-      const minutes = pomodoroDuration / 60;
-      sendNotification('Hết phiên tập trung', `Bạn vừa hoàn thành ${minutes} phút tập trung. Nghỉ một chút nhé.`);
+  function startTimerInterval() {
+    if (pomodoroTimer) clearInterval(pomodoroTimer);
+    pomodoroTimer = setInterval(() => {
+        const now = new Date().getTime();
+        const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
+        pomodoroRemaining = pomodoroDuration - elapsed;
+
+        if (pomodoroRemaining <= 0) {
+            finishPomodoro();
+        } else {
+            renderPomodoro();
+        }
+    }, 500);
+  }
+
+  function togglePomodoro() {
+    if (pomodoroRunning) {
+      pausePomodoro(); 
+    } else {
+      startPomodoro(); 
     }
   }
 
   function startPomodoro() {
     if (pomodoroRunning) return;
     pomodoroRunning = true;
-    // Tính toán thời điểm bắt đầu dựa trên thời gian còn lại
-    // Để khi resume, nó tiếp tục từ thời gian đã pause, không reset
-    pomodoroStartTime = new Date().getTime() - (pomodoroDuration - pomodoroRemaining) * 1000;
-    pomodoroStatus.textContent = 'Đang tập trung... Đừng chạm điện thoại / mạng xã hội.';
+    
+    if (pomodoroRemaining === pomodoroDuration || !pomodoroStartTime) {
+        pomodoroStartTime = new Date().getTime();
+    } else {
+        pomodoroStartTime = new Date().getTime() - (pomodoroDuration - pomodoroRemaining) * 1000;
+    }
 
-    if (pomodoroTimer) clearInterval(pomodoroTimer);
-
-    pomodoroTimer = setInterval(updatePomodoroDisplay, 500);
+    startTimerInterval();
+    updateButtonUI('pause');
+    statusEl.textContent = 'Đang tập trung... Đừng chạm điện thoại!';
+    savePomodoroState();
   }
 
   function pausePomodoro() {
     if (!pomodoroRunning) return;
     pomodoroRunning = false;
-    pomodoroStartTime = null;
+    
     if (pomodoroTimer) {
-      clearInterval(pomodoroTimer);
-      pomodoroTimer = null;
+        clearInterval(pomodoroTimer);
+        pomodoroTimer = null;
     }
-    pomodoroStatus.textContent = 'Đã tạm dừng. Khi sẵn sàng, bấm Bắt đầu lại.';
+    
+    const now = new Date().getTime();
+    const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
+    pomodoroRemaining = Math.max(0, pomodoroDuration - elapsed);
+    pomodoroStartTime = null;
+
+    updateButtonUI('resume');
+    statusEl.textContent = 'Đã tạm dừng.';
+    savePomodoroState();
   }
 
   function resetPomodoro() {
     pomodoroRemaining = pomodoroDuration;
     pomodoroRunning = false;
     pomodoroStartTime = null;
-    if (pomodoroTimer) {
-      clearInterval(pomodoroTimer);
-      pomodoroTimer = null;
-    }
+    if (pomodoroTimer) clearInterval(pomodoroTimer);
+    
     renderPomodoro();
-    pomodoroStatus.textContent = 'Đã reset. Bấm Bắt đầu để bắt đầu lại phiên tập trung.';
+    updateButtonUI('start');
+    statusEl.textContent = 'Sẵn sàng.';
+    localStorage.removeItem('timefocus_pomodoro');
   }
 
-  // Khi tab quay lại focus, cập nhật lại display
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && pomodoroRunning && pomodoroStartTime) {
-      updatePomodoroDisplay();
+  function finishPomodoro() {
+    pomodoroRemaining = 0;
+    pomodoroRunning = false;
+    pomodoroStartTime = null;
+    if (pomodoroTimer) clearInterval(pomodoroTimer);
+    
+    renderPomodoro();
+    updateButtonUI('start');
+    statusEl.textContent = 'Hoàn thành tuyệt vời! Hãy nghỉ ngơi.';
+    
+    // --- THÔNG BÁO MÁY TÍNH ---
+    const minutes = Math.floor(pomodoroDuration / 60);
+    sendNotification(
+        "🎉 HOÀN THÀNH POMODORO!", 
+        `Bạn đã tập trung tuyệt vời trong ${minutes} phút. Hãy đứng dậy vươn vai và nghỉ ngơi nhé!`
+    );
+    // ---------------------------
+
+    localStorage.removeItem('timefocus_pomodoro');
+  }
+
+  function updateButtonUI(state) {
+    const btn = document.getElementById('pomodoroStartBtn');
+    if (!btn) return;
+    
+    if (state === 'pause') {
+        btn.innerHTML = '⏸ Tạm dừng';
+        btn.classList.add('is-running');
+    } else if (state === 'resume') {
+        btn.innerHTML = '▶ Tiếp tục';
+        btn.classList.remove('is-running');
+    } else {
+        btn.innerHTML = '▶ Bắt đầu';
+        btn.classList.remove('is-running');
     }
-  });
+  }
+
+  function setPomodoroDuration(minutes) {
+    pomodoroDuration = minutes * 60;
+    resetPomodoro();
+  }
+  function renderTopTasks() {
+    return;
+  } 
+
+  /* --- KHỞI TẠO NÚT BẤM (FIX LỖI EVENT) --- */
+  const oldBtn = document.getElementById('pomodoroStartBtn');
+  if (oldBtn) {
+    const newBtn = oldBtn.cloneNode(true);
+    oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+    newBtn.addEventListener('click', togglePomodoro);
+  }
 
   document.getElementById('pomodoro25Btn').addEventListener('click', () => setPomodoroDuration(25));
   document.getElementById('pomodoro50Btn').addEventListener('click', () => setPomodoroDuration(50));
-  document.getElementById('pomodoroStartBtn').addEventListener('click', startPomodoro);
-  document.getElementById('pomodoroPauseBtn').addEventListener('click', pausePomodoro);
   document.getElementById('pomodoroResetBtn').addEventListener('click', resetPomodoro);
 
-  // Khởi tạo hiển thị ban đầu
+  // Load lại trạng thái cũ nếu có
+  loadPomodoroState();
   renderPomodoro();
-
-  // ==========================
-  // Khởi tạo chung
-  // ==========================
 
   loadTasks();
   loadImportantTasks();
@@ -2161,6 +3360,7 @@
       renderTasks();
     }
   }, 60000);
+  
 
 </script>
 </body>
