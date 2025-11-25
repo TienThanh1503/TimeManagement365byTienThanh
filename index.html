@@ -2500,6 +2500,47 @@
     body.dark-mode table tbody tr:hover {
         background: #293548 !important;
     }
+    /* ================================================= */
+    /* --- FIX LỖI MENU PHẦN THƯỞNG (DARK MODE) --- */
+    /* ================================================= */
+
+    /* 1. Đổi nền menu sang màu tối */
+    body.dark-mode .reward-menu {
+        background: #1e293b !important; /* Màu xanh đen đậm */
+        border: 1px solid #334155 !important; /* Viền xám xanh */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important; /* Bóng đổ đậm */
+    }
+
+    /* 2. Đổi màu chữ các mục sang trắng */
+    body.dark-mode .reward-menu-item {
+        color: #f1f5f9 !important; /* Chữ trắng sáng */
+        border-bottom: 1px solid #334155 !important; /* Đường kẻ ngăn cách mờ */
+    }
+
+    /* 3. Hiệu ứng khi di chuột vào mục (Hover) */
+    body.dark-mode .reward-menu-item:hover {
+        background: #334155 !important; /* Sáng hơn một chút */
+        color: #6366f1 !important; /* Chữ chuyển tím cho đẹp */
+    }
+
+    /* 4. Khu vực nhập tay ở dưới cùng */
+    body.dark-mode .reward-custom-input-wrapper {
+        border-top: 1px solid #334155 !important;
+        background: #1e293b !important;
+    }
+
+    /* 5. Ô input nhập tay */
+    body.dark-mode .reward-custom-input-wrapper input {
+        background: #0f172a !important; /* Nền input đen sâu hơn */
+        border-color: #475569 !important;
+        color: #fff !important;
+    }
+    
+    /* Khi bấm vào ô input */
+    body.dark-mode .reward-custom-input-wrapper input:focus {
+        border-color: #6366f1 !important;
+        background: #1e293b !important;
+    }
   </style>  
 </head>
 <body>
@@ -2721,6 +2762,65 @@
   // ==========================
 
   const STORAGE_KEY = 'timefocus_tasks_v1';
+  // --- KHAI BÁO ÂM THANH ---
+  /* ================================================= */
+  /* --- KHAI BÁO ÂM THANH (LINK ỔN ĐỊNH) --- */
+  /* ================================================= */
+  /* ================================================= */
+  /* --- HỆ THỐNG ÂM THANH (DÙNG WEB AUDIO API - KHÔNG CẦN LINK) --- */
+  /* ================================================= */
+  
+  // 1. Khởi tạo "Dàn nhạc"
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  // 2. Hàm tự tạo tiếng động (Synth)
+  function playTone(freq, type, duration) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type; // 'sine', 'square', 'triangle'
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime); // Âm lượng nhỏ vừa
+      gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+  }
+
+  // 3. Hàm phát âm thanh theo tên hành động
+  function playSound(name) {
+      try {
+          switch (name) {
+              case 'click':
+                  // Tiếng "Tách" nhẹ (Click chuột)
+                  playTone(600, 'sine', 0.1);
+                  break;
+                  
+              case 'start':
+                  // Tiếng "Tu-tút" (Bắt đầu - Giống game Mario)
+                  playTone(400, 'triangle', 0.1);
+                  setTimeout(() => playTone(600, 'triangle', 0.2), 100);
+                  break;
+                  
+              case 'trash':
+                  // Tiếng "Bụp" trầm (Xóa)
+                  playTone(150, 'square', 0.15);
+                  break;
+                  
+              case 'success':
+                  // Tiếng "Ting Ting" (Hoàn thành - Link ngoài vì khó giả lập hay)
+                  const successSound = new Audio('https://www.soundjay.com/misc/sounds/magic-chime-01.mp3');
+                  successSound.volume = 0.5;
+                  successSound.play().catch(e => console.log('Chặn play:', e));
+                  break;
+          }
+      } catch (e) {
+          console.error("Lỗi âm thanh:", e);
+      }
+  }
+  
+  
   const IMPORTANT_TASKS_KEY = 'timefocus_important_tasks_v1';
   let tasks = [];
   let importantTasks = [];
@@ -3026,6 +3126,7 @@
   window.markDone = markDone;
 
   function deleteTask(id) {
+    playSound('trash');
     if (!confirm('Xoá công việc này?')) return;
     
     // Tìm dòng cần xóa trong bảng để thêm hiệu ứng
@@ -3061,6 +3162,7 @@
   /* --- HÀM BẮT ĐẦU: KÍCH HOẠT GIAO DIỆN ĐẸP --- */
   /* ================================================= */
   function startTask(id) {
+    playSound('start');
     const task = tasks.find(t => t.id === id);
     if (!task) return;
 
@@ -3128,6 +3230,7 @@
   /* --- HÀM HOÀN THÀNH: CHỈ SET done = true --- */
   /* ================================================= */
   function markDone(id) {
+    playSound('success');
     // 1. Cập nhật dữ liệu
     tasks = tasks.map(t => t.id === id ? { ...t, done: true } : t);
     saveTasks();
@@ -3200,6 +3303,7 @@
 
   taskForm.addEventListener('submit', function (e) {
     e.preventDefault();
+    playSound('click');
     const title = document.getElementById('title').value.trim();
     const date = document.getElementById('date').value;
     const startTime = document.getElementById('startTime').value;
