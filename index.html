@@ -28,6 +28,8 @@
       --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
       --shadow-xl: 0 20px 60px rgba(0,0,0,0.3);
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      /* unified control height for form controls */
+      --control-h: clamp(44px, 6vw, 52px);
     }
 
     body {
@@ -251,66 +253,6 @@
       background: #e0e0e0;
     }
 
-    /* Settings Modal */
-    .settings-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .settings-modal.show {
-      display: flex;
-    }
-
-    .settings-modal-content {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 400px;
-      width: 90%;
-    }
-
-    .settings-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: #1f2937;
-    }
-
-    .settings-section {
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .settings-section:last-child {
-      border-bottom: none;
-    }
-
-    .settings-section label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #1f2937;
-      font-size: 0.95rem;
-    }
-
-    .settings-section select {
-      width: 100%;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 2px solid #e5e7eb;
-      font-size: 0.9rem;
-    }
-
     .btn-primary {
       background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: #fff;
@@ -399,48 +341,40 @@
       50% { transform: translate(20px, 20px); }
     }
 
-    form {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: clamp(10px, 1.5vw, 14px);
-      align-items: center;
-      overflow-x: auto;
-      padding-bottom: 8px;
-    }
 
-    form input[type="text"],
-    form input[type="date"],
-    form input[type="time"],
-    form input[type="number"] {
-      flex: 0 1 auto;
-      min-width: 0;
-    }
+      form {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr); /* Chia lưới 12 phần */
+        gap: 12px 16px;
+        align-items: end;
+      }
 
-    form input[type="text"] {
-      flex: 1 1 auto;
-      min-width: clamp(120px, 20vw, 200px);
-    }
+      /* Dòng 1 */
+      form > div:nth-child(1) { grid-column: span 5; } /* Tên công việc rộng 5/12 */
+      form > div:nth-child(2) { grid-column: span 3; } /* Ngày */
+      form > div:nth-child(3) { grid-column: span 2; } /* Bắt đầu */
+      form > div:nth-child(4) { grid-column: span 2; } /* Kết thúc */
 
-    form input[type="date"],
-    form input[type="time"] {
-      min-width: clamp(90px, 12vw, 130px);
-    }
+      /* Dòng 2 */
+      form > div:nth-child(5) { grid-column: span 6; } /* Phần thưởng rộng 6/12 -> Hiển thị đủ chữ */
+      form > div:nth-child(6) { grid-column: span 2; } /* Nhắc trước */
+      form > button[type="submit"] { 
+        grid-column: span 4; /* Nút thêm rộng 4/12 */
+        width: 100%;
+      }
 
-    form input[type="number"] {
-      min-width: clamp(60px, 8vw, 90px);
-    }
-
-    .form-reward-wrapper {
-      flex: 0 0 auto;
-      position: relative;
-    }
+/* Mobile: Về lại 1 cột dọc */
+@media (max-width: 768px) {
+  form { grid-template-columns: 1fr; }
+  form > div, form > button[type="submit"] { grid-column: span 1; }
+}
 
     label {
-      font-size: clamp(0.75rem, 1.4vw, 0.9rem);
+      font-size: clamp(0.65rem, 1.2vw, 0.85rem);
       font-weight: 600;
-      color: #333;
+      color: var(--color-secondary, #555);
       display: block;
-      margin-bottom: clamp(5px, 0.8vw, 8px);
+      margin-bottom: clamp(3px, 0.5vw, 6px);
       letter-spacing: 0.3px;
     }
 
@@ -450,22 +384,12 @@
     input[type="number"],
     select {
       width: 100%;
-      padding: 0 clamp(12px, 2.5vw, 16px);
+      padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 14px);
       border-radius: clamp(8px, 1.5vw, 12px);
-      border: 2px solid #ddd;
-      font-size: clamp(0.9rem, 1.8vw, 1rem);
+      border: 2px solid #e5e7eb;
+      font-size: clamp(0.85rem, 1.8vw, 0.95rem);
       transition: var(--transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
       background: #fff;
-      height: clamp(44px, 6vw, 52px);
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-    }
-
-    /* Small reminder input */
-    input[type="number"]#reminder {
-      max-width: 90px;
-      font-size: clamp(0.85rem, 1.6vw, 0.95rem);
     }
 
     input:focus,
@@ -793,6 +717,35 @@
       transition: var(--transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
       font-weight: 600;
     }
+    /* --- THÊM ĐOẠN NÀY ĐỂ FIX LỆCH VÀ CHIỀU CAO --- */
+
+      /* Ép tất cả input và nút cao bằng nhau (42px) */
+      form input, 
+      form select,
+      .reward-trigger,
+      form button[type="submit"] {
+        height: 42px !important; 
+        box-sizing: border-box;
+      }
+
+      /* Chỉnh lại nút Reward cho đẹp */
+      .reward-trigger {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Căn chữ sang trái */
+        background: #fff;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px; /* Bo góc giống input */
+        padding: 0 12px;
+        font-size: 0.9rem;
+        color: #333;
+      }
+
+      .reward-trigger:hover {
+        border-color: #2563eb;
+        background: #f8fafc;
+      }
 
     .reward-trigger:hover {
       border-color: #2563eb;
@@ -970,6 +923,7 @@
 
     /* Important Tasks */
     .important-tasks-form {
+      --imp-control-h: clamp(44px, 6vw, 52px);
       display: flex;
       gap: clamp(8px, 2vw, 12px);
       margin-bottom: clamp(12px, 2.5vw, 16px);
@@ -981,19 +935,54 @@
       flex: 1;
       min-width: clamp(160px, 50vw, 200px);
       background: linear-gradient(135deg, #fff 0%, #f9fafb 100%);
+      /* unified control height with button */
+      height: var(--imp-control-h);
+      display: inline-flex;
+      align-items: center;
+      padding: 0 clamp(12px, 2vw, 16px);
+      box-sizing: border-box;
     }
 
     .important-tasks-form button {
-      padding: clamp(8px, 1.5vw, 12px) clamp(14px, 2vw, 20px);
+      /* match input height and center content */
+      height: var(--imp-control-h);
+      padding: 0 clamp(14px, 2vw, 20px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
       white-space: nowrap;
     }
 
+    /* Task form controls should match global control height */
+    #taskForm input[type="number"],
+    #taskForm button[type="submit"],
+    #taskForm input[type="time"],
+    #taskForm input[type="date"],
+    #taskForm input[type="text"] {
+      height: var(--control-h);
+      display: inline-flex;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 0.25rem 0.6rem;
+    }
+
+    /* ensure submit button vertically aligns and has comparable padding */
+    #taskForm button[type="submit"] {
+      padding: 0 clamp(12px, 2vw, 16px);
+    }
+
     .important-tasks-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(clamp(240px, 28vw, 300px), 1fr));
-      gap: clamp(10px, 2vw, 14px);
+      /* single column layout - show only top 3 items, rest scroll */
+      --imp-gap: clamp(10px, 2vw, 14px);
+      --imp-item-h: clamp(64px, 9vw, 72px);
+      display: flex;
+      flex-direction: column;
+      gap: var(--imp-gap);
       margin-top: clamp(8px, 2vw, 12px);
+      max-height: calc(var(--imp-item-h) * 3 + var(--imp-gap) * 2);
+      overflow-y: auto;
+      padding-right: 6px; /* allow room for scrollbar */
     }
 
     .important-task-item {
@@ -1001,14 +990,19 @@
       color: white;
       padding: clamp(12px, 2.5vw, 16px) clamp(14px, 2.5vw, 18px);
       border-radius: clamp(10px, 1.8vw, 14px);
-      display: flex;
-      justify-content: space-between;
+      /* grid layout: index | text (grow) | actions */
+      display: grid;
+      grid-template-columns: clamp(36px, 4vw, 44px) 1fr auto;
+      gap: clamp(8px, 1.5vw, 12px);
       align-items: center;
+  width: 100%;
+  min-height: var(--imp-item-h);
       box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
       transition: var(--transition, all 0.3s cubic-bezier(0.4, 0, 0.2, 1));
       border-left: 4px solid rgba(255, 255, 255, 0.7);
       position: relative;
       overflow: hidden;
+      box-sizing: border-box;
     }
 
     .important-task-item::before {
@@ -1037,12 +1031,43 @@
     }
 
     .important-task-text {
-      font-size: clamp(0.85rem, 2vw, 1.05rem);
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
       font-weight: 700;
-      flex: 1;
-      word-break: break-word;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       padding-right: clamp(8px, 1.5vw, 12px);
       line-height: 1.4;
+    }
+
+    .important-task-index {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+      background: rgba(255,255,255,0.12);
+      width: clamp(36px, 4vw, 44px);
+      height: clamp(36px, 4vw, 44px);
+      border-radius: 8px;
+      flex-shrink: 0;
+      color: #fff;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.15);
+    }
+
+    .important-task-item.top-priority {
+      outline: 2px solid rgba(255,255,255,0.08);
+      transform: translateY(-1px);
+    }
+
+    .important-task-item.drag-over {
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      transform: scale(1.01);
+    }
+
+    .important-task-item.dragging {
+      opacity: 0.5;
+      transform: scale(0.99);
     }
 
     .important-task-actions {
@@ -1251,28 +1276,6 @@
 
       form {
         gap: clamp(8px, 2vw, 10px);
-        flex-wrap: wrap;
-      }
-
-      form input[type="text"] {
-        flex: 1 1 100%;
-        min-width: 100%;
-      }
-
-      form input[type="date"],
-      form input[type="time"],
-      form input[type="number"] {
-        flex: 1 1 auto;
-        min-width: 70px;
-      }
-
-      form button {
-        flex: 0 1 auto;
-        padding: clamp(8px, 1.5vw, 10px) clamp(10px, 1.8vw, 12px);
-      }
-
-      .form-reward-wrapper {
-        flex: 0 1 auto;
       }
 
       .notice {
@@ -1339,52 +1342,41 @@
 
   <div class="top-row">
     <button id="noticeBtn" class="notice-btn" title="Thông báo trình duyệt">🔔</button>
-    <button id="settingsBtn" class="notice-btn" title="Settings" style="margin-left: 8px;">⚙️</button>
-  </div>
-
-  <!-- SETTINGS MODAL -->
-  <div id="settingsModal" class="settings-modal">
-    <div class="settings-modal-content">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div class="settings-title" data-i18n="settings">⚙️ Settings</div>
-        <button id="settingsCloseBtn" class="notice-close-btn">✕</button>
-      </div>
-
-      <div class="settings-section">
-        <label data-i18n="language">Language / Ngôn ngữ</label>
-        <select id="languageSelect">
-          <option value="vi">Tiếng Việt (Vietnamese)</option>
-          <option value="en">English</option>
-        </select>
-      </div>
-
-      <div class="settings-section">
-        <label data-i18n="notifications">Browser Notifications</label>
-        <div id="notifStatusInSettings" style="padding: 12px; background: #f0f4ff; border-radius: 8px; font-size: 0.9rem; margin-top: 8px;"></div>
-      </div>
-    </div>
   </div>
 
   <!-- NOTIFICATION MODAL -->
   <div id="noticeModal" class="notice-modal">
     <div class="notice-modal-content">
       <button class="notice-close-btn" id="noticeCloseBtn">✕</button>
-      <div class="notice-modal-title">🔔 Notifications</div>
-      <div class="notice-status" id="noticeStatusDisplay">Loading...</div>
+      <div class="notice-modal-title">🔔 Thông báo trình duyệt</div>
+      <div class="notice-status" id="noticeStatusDisplay">Chưa kiểm tra</div>
       <div id="noticeButtonGroup" class="notice-button-group"></div>
     </div>
   </div>
 
   <!-- FORM THÊM CÔNG VIỆC -->
   <section class="card">
-    <div class="card-title" data-i18n="addTask">Thêm công việc cần tập trung</div>
+    <div class="card-title">Thêm công việc cần tập trung</div>
     <form id="taskForm">
-      <input type="text" id="title" placeholder="VD: Ôn CS115, làm assignment 3" required data-i18n="taskNamePlaceholder">
-      <input type="date" id="date" required>
-      <input type="time" id="startTime" required>
-      <input type="time" id="endTime">
-      <div class="form-reward-wrapper">
-        <button type="button" class="reward-trigger" id="rewardTrigger" data-i18n="chooseReward">Chọn phần thưởng</button>
+      <div>
+        <label for="title">Tên công việc</label>
+        <input type="text" id="title" placeholder="VD: Ôn CS115, làm assignment 3" required>
+      </div>
+      <div>
+        <label for="date">Ngày</label>
+        <input type="date" id="date" required>
+      </div>
+      <div>
+        <label for="startTime">Giờ bắt đầu</label>
+        <input type="time" id="startTime" required>
+      </div>
+      <div>
+        <label for="endTime">Giờ kết thúc</label>
+        <input type="time" id="endTime">
+      </div>
+      <div class="reward-dropdown">
+      <label>🏆 Phần thưởng</label> 
+      <button type="button" class="reward-trigger" id="rewardTrigger">Chọn phần thưởng ▾</button>
         <div class="reward-menu" id="rewardMenu">
           <div class="reward-menu-item" data-reward="🎮 Chơi 1 ván game">🎮 Chơi 1 ván game</div>
           <div class="reward-menu-item" data-reward="☕ Nghỉ 10 phút">☕ Nghỉ 10 phút</div>
@@ -1395,167 +1387,67 @@
           </div>
         </div>
       </div>
-      <input type="number" id="reminder" min="0" value="10" title="Nhắc trước (phút)" placeholder="10">
-      <button type="submit" class="btn-primary" data-i18n="addBtn">+ Thêm</button>
+      <div>
+        <label for="reminder">Nhắc trước (phút)</label>
+        <input type="number" id="reminder" min="0" value="10">
+      </div>
+      <button type="submit" class="btn-primary" style="align-self: end; padding: 8px 14px;">+ Thêm công việc</button>
     </form>
-    <p class="focus-tips" data-i18n="tip">
+    <p class="focus-tips">
       Gợi ý: chia việc lớn thành các block 25–50 phút, chỉ tập trung một việc trong khung giờ đó.
     </p>
   </section>
 
   <!-- NHIỆM VỤ QUAN TRỌNG NGÀY HÔM NAY -->
   <section class="card">
-    <div class="card-title" data-i18n="importantTasks">🔥 Nhiệm vụ quan trọng bắt buộc hôm nay</div>
+    <div class="card-title">🔥 Nhiệm vụ quan trọng bắt buộc hôm nay</div>
     <div class="important-tasks-form">
-      <input type="text" id="importantTaskInput" placeholder="VD: Hoàn thành báo cáo, gọi điện cho khách hàng..." data-i18n="importantPlaceholder" />
-      <button type="button" id="addImportantTaskBtn" class="btn-primary" data-i18n="addBtn">+ Thêm</button>
+      <input type="text" id="importantTaskInput" placeholder="VD: Hoàn thành báo cáo, gọi điện cho khách hàng..." />
+      <button type="button" id="addImportantTaskBtn" class="btn-primary">+ Thêm</button>
     </div>
     <div class="important-tasks-list" id="importantTasksList"></div>
   </section>
 
   <!-- POMODORO TIMER -->
   <section class="card card-pomodoro">
-    <div class="card-title" data-i18n="pomodoroTitle">Phiên tập trung 25 phút (Pomodoro)</div>
+    <div class="card-title">Phiên tập trung 25 phút (Pomodoro)</div>
     <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
     <div class="pomodoro-status" id="pomodoroStatus">
-      Ready. Choose duration and press Start.
+      Sẵn sàng. Chọn thời lượng và bấm Bắt đầu.
     </div>
     <div class="pomodoro-controls">
-      <button class="btn-small btn-outline" id="pomodoro25Btn">25 min</button>
-      <button class="btn-small btn-outline" id="pomodoro50Btn">50 min</button>
-      <button class="btn-small btn-primary" id="pomodoroStartBtn">▶ Start</button>
-      <button class="btn-small btn-outline" id="pomodoroPauseBtn">⏸ Pause</button>
+      <button class="btn-small btn-outline" id="pomodoro25Btn">25 phút</button>
+      <button class="btn-small btn-outline" id="pomodoro50Btn">50 phút</button>
+      <button class="btn-small btn-primary" id="pomodoroStartBtn">▶ Bắt đầu</button>
+      <button class="btn-small btn-outline" id="pomodoroPauseBtn">⏸ Tạm dừng</button>
       <button class="btn-small btn-outline" id="pomodoroResetBtn">⟲ Reset</button>
     </div>
   </section>
 
   <!-- TOP TASKS NGÀY HÔM NAY -->
   <section class="card">
-    <div class="card-title" data-i18n="topTasks">⭐ Top nhiệm vụ hôm nay</div>
+    <div class="card-title">⭐ Top nhiệm vụ hôm nay</div>
     <div class="top-tasks-container" id="topTasksContainer"></div>
   </section>
 
   <!-- DANH SÁCH CÔNG VIỆC -->
   <section class="card">
     <div class="tasks-header">
-      <h2 data-i18n="scheduledTasks">Công việc đã lên lịch</h2>
+      <h2>Công việc đã lên lịch</h2>
       <small id="taskSummary"></small>
     </div>
     <div class="filter-row">
-      <span data-i18n="filter">Lọc:</span>
-      <button class="btn-small btn-outline" data-filter="today" data-i18n="today">Hôm nay</button>
-      <button class="btn-small btn-outline" data-filter="all" data-i18n="all">Tất cả</button>
-      <button class="btn-small btn-outline" data-filter="pending" data-i18n="pending">Chưa xong</button>
-      <button class="btn-small btn-outline" data-filter="done" data-i18n="done">Đã xong</button>
+      <span>Lọc:</span>
+      <button class="btn-small btn-outline" data-filter="today">Hôm nay</button>
+      <button class="btn-small btn-outline" data-filter="all">Tất cả</button>
+      <button class="btn-small btn-outline" data-filter="pending">Chưa xong</button>
+      <button class="btn-small btn-outline" data-filter="done">Đã xong</button>
     </div>
     <div id="tasksContainer"></div>
   </section>
 </div>
 
 <script>
-  // ====== TRANSLATIONS ======
-  const translations = {
-    vi: {
-      title: 'TimeFocus – Quản lý thời gian',
-      tagline: 'Giảm trì hoãn từng bước nhỏ, mỗi việc một thời điểm.',
-      addTask: 'Thêm công việc cần tập trung',
-      taskName: 'Tên công việc',
-      taskNamePlaceholder: 'VD: Ôn CS115, làm assignment 3',
-      date: 'Ngày',
-      startTime: 'Giờ bắt đầu',
-      endTime: 'Giờ kết thúc',
-      reward: 'Phần thưởng',
-      chooseReward: 'Chọn phần thưởng',
-      reminder: 'Nhắc trước (phút)',
-      addBtn: '+ Thêm',
-      tip: 'Gợi ý: chia việc lớn thành các block 25–50 phút, chỉ tập trung một việc trong khung giờ đó.',
-      importantTasks: '🔥 Nhiệm vụ quan trọng bắt buộc hôm nay',
-      noImportantTasks: 'Chưa có nhiệm vụ quan trọng. Thêm các việc cần ưu tiên hôm nay!',
-      importantPlaceholder: 'VD: Hoàn thành báo cáo, gọi điện cho khách hàng...',
-      pomodoroTitle: 'Phiên tập trung 25 phút (Pomodoro)',
-      topTasks: '⭐ Top nhiệm vụ hôm nay',
-      scheduledTasks: 'Công việc đã lên lịch',
-      filter: 'Lọc:',
-      today: 'Hôm nay',
-      all: 'Tất cả',
-      pending: 'Chưa xong',
-      done: 'Đã xong',
-      settings: '⚙️ Settings',
-      language: 'Ngôn ngữ',
-      notifications: 'Thông báo',
-      pomodoroReady: 'Sẵn sàng. Chọn thời lượng và bấm Bắt đầu.',
-      pomodoroSet: 'Đã đặt {minutes} phút. Bấm Bắt đầu để tập trung.',
-      pomodoroFocus: 'Đang tập trung... Đừng chạm điện thoại / mạng xã hội.',
-      pomodoroPaused: 'Đã tạm dừng. Khi sẵn sàng, bấm Bắt đầu lại.',
-      pomodoroComplete: 'Hoàn thành! Nghỉ 5 phút rồi bắt đầu phiên mới.',
-      pomodoroReset: 'Đã reset. Bấm Bắt đầu để bắt đầu lại phiên tập trung.',
-    },
-    en: {
-      title: 'TimeFocus - Time Management',
-      tagline: 'Reduce procrastination one step at a time, one task at a time.',
-      addTask: 'Add Task to Focus',
-      taskName: 'Task name',
-      taskNamePlaceholder: 'E.g., Study CS115, Do assignment 3',
-      date: 'Date',
-      startTime: 'Start time',
-      endTime: 'End time',
-      reward: 'Reward',
-      chooseReward: 'Choose reward',
-      reminder: 'Remind (mins)',
-      addBtn: '+ Add Task',
-      tip: 'Tip: Divide large tasks into 25–50 minute blocks, focus on one task in that time frame.',
-      importantTasks: '🔥 Priority Tasks Today',
-      noImportantTasks: 'No priority tasks yet. Add important tasks for today!',
-      importantPlaceholder: 'E.g., Complete report, call customer...',
-      pomodoroTitle: 'Focus Session 25 min (Pomodoro)',
-      topTasks: '⭐ Top Tasks Today',
-      scheduledTasks: 'Scheduled Tasks',
-      filter: 'Filter:',
-      today: 'Today',
-      all: 'All',
-      pending: 'Pending',
-      done: 'Done',
-      settings: '⚙️ Settings',
-      language: 'Language',
-      notifications: 'Notifications',
-      pomodoroReady: 'Ready. Choose duration and press Start.',
-      pomodoroSet: 'Set to {minutes} minutes. Press Start to focus.',
-      pomodoroFocus: 'Focusing... Don\'t touch your phone / social media.',
-      pomodoroPaused: 'Paused. When ready, press Start again.',
-      pomodoroComplete: 'Complete! Take a 5-minute break then start a new session.',
-      pomodoroReset: 'Reset. Press Start to begin a new focus session.',
-    }
-  };
-
-  const LANG_KEY = 'timefocus_lang';
-  let currentLang = localStorage.getItem(LANG_KEY) || 'vi';
-
-  function t(key) {
-    return translations[currentLang]?.[key] || translations.vi[key] || key;
-  }
-
-  function setLanguage(lang) {
-    if (translations[lang]) {
-      currentLang = lang;
-      localStorage.setItem(LANG_KEY, lang);
-      applyTranslations();
-    }
-  }
-
-  function applyTranslations() {
-    document.documentElement.lang = currentLang;
-    document.querySelector('title').textContent = t('title');
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        el.placeholder = t(key);
-      } else {
-        el.textContent = t(key);
-      }
-    });
-    document.getElementById('languageSelect').value = currentLang;
-  }
-
   // ==========================
   // Helpers thời gian – format
   // ==========================
@@ -1912,9 +1804,14 @@
 
     let html = '';
     importantTasks.forEach((task, index) => {
+      // top-priority for first 3
+      const topCls = index < 3 ? 'top-priority' : '';
       html += `
-        <div class="important-task-item ${task.done ? 'completed' : ''}">
-          <div class="important-task-text">${task.text}</div>
+        <div class="important-task-item ${task.done ? 'completed' : ''} ${topCls}" draggable="true" data-id="${task.id}"
+             ondragstart="onImportantDragStart(event)" ondragend="onImportantDragEnd(event)"
+             ondragover="onImportantDragOver(event)" ondragleave="onImportantDragLeave(event)" ondrop="onImportantDrop(event)">
+          <div class="important-task-index">${index + 1}</div>
+          <div class="important-task-text" title="${escapeHtml(task.text)}">${task.text}</div>
           <div class="important-task-actions">
             <button type="button" class="important-task-done" onclick="markImportantDone(${task.id})" ${task.done ? 'style="display:none"' : ''}>✓ Xong</button>
             <button type="button" class="important-task-delete" onclick="deleteImportantTask(${task.id})">✕ Xoá</button>
@@ -1925,6 +1822,16 @@
     importantTasksList.innerHTML = html;
   }
 
+  // small helper to avoid breaking attributes when text contains quotes
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function markImportantDone(id) {
     importantTasks = importantTasks.map(t => t.id === id ? { ...t, done: true } : t);
     saveImportantTasks();
@@ -1933,6 +1840,53 @@
 
   function deleteImportantTask(id) {
     importantTasks = importantTasks.filter(t => t.id !== id);
+    saveImportantTasks();
+    renderImportantTasks();
+  }
+
+  // Drag & drop handlers for reordering important tasks
+  function onImportantDragStart(e) {
+    const el = e.currentTarget;
+    const id = el.dataset.id;
+    e.dataTransfer.setData('text/plain', id);
+    // show dragging style
+    el.classList.add('dragging');
+  }
+
+  function onImportantDragEnd(e) {
+    const el = e.currentTarget;
+    el.classList.remove('dragging');
+    // remove any lingering drag-over classes
+    document.querySelectorAll('.important-task-item.drag-over').forEach(x => x.classList.remove('drag-over'));
+  }
+
+  function onImportantDragOver(e) {
+    e.preventDefault(); // allow drop
+    const el = e.currentTarget;
+    if (!el.classList.contains('drag-over')) el.classList.add('drag-over');
+  }
+
+  function onImportantDragLeave(e) {
+    const el = e.currentTarget;
+    el.classList.remove('drag-over');
+  }
+
+  function onImportantDrop(e) {
+    e.preventDefault();
+    const targetEl = e.currentTarget;
+    targetEl.classList.remove('drag-over');
+    const draggedId = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    const targetId = parseInt(targetEl.dataset.id, 10);
+    if (!draggedId || !targetId || draggedId === targetId) return;
+    reorderImportant(draggedId, targetId);
+  }
+
+  function reorderImportant(draggedId, targetId) {
+    const from = importantTasks.findIndex(t => t.id === draggedId);
+    const to = importantTasks.findIndex(t => t.id === targetId);
+    if (from === -1 || to === -1) return;
+    const [moved] = importantTasks.splice(from, 1);
+    importantTasks.splice(to, 0, moved);
     saveImportantTasks();
     renderImportantTasks();
   }
@@ -2115,7 +2069,7 @@
       pomodoroTimer = null;
     }
     renderPomodoro();
-    pomodoroStatus.textContent = t('pomodoroSet').replace('{minutes}', minutes);
+    pomodoroStatus.textContent = `Đã đặt ${minutes} phút. Bấm Bắt đầu để tập trung.`;
   }
 
   function updatePomodoroDisplay() {
@@ -2133,11 +2087,9 @@
       pomodoroTimer = null;
       pomodoroRunning = false;
       pomodoroStartTime = null;
-      pomodoroStatus.textContent = t('pomodoroComplete');
+      pomodoroStatus.textContent = 'Hoàn thành! Nghỉ 5 phút rồi bắt đầu phiên mới.';
       const minutes = pomodoroDuration / 60;
-      const completeMsg = currentLang === 'en' ? `You just completed ${minutes} minutes of focus. Take a break!` : `Bạn vừa hoàn thành ${minutes} phút tập trung. Nghỉ một chút nhé.`;
-      const completeTitle = currentLang === 'en' ? 'Focus session complete' : 'Hết phiên tập trung';
-      sendNotification(completeTitle, completeMsg);
+      sendNotification('Hết phiên tập trung', `Bạn vừa hoàn thành ${minutes} phút tập trung. Nghỉ một chút nhé.`);
     }
   }
 
@@ -2147,7 +2099,7 @@
     // Tính toán thời điểm bắt đầu dựa trên thời gian còn lại
     // Để khi resume, nó tiếp tục từ thời gian đã pause, không reset
     pomodoroStartTime = new Date().getTime() - (pomodoroDuration - pomodoroRemaining) * 1000;
-    pomodoroStatus.textContent = t('pomodoroFocus');
+    pomodoroStatus.textContent = 'Đang tập trung... Đừng chạm điện thoại / mạng xã hội.';
 
     if (pomodoroTimer) clearInterval(pomodoroTimer);
 
@@ -2162,7 +2114,7 @@
       clearInterval(pomodoroTimer);
       pomodoroTimer = null;
     }
-    pomodoroStatus.textContent = t('pomodoroPaused');
+    pomodoroStatus.textContent = 'Đã tạm dừng. Khi sẵn sàng, bấm Bắt đầu lại.';
   }
 
   function resetPomodoro() {
@@ -2174,7 +2126,7 @@
       pomodoroTimer = null;
     }
     renderPomodoro();
-    pomodoroStatus.textContent = t('pomodoroReset');
+    pomodoroStatus.textContent = 'Đã reset. Bấm Bắt đầu để bắt đầu lại phiên tập trung.';
   }
 
   // Khi tab quay lại focus, cập nhật lại display
@@ -2190,66 +2142,12 @@
   document.getElementById('pomodoroPauseBtn').addEventListener('click', pausePomodoro);
   document.getElementById('pomodoroResetBtn').addEventListener('click', resetPomodoro);
 
-  // ==========================
-  // Settings & Language
-  // ==========================
-
-  const settingsBtn = document.getElementById('settingsBtn');
-  const settingsModal = document.getElementById('settingsModal');
-  const settingsCloseBtn = document.getElementById('settingsCloseBtn');
-  const languageSelect = document.getElementById('languageSelect');
-  const notifStatusInSettings = document.getElementById('notifStatusInSettings');
-
-  settingsBtn.addEventListener('click', () => {
-    settingsModal.classList.add('show');
-    updateNotifStatusInSettings();
-  });
-
-  settingsCloseBtn.addEventListener('click', () => {
-    settingsModal.classList.remove('show');
-  });
-
-  settingsModal.addEventListener('click', (e) => {
-    if (e.target === settingsModal) {
-      settingsModal.classList.remove('show');
-    }
-  });
-
-  languageSelect.addEventListener('change', () => {
-    setLanguage(languageSelect.value);
-  });
-
-  function updateNotifStatusInSettings() {
-    if (!('Notification' in window)) {
-      notifStatusInSettings.innerHTML = '<strong>⚠️ Not supported in this browser</strong>';
-      return;
-    }
-    if (Notification.permission === 'granted') {
-      notifStatusInSettings.innerHTML = '<strong style="color: #166534;">✅ Notifications enabled</strong>';
-    } else if (Notification.permission === 'denied') {
-      notifStatusInSettings.innerHTML = '<strong style="color: #991b1b;">❌ Notifications blocked</strong>';
-    } else {
-      notifStatusInSettings.innerHTML = `
-        <strong style="color: #92400e;">⏳ Not enabled yet</strong>
-        <button class="btn-primary" style="width: 100%; margin-top: 8px; padding: 8px;" onclick="Notification.requestPermission().then(() => updateNotifStatusInSettings())">
-          🔔 Enable Notifications
-        </button>
-      `;
-    }
-  }
-
   // Khởi tạo hiển thị ban đầu
   renderPomodoro();
 
   // ==========================
   // Khởi tạo chung
   // ==========================
-
-  // Apply translations on page load
-  applyTranslations();
-
-  // Set initial pomodoro status after translations are applied
-  pomodoroStatus.textContent = t('pomodoroReady');
 
   loadTasks();
   loadImportantTasks();
