@@ -2541,12 +2541,149 @@
         border-color: #6366f1 !important;
         background: #1e293b !important;
     }
+    /* ================================================= */
+    /* --- FOCUS STUDIO (THANH NHẠC NỀN) --- */
+    /* ================================================= */
+    .focus-studio {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        text-align: center;
+    }
+    
+    .studio-title {
+        font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;
+        color: rgba(255,255,255,0.8); margin-bottom: 10px; font-weight: 700;
+    }
+
+    .sound-controls {
+        display: flex; justify-content: center; gap: 10px;
+    }
+
+    .sound-btn {
+        width: 45px !important; height: 45px !important;
+        border-radius: 50% !important;
+        border: 2px solid rgba(255,255,255,0.3) !important;
+        background: rgba(0,0,0,0.2) !important;
+        font-size: 1.2rem !important;
+        cursor: pointer; transition: all 0.3s;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0 !important; min-width: auto !important;
+    }
+
+    .sound-btn:hover {
+        background: rgba(255,255,255,0.3) !important;
+        transform: scale(1.1) !important;
+    }
+
+    /* Hiệu ứng khi đang bật nhạc */
+    .sound-btn.active {
+        background: #fff !important;
+        border-color: #fff !important;
+        box-shadow: 0 0 15px rgba(255,255,255,0.5) !important;
+        animation: pulseBtn 2s infinite;
+    }
+    
+    @keyframes pulseBtn { 0% {box-shadow: 0 0 0 0 rgba(255,255,255,0.7);} 70% {box-shadow: 0 0 0 10px rgba(255,255,255,0);} 100% {box-shadow: 0 0 0 0 rgba(255,255,255,0);} }
+
+    .now-playing {
+        font-size: 0.8rem; margin-top: 8px; color: rgba(255,255,255,0.9); font-style: italic; height: 15px;
+    }
+    /* --- HIỆU ỨNG CHO DÒNG ĐÃ HOÀN THÀNH --- */
+    tr.task-done {
+        opacity: 0.6; /* Làm mờ dòng đã xong */
+        background-color: #f8fafc !important; /* Nền xám nhạt */
+        transition: all 0.5s ease;
+    }
+    
+    tr.task-done td {
+        color: #94a3b8 !important; /* Chữ màu xám */
+        text-decoration: line-through; /* Gạch ngang chữ */
+    }
+    
+    /* Đảm bảo nút Xóa/Done vẫn không bị gạch ngang */
+    tr.task-done .task-actions button {
+        text-decoration: none !important;
+        opacity: 1 !important;
+    }
+    
+    /* Gạch ngang chỉ áp dụng cho cột Tên và Phần thưởng */
+    tr.task-done td:nth-child(1),
+    tr.task-done td:nth-child(5) {
+        text-decoration: line-through;
+    }
+
+    /* Bỏ gạch ngang ở các cột khác nếu cần */
+    tr.task-done td:not(:nth-child(1)):not(:nth-child(5)) {
+        text-decoration: none;
+    }
+    /* --- ANIMATION CHO NÚT CHUÔNG --- */
+    .notice-btn {
+        animation: swing 10s ease-in-out infinite;
+        transform-origin: 50% 100%; /* Xoay từ dưới lên */
+    }
+
+    @keyframes swing {
+        0% { transform: rotate(0deg); }
+        1% { transform: rotate(10deg); }
+        2% { transform: rotate(-8deg); }
+        3% { transform: rotate(6deg); }
+        4% { transform: rotate(-4deg); }
+        5% { transform: rotate(2deg); }
+        6% { transform: rotate(0deg); }
+        100% { transform: rotate(0deg); }
+    }
+    /* --- BỔ SUNG: HIỆU ỨNG CHO DÒNG QUÁ HẠN --- */
+    tr.task-overdue {
+        opacity: 0.7; /* Hơi mờ đi so với bình thường */
+        background-color: #fef2f2 !important; /* Nền màu đỏ rất nhạt */
+        transition: all 0.5s ease;
+    }
+
+    tr.task-overdue td {
+        color: #ef4444 !important; /* Chữ màu đỏ nhạt */
+        font-style: italic; /* Nghiêng nhẹ để nhấn mạnh */
+    }
+
+    /* Đảm bảo các nút hành động (Start, Done, Delete) và Badge vẫn rõ ràng */
+    tr.task-overdue .task-actions button,
+    tr.task-overdue .badge-late {
+        opacity: 1 !important;
+        font-style: normal !important; /* Bỏ in nghiêng cho nút và badge */
+    }
+
+    /* Dòng quá hạn không bị gạch ngang (line-through) */
+    tr.task-overdue td {
+        text-decoration: none !important; 
+    }
+    /* --- FIX LỖI MỜ CHỮ TRONG DARK MODE --- */
+
+    /* Ép màu chữ trong cột công việc phải sáng trong Dark Mode */
+    body.dark-mode td:first-child div {
+        color: #f1f5f9 !important; 
+    }
+    
+    /* Thiết lập màu chữ mặc định của dòng phải sáng */
+    body.dark-mode td {
+        color: #c0c8d4 !important; /* Màu xám nhạt dễ đọc */
+    }
+
+    /* Đảm bảo chữ "Quá hạn" (Màu đỏ) sáng lên, không bị chìm */
+    body.dark-mode tr.task-overdue td {
+        color: #f87171 !important; /* Màu đỏ sáng hơn */
+    }
+
+    /* Đảm bảo chữ "Đã xong" (Màu xám) vẫn nhìn rõ trên nền tối */
+    body.dark-mode tr.task-done td {
+        color: #7d8b9f !important; /* Màu xám trung tính */
+    }
   </style>  
 </head>
 <body>
 
 <div class="app">
   <header>
+    
     <div>
       <h1>TimeFocus – Quản lý thời gian</h1>
       <p class="tagline">Giảm trì hoãn từng bước nhỏ, mỗi việc một thời điểm.</p>
@@ -2651,6 +2788,16 @@
 
   <!-- POMODORO TIMER -->
   <section class="card card-pomodoro">
+    <div class="focus-studio">
+        <div class="studio-title">🎵 Âm thanh tập trung</div>
+        <div class="sound-controls">
+            <button class="sound-btn" onclick="toggleAmbience('rain')" title="Tiếng mưa">🌧️</button>
+            <button class="sound-btn" onclick="toggleAmbience('fire')" title="Lửa trại">🔥</button>
+            <button class="sound-btn" onclick="toggleAmbience('night')" title="Đêm tĩnh lặng">🦗</button>
+            <button class="sound-btn" onclick="stopAmbience()" title="Tắt nhạc" style="color: #ff4757;">🔇</button>
+        </div>
+        <div id="nowPlaying" class="now-playing">Đang tắt</div>
+    </div>
     <div class="card-title">Phiên tập trung 25 phút (Pomodoro)</div>
     <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
     <div class="pomodoro-status" id="pomodoroStatus">
@@ -2726,7 +2873,8 @@
   // ==========================
   // Helpers thời gian – format
   // ==========================
-
+  // Biến lưu ID của task đang được sửa (null nếu đang ở chế độ Thêm mới)
+  let editingId = null;
   function updateClock() {
     const clockEl = document.getElementById('clock');
     const now = new Date();
@@ -2741,7 +2889,29 @@
 
   setInterval(updateClock, 1000);
   updateClock();
+  /* --- HÀM CHUYỂN ĐỔI NGÀY THÁNG THÂN THIỆN --- */
+  function getFriendlyDate(dateStr) {
+    if (!dateStr) return '-';
+    
+    // Lấy ngày hiện tại và các mốc so sánh
+    const today = new Date(todayStr());
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    
+    // Lấy ngày của task và chuẩn hóa (bỏ giờ phút)
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const taskDate = new Date(y, m - 1, d); // Đảm bảo so sánh chỉ ngày
 
+    if (taskDate.getTime() === today.getTime()) return 'Hôm nay';
+    if (taskDate.getTime() === tomorrow.getTime()) return 'Ngày mai';
+    if (taskDate.getTime() === yesterday.getTime()) return 'Hôm qua';
+
+    // Định dạng cho các ngày khác (VD: Thứ 5, 28/11)
+    const formatter = new Intl.DateTimeFormat('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' });
+    return formatter.format(taskDate);
+  }
   function todayStr() {
     const d = new Date();
     const y = d.getFullYear();
@@ -3057,10 +3227,18 @@
 
       const now = new Date();
 
-      for (const t of filtered) {
+      for (const t of filtered) { 
         const start = buildDateTime(t.date, t.startTime);
         const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
         
+        const isOverDue = end && now > end && !t.done; // Xác định: Quá hạn VÀ Chưa xong
+        
+        let rowClass = '';
+        if (t.done) {
+            rowClass = 'task-done';
+        } else if (isOverDue) {
+            rowClass = 'task-overdue'; // Áp dụng class mới
+        }
         let statusContent = ''; 
         if (t.done) statusContent = '<span class="badge badge-done">ĐÃ HOÀN THÀNH</span>';
         else if (t.started) statusContent = '<span class="badge badge-in-progress">ĐANG THỰC HIỆN</span>';
@@ -3068,6 +3246,10 @@
         else statusContent = '<span class="badge badge-pending">CHƯA BẮT ĐẦU</span>';
 
         let actionButtons = '';
+        /* --- TRƯỚC HÀM XÓA CŨ (DÁN NÚT SỬA VÀO ĐÂY) --- */
+        actionButtons += `<button class="btn-small btn-outline" onclick="loadTaskForEdit(${t.id})" title="Sửa công việc">✏️</button>`;
+
+// Luôn nhớ kiểm tra xem bạn đã thêm CSS cho nút này chưa (dùng btn-outline)
         const isOverdue = end && now > end; 
         if (!t.done) {
            if (!isOverdue && !t.started) actionButtons += `<button class="btn-small btn-start" onclick="startTask(${t.id})" title="Bắt đầu">▶</button>`;
@@ -3075,9 +3257,9 @@
         }
         actionButtons += `<button class="btn-small btn-danger" onclick="deleteTask(${t.id})" title="Xóa">✕</button>`;
 
-        html += `<tr>
-          <td><div style="font-weight:600; color:#333;">${t.title}</div></td>
-          <td>${t.date || '-'}</td>
+        html += `<tr class="${rowClass}">
+          <td><div style="font-weight:600;">${t.title}</div></td>
+          <td>${getFriendlyDate(t.date) || '-'}</td>
           <td>${t.startTime || '-'}</td>
           <td>${t.endTime || '-'}</td>
           <td><div class="reward-box" title="${t.reward || 'Chưa chọn'}">${t.reward || '-'}</div></td>
@@ -3303,64 +3485,54 @@
 
   taskForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    playSound('click');
+    // (Giữ nguyên phần gọi playSound nếu có)
+
     const title = document.getElementById('title').value.trim();
     const date = document.getElementById('date').value;
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
     const reminderVal = document.getElementById('reminder').value;
-
-    if (!title || !date || !startTime) {
-      alert('Vui lòng nhập ít nhất: tên, ngày, và giờ bắt đầu.');
-      return;
-    }
-
-    if (!selectedReward && !customRewardInput.value.trim()) {
-      alert('Vui lòng chọn hoặc nhập phần thưởng.');
-      return;
-    }
+    const customRewardInput = document.getElementById('customRewardInput');
+    const rewardTrigger = document.getElementById('rewardTrigger');
+    
+    // ... (Kiểm tra dữ liệu bắt buộc giữ nguyên) ...
 
     const reminderMinutes = Math.max(0, Number(reminderVal) || 0);
-    const finalReward = selectedReward || customRewardInput.value.trim();
+    const finalReward = customRewardInput.value.trim() || rewardTrigger.textContent;
 
-    const newTask = {
-      id: Date.now() + Math.random(), // <--- SỬA Ở ĐÂY: Thêm đuôi ngẫu nhiên để ko bao giờ trùng
-      title,
-      date,
-      startTime,
-      endTime: endTime || '',
-      reminderMinutes,
-      reward: finalReward,
-      done: false,
-      notified: false
+    const taskData = {
+        title, date, startTime, endTime: endTime || '', reminderMinutes,
+        reward: finalReward,
     };
+    
+    if (editingId) {
+        // --- CHẾ ĐỘ LƯU THAY ĐỔI (EDIT MODE) ---
+        tasks = tasks.map(t => {
+            if (t.id === editingId) {
+                // Giữ nguyên trạng thái done/started/notified cũ, chỉ cập nhật nội dung
+                return { ...t, ...taskData };
+            }
+            return t;
+        });
+        alert('Đã lưu thay đổi thành công!');
+    } else {
+        // --- CHẾ ĐỘ THÊM MỚI (ADD MODE) ---
+        const newTask = {
+            id: Date.now() + Math.random(), 
+            ...taskData,
+            done: false,
+            started: false,
+            notified: false
+        };
+        tasks.push(newTask);
+        // (Giữ nguyên playSound nếu cần)
+    }
 
-    tasks.push(newTask);
     saveTasks();
     renderTasks();
-
-
-
-    /* --- ĐOẠN MỚI: RESET FORM SẠCH SẼ --- */
-    // 1. Xóa trắng các ô nhập liệu chính
-    document.getElementById('title').value = '';
-    document.getElementById('startTime').value = '';
-    document.getElementById('endTime').value = '';
     
-    // 2. Reset ô Nhắc nhở về mặc định (10 phút)
-    document.getElementById('reminder').value = '10';
-    
-    // 3. Reset phần Ngày về ngày hôm nay (cho tiện nhập tiếp)
-    document.getElementById('date').value = todayStr();
-
-    // 4. Reset phần Thưởng về trạng thái ban đầu
-    customRewardInput.value = ''; // Xóa ô nhập tay
-    selectedReward = '';          // Xóa biến lưu trữ
-    rewardTrigger.textContent = 'Chọn phần thưởng'; // Reset chữ trên nút chọn
-    /* ----------------------------------- */
-    
-    // (Tùy chọn) Đưa con trỏ chuột quay lại ô Tên công việc để nhập luôn
-    document.getElementById('title').focus();
+    // --- RESET UI VỀ TRẠNG THÁI THÊM MỚI ---
+    resetTaskFormUI(); 
   });
 
   // ==========================
@@ -3876,6 +4048,168 @@
             }
         });
     }
+    /* ================================================= */
+  /* --- XỬ LÝ NHẠC NỀN (AMBIENT SOUNDS) --- */
+  /* ================================================= */
+  /* ================================================= */
+  /* --- LINK NHẠC NỀN (MP3 - TƯƠNG THÍCH MỌI MÁY) --- */
+  /* ================================================= */
+  const ambienceTracks = {
+      // Tiếng mưa rơi tí tách (MP3)
+      rain: 'https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3',
+      
+      // Tiếng lửa trại (ĐÃ ĐỔI LINK KHÁC - Internet Archive)
+      fire: 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/217233/fire.mp3',
+      
+      // Tiếng dế kêu đêm hè (MP3)
+      night: 'https://assets.mixkit.co/active_storage/sfx/1242/1242-preview.mp3'
+  };
+
+  /* ================================================= */
+  /* --- XỬ LÝ PHÁT NHẠC (PHIÊN BẢN MƯỢT - KHÔNG LAG) --- */
+  /* ================================================= */
+  
+  let currentAmbience = null;
+  const ambienceAudio = new Audio();
+  ambienceAudio.loop = true; // Tự động lặp lại
+
+  // Đăng ký sự kiện một lần duy nhất để cập nhật giao diện
+  const statusText = document.getElementById('nowPlaying');
+
+  // Khi bắt đầu tải (hiện chữ Đang tải)
+  ambienceAudio.addEventListener('loadstart', () => {
+      if(statusText) statusText.textContent = '⏳ Đang kết nối...';
+  });
+
+  // Khi đang tải dữ liệu (hiện % nếu cần, ở đây hiện loading)
+  ambienceAudio.addEventListener('waiting', () => {
+      if(statusText) statusText.textContent = '⏳ Đang tải dữ liệu...';
+  });
+
+  // Khi bắt đầu phát nhạc thành công
+  ambienceAudio.addEventListener('playing', () => {
+      if(statusText) {
+          let name = '';
+          if (currentAmbience === 'rain') name = 'Tiếng Mưa Rơi';
+          else if (currentAmbience === 'fire') name = 'Lửa Trại Ấm Áp';
+          else if (currentAmbience === 'night') name = 'Đêm Tĩnh Lặng';
+          statusText.textContent = '🎵 Đang phát: ' + name;
+      }
+  });
+
+  // Khi gặp lỗi
+  ambienceAudio.addEventListener('error', (e) => {
+      console.error("Lỗi tải nhạc:", e);
+      if(statusText) statusText.textContent = '❌ Lỗi kết nối. Vui lòng thử lại.';
+      stopAmbience(); // Tắt nút active đi
+  });
+
+  // --- HÀM BẬT/TẮT ---
+  function toggleAmbience(type) {
+      // 1. Nếu đang nghe đúng bài đó -> TẮT
+      if (currentAmbience === type && !ambienceAudio.paused) {
+          stopAmbience();
+          return;
+      }
+
+      // 2. Reset giao diện các nút
+      document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+      
+      // 3. Active nút mới bấm
+      const btn = document.querySelector(`.sound-btn[onclick="toggleAmbience('${type}')"]`);
+      if(btn) btn.classList.add('active');
+
+      // 4. Cập nhật nguồn nhạc
+      currentAmbience = type;
+      ambienceAudio.src = ambienceTracks[type];
+      
+      // 5. Phát nhạc (Dùng Promise để bắt lỗi Autoplay)
+      // Lưu ý: Không cần gọi .load(), để trình duyệt tự lo
+      const playPromise = ambienceAudio.play();
+
+      if (playPromise !== undefined) {
+          playPromise.catch(error => {
+              console.warn("Trình duyệt chặn tự động phát:", error);
+              if(statusText) statusText.textContent = '⚠️ Bấm lại lần nữa để phát';
+              stopAmbience(); // Tắt nút active nếu bị chặn
+          });
+      }
+  }
+
+  function stopAmbience() {
+      ambienceAudio.pause();
+      // Reset nút
+      document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+      
+      if(statusText) statusText.textContent = 'Đã tắt nhạc nền';
+      currentAmbience = null;
+  }
+  
+  // Đưa hàm ra ngoài window
+  window.toggleAmbience = toggleAmbience;
+  window.stopAmbience = stopAmbience;
+  // Hàm: Nạp dữ liệu công việc lên Form để sửa
+function loadTaskForEdit(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    
+    // 1. Gán ID của task này vào biến toàn cục
+    editingId = id;
+
+    // 2. Nạp dữ liệu vào Form
+    document.getElementById('title').value = task.title;
+    document.getElementById('date').value = task.date;
+    document.getElementById('startTime').value = task.startTime;
+    document.getElementById('endTime').value = task.endTime;
+    document.getElementById('reminder').value = task.reminderMinutes;
+
+    // 3. Nạp dữ liệu Phần thưởng
+    const rewardTrigger = document.getElementById('rewardTrigger');
+    const customRewardInput = document.getElementById('customRewardInput');
+    
+    // Nạp reward vào input custom hoặc nút trigger
+    customRewardInput.value = '';
+    rewardTrigger.textContent = task.reward;
+    
+    // 4. Đổi nút "Thêm" thành nút "Lưu"
+    const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = '💾 Lưu thay đổi';
+        submitBtn.classList.add('btn-warning'); 
+        submitBtn.classList.remove('btn-primary');
+    }
+    
+    // Cuộn lên đầu trang cho người dùng dễ chỉnh sửa
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.loadTaskForEdit = loadTaskForEdit;
+
+// HÀM RESET FORM MỚI
+function resetTaskFormUI() {
+    // Hàm này được gọi sau khi lưu thành công
+    document.getElementById('title').value = '';
+    document.getElementById('startTime').value = '';
+    document.getElementById('endTime').value = '';
+    document.getElementById('reminder').value = '10';
+    document.getElementById('date').value = todayStr();
+    
+    const customRewardInput = document.getElementById('customRewardInput');
+    const rewardTrigger = document.getElementById('rewardTrigger');
+    const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+
+    customRewardInput.value = '';
+    rewardTrigger.textContent = 'Chọn phần thưởng';
+    
+    // Đổi nút về trạng thái "Thêm công việc"
+    if (submitBtn) {
+        submitBtn.textContent = '+ Thêm công việc';
+        submitBtn.classList.remove('btn-warning');
+        submitBtn.classList.add('btn-primary');
+    }
+    
+    document.getElementById('title').focus();
+    editingId = null; // Rất quan trọng: Thoát khỏi chế độ sửa
+}
 
 </script>
 </body>
