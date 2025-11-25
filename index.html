@@ -146,18 +146,109 @@
       height: 300px;
     }
 
-    .notice {
-      font-size: clamp(0.75rem, 1.6vw, 0.9rem);
-      color: #555;
-      background: #f0f4ff;
-      padding: clamp(6px, 1.5vw, 10px) clamp(10px, 1.8vw, 14px);
-      border-radius: 8px;
-      border-left: 3px solid #2563eb;
+    .notice-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: clamp(42px, 8vw, 48px);
+      height: clamp(42px, 8vw, 48px);
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      transition: var(--transition);
+      position: relative;
+      flex-shrink: 0;
     }
 
-    .notice span {
+    .notice-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .notice-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notice-modal.show {
+      display: flex;
+    }
+
+    .notice-modal-content {
+      background: white;
+      padding: clamp(24px, 6vw, 32px);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .notice-modal-title {
+      font-size: clamp(1.2rem, 3vw, 1.5rem);
       font-weight: 700;
-      color: #2563eb;
+      margin-bottom: 12px;
+      color: #1f2937;
+    }
+
+    .notice-status {
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      margin-bottom: 20px;
+      padding: clamp(12px, 2vw, 16px);
+      border-radius: 12px;
+      background: #f0f4ff;
+    }
+
+    .notice-status.enabled {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .notice-status.disabled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .notice-button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .notice-button-group button {
+      flex: 1;
+      padding: clamp(10px, 2vw, 14px) clamp(16px, 2vw, 20px);
+      font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+    }
+
+    .notice-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #f0f0f0;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .notice-close-btn:hover {
+      background: #e0e0e0;
     }
 
     .btn-primary {
@@ -221,6 +312,31 @@
       font-weight: 700;
       margin-bottom: 12px;
       color: #1f2937;
+    }
+
+    /* Pomodoro Card Special Style */
+    .card-pomodoro {
+      background: linear-gradient(135deg, #fff5f7 0%, #ffe4e9 50%, #ffd4e0 100%) !important;
+      border: 2px solid #ffb3cc !important;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-pomodoro::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(20px, 20px); }
     }
 
     form {
@@ -292,6 +408,44 @@
       border-collapse: collapse;
       font-size: clamp(0.8rem, 1.8vw, 0.95rem);
       margin-top: clamp(8px, 2vw, 12px);
+      table-layout: auto;
+    }
+
+    div[style*="overflow-x: auto"] {
+      -webkit-overflow-scrolling: touch;
+      border-radius: 8px;
+    }
+
+    /* Only show scrollbar on mobile */
+    @media (max-width: 768px) {
+      div[style*="overflow-x: auto"] {
+        overflow-x: auto;
+      }
+
+      div[style*="overflow-x: auto"]::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+
+      div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    }
+
+    /* Desktop: let table expand naturally, browser handles overflow */
+    @media (min-width: 769px) {
+      div[style*="overflow-x: auto"] {
+        overflow-x: visible;
+      }
     }
 
     th {
@@ -301,13 +455,59 @@
       letter-spacing: 0.05em;
       color: #4b5563;
       font-weight: 700;
-      padding: clamp(8px, 1.5vw, 12px) clamp(6px, 1vw, 8px);
+      padding: clamp(8px, 1.5vw, 12px) clamp(6px, 1vw, 10px);
+      white-space: nowrap;
+      min-width: fit-content;
     }
 
     td {
-      padding: clamp(8px, 1.5vw, 10px) clamp(6px, 1vw, 8px);
+      padding: clamp(8px, 1.5vw, 10px) clamp(6px, 1vw, 10px);
       border-bottom: 1px solid #e5e7eb;
       vertical-align: middle;
+      white-space: normal;
+    }
+
+    /* Desktop: Ensure columns have good width */
+    @media (min-width: 1025px) {
+      table {
+        min-width: 100%;
+        width: max-content;
+      }
+
+      th:nth-child(1) { width: auto; } /* Công việc - flexible, grows with content */
+      th:nth-child(2) { width: 130px; } /* Ngày */
+      th:nth-child(3) { width: 110px; } /* Bắt đầu */
+      th:nth-child(4) { width: 110px; } /* Kết thúc */
+      th:nth-child(5) { width: 90px; }  /* Phần thưởng */
+      th:nth-child(6) { width: 120px; } /* Nhắc trước */
+      th:nth-child(7) { width: 130px; } /* Trạng thái */
+      th:nth-child(8) { width: 80px; } /* Hành động */
+
+      td:nth-child(1) { width: auto; word-wrap: break-word; overflow-wrap: break-word; }
+      td:nth-child(2) { width: 130px; }
+      td:nth-child(3) { width: 110px; }
+      td:nth-child(4) { width: 110px; }
+      td:nth-child(5) { width: 90px; text-align: center; }
+      td:nth-child(6) { width: 120px; }
+      td:nth-child(7) { width: 130px; }
+      td:nth-child(8) { width: 80px; text-align: center; }
+    }
+
+    @media (max-width: 1024px) {
+      table {
+        font-size: clamp(0.75rem, 1.6vw, 0.9rem);
+      }
+
+      td {
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: normal !important;
+      }
+
+      th {
+        white-space: normal;
+      }
     }
 
     tr:hover {
@@ -328,6 +528,8 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.03em;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .badge-today {
@@ -343,6 +545,17 @@
     .badge-done {
       background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
       color: #164e63;
+    }
+
+    .badge-in-progress {
+      background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%);
+      color: #312e81;
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
     }
 
     .status-dot {
@@ -365,6 +578,16 @@
       background: #ef4444;
     }
 
+    .status-in-progress {
+      background: #6366f1;
+      animation: pulse-dot 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+      50% { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0); }
+    }
+
     .task-actions {
       display: flex;
       gap: 6px;
@@ -378,6 +601,14 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
       border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Full width for task action buttons */
+    .task-actions .btn-small {
+      width: 100%;
     }
 
     .btn-success {
@@ -418,10 +649,11 @@
       font-weight: 800;
       text-align: center;
       margin: clamp(12px, 3vw, 16px) 0 clamp(10px, 2vw, 12px);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 50%, #ff4081 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      filter: drop-shadow(0 2px 4px rgba(255, 107, 107, 0.3));
     }
 
     .pomodoro-status {
@@ -714,6 +946,40 @@
       line-height: 1.4;
     }
 
+    .important-task-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .important-task-done {
+      background: rgba(255, 255, 255, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .important-task-done:hover {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(255, 255, 255, 0.8);
+      transform: scale(1.1);
+    }
+
+    .important-task-item.completed {
+      opacity: 0.6;
+    }
+
+    .important-task-item.completed .important-task-text {
+      text-decoration: line-through;
+    }
+
     .important-task-delete {
       background: rgba(255, 255, 255, 0.3);
       border: 2px solid rgba(255, 255, 255, 0.5);
@@ -951,10 +1217,17 @@
   </header>
 
   <div class="top-row">
-    <button id="enableNotifyBtn" class="btn-outline">🔔 Bật thông báo trình duyệt</button>
-    <span class="notice">
-      Trạng thái thông báo: <span id="notifyStatus">Chưa kiểm tra</span>
-    </span>
+    <button id="noticeBtn" class="notice-btn" title="Thông báo trình duyệt">🔔</button>
+  </div>
+
+  <!-- NOTIFICATION MODAL -->
+  <div id="noticeModal" class="notice-modal">
+    <div class="notice-modal-content">
+      <button class="notice-close-btn" id="noticeCloseBtn">✕</button>
+      <div class="notice-modal-title">🔔 Thông báo trình duyệt</div>
+      <div class="notice-status" id="noticeStatusDisplay">Chưa kiểm tra</div>
+      <div id="noticeButtonGroup" class="notice-button-group"></div>
+    </div>
   </div>
 
   <!-- FORM THÊM CÔNG VIỆC -->
@@ -984,8 +1257,6 @@
           <div class="reward-menu-item" data-reward="🎮 Chơi 1 ván game">🎮 Chơi 1 ván game</div>
           <div class="reward-menu-item" data-reward="☕ Nghỉ 10 phút">☕ Nghỉ 10 phút</div>
           <div class="reward-menu-item" data-reward="📺 Xem video yêu thích">📺 Xem video yêu thích</div>
-          <div class="reward-menu-item" data-reward="🍿 Ăn snack">🍿 Ăn snack</div>
-          <div class="reward-menu-item" data-reward="🎵 Nghe nhạc 15 phút">🎵 Nghe nhạc 15 phút</div>
           <div class="reward-menu-item" data-reward="🚶 Đi bộ ngoài trời">🚶 Đi bộ ngoài trời</div>
           <div class="reward-custom-input-wrapper">
             <input type="text" id="customRewardInput" placeholder="Hoặc nhập phần thưởng khác..." style="width: 100%;">
@@ -1014,7 +1285,7 @@
   </section>
 
   <!-- POMODORO TIMER -->
-  <section class="card">
+  <section class="card card-pomodoro">
     <div class="card-title">Phiên tập trung 25 phút (Pomodoro)</div>
     <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
     <div class="pomodoro-status" id="pomodoroStatus">
@@ -1110,6 +1381,11 @@
     try {
       const raw = localStorage.getItem(IMPORTANT_TASKS_KEY);
       importantTasks = raw ? JSON.parse(raw) : [];
+      // Migrate old tasks without done property
+      importantTasks = importantTasks.map(task => ({
+        ...task,
+        done: task.done ?? false
+      }));
     } catch (e) {
       console.error('Lỗi đọc important tasks', e);
       importantTasks = [];
@@ -1158,7 +1434,7 @@
     if (!filtered.length) {
       container.innerHTML = '<p class="tasks-empty">Không có công việc phù hợp với bộ lọc hiện tại.</p>';
     } else {
-      let html = '<table><thead><tr>' +
+      let html = '<div style="overflow-x: auto; -webkit-overflow-scrolling: touch;"><table><thead><tr>' +
         '<th>Công việc</th>' +
         '<th>Ngày</th>' +
         '<th>Bắt đầu</th>' +
@@ -1185,9 +1461,14 @@
           statusClass = 'status-done';
           badge = '<span class="badge badge-done">Đã hoàn thành</span>';
         } else if (end && now > end) {
-          statusLabel = 'Trễ hạn';
+          statusLabel = 'Quá hạn';
           statusClass = 'status-overdue';
           badge = '<span class="badge badge-late">Quá hạn</span>';
+        } else if (start && now >= start && (!end || now <= end)) {
+          // Đang làm (trong khoảng thời gian bắt đầu đến kết thúc)
+          statusLabel = 'Chưa bắt đầu';
+          statusClass = 'status-in-progress';
+          badge = '';
         } else if (isToday) {
           badge = '<span class="badge badge-today">Hôm nay</span>';
         }
@@ -1198,6 +1479,11 @@
           const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
           reward = Math.ceil(durationMinutes / 10); // 10 phút = 1 điểm
         }
+
+        // Chỉ hiển thị nút Xoá nếu chưa xong, ẩn nút Xong nếu đã xong
+        const actionButtons = t.done ? 
+          '' : 
+          `<button class="btn-small btn-success" onclick="markDone(${t.id})">Xong</button>`;
 
         html += `<tr>
           <td>
@@ -1218,14 +1504,13 @@
           </td>
           <td>
             <div class="task-actions">
-              <button class="btn-small btn-success" onclick="markDone(${t.id})">Xong</button>
-              <button class="btn-small btn-danger" onclick="deleteTask(${t.id})">Xoá</button>
+              ${actionButtons}
             </div>
           </td>
         </tr>`;
       }
 
-      html += '</tbody></table>';
+      html += '</tbody></table></div>';
       container.innerHTML = html;
     }
 
@@ -1396,13 +1681,22 @@
     let html = '';
     importantTasks.forEach((task, index) => {
       html += `
-        <div class="important-task-item">
+        <div class="important-task-item ${task.done ? 'completed' : ''}">
           <div class="important-task-text">${task.text}</div>
-          <button type="button" class="important-task-delete" onclick="deleteImportantTask(${task.id})">✕ Xoá</button>
+          <div class="important-task-actions">
+            <button type="button" class="important-task-done" onclick="markImportantDone(${task.id})" ${task.done ? 'style="display:none"' : ''}>✓ Xong</button>
+            <button type="button" class="important-task-delete" onclick="deleteImportantTask(${task.id})">✕ Xoá</button>
+          </div>
         </div>
       `;
     });
     importantTasksList.innerHTML = html;
+  }
+
+  function markImportantDone(id) {
+    importantTasks = importantTasks.map(t => t.id === id ? { ...t, done: true } : t);
+    saveImportantTasks();
+    renderImportantTasks();
   }
 
   function deleteImportantTask(id) {
@@ -1411,6 +1705,7 @@
     renderImportantTasks();
   }
 
+  window.markImportantDone = markImportantDone;
   window.deleteImportantTask = deleteImportantTask;
 
   addImportantTaskBtn.addEventListener('click', () => {
@@ -1422,7 +1717,8 @@
 
     importantTasks.push({
       id: Date.now(),
-      text: text
+      text: text,
+      done: false
     });
 
     saveImportantTasks();
@@ -1438,33 +1734,59 @@
   });
 
   // ==========================
-  // Thông báo trình duyệt
+  // Thông báo trình duyệt (Modal Icon)
   // ==========================
 
-  const notifyStatusEl = document.getElementById('notifyStatus');
-  const enableNotifyBtn = document.getElementById('enableNotifyBtn');
+  const noticeBtn = document.getElementById('noticeBtn');
+  const noticeModal = document.getElementById('noticeModal');
+  const noticeCloseBtn = document.getElementById('noticeCloseBtn');
+  const noticeStatusDisplay = document.getElementById('noticeStatusDisplay');
+  const noticeButtonGroup = document.getElementById('noticeButtonGroup');
 
   function updateNotifyStatus() {
     if (!('Notification' in window)) {
-      notifyStatusEl.textContent = 'Trình duyệt không hỗ trợ Notification API.';
-      enableNotifyBtn.disabled = true;
+      noticeStatusDisplay.innerHTML = '<strong>⚠️ Trình duyệt không hỗ trợ Notification API.</strong>';
+      noticeStatusDisplay.className = 'notice-status disabled';
+      noticeButtonGroup.innerHTML = '';
       return;
     }
+
     if (Notification.permission === 'granted') {
-      notifyStatusEl.textContent = 'Đã bật (granted)';
+      noticeStatusDisplay.innerHTML = '<strong>✅ Thông báo đã được bật</strong>';
+      noticeStatusDisplay.className = 'notice-status enabled';
+      noticeButtonGroup.innerHTML = '<button class="btn-outline" onclick="location.reload()">Đã bật - Đóng</button>';
     } else if (Notification.permission === 'denied') {
-      notifyStatusEl.textContent = 'Đã bị chặn (denied). Hãy kiểm tra cài đặt trình duyệt.';
+      noticeStatusDisplay.innerHTML = '<strong>❌ Thông báo bị chặn</strong><br><small>Hãy kiểm tra cài đặt trình duyệt</small>';
+      noticeStatusDisplay.className = 'notice-status disabled';
+      noticeButtonGroup.innerHTML = '<button class="btn-outline" onclick="alert(\'Kiểm tra cài đặt quyền truy cập của trình duyệt\')">Kiểm tra cài đặt</button>';
     } else {
-      notifyStatusEl.textContent = 'Chưa xin quyền (default).';
+      noticeStatusDisplay.innerHTML = '<strong>⏳ Chưa bật thông báo</strong><br><small>Bấm nút bên dưới để bật</small>';
+      noticeStatusDisplay.className = 'notice-status disabled';
+      noticeButtonGroup.innerHTML = '<button class="btn-primary" id="enableNotifyBtn">🔔 Bật thông báo</button>';
+      
+      const enableBtn = document.getElementById('enableNotifyBtn');
+      if (enableBtn) {
+        enableBtn.addEventListener('click', () => {
+          Notification.requestPermission().then(updateNotifyStatus);
+        });
+      }
     }
   }
 
-  enableNotifyBtn.addEventListener('click', function () {
-    if (!('Notification' in window)) {
-      alert('Trình duyệt của bạn không hỗ trợ thông báo.');
-      return;
+  noticeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    updateNotifyStatus();
+    noticeModal.classList.add('show');
+  });
+
+  noticeCloseBtn.addEventListener('click', () => {
+    noticeModal.classList.remove('show');
+  });
+
+  noticeModal.addEventListener('click', (e) => {
+    if (e.target === noticeModal) {
+      noticeModal.classList.remove('show');
     }
-    Notification.requestPermission().then(updateNotifyStatus);
   });
 
   updateNotifyStatus();
@@ -1588,7 +1910,9 @@
   function startPomodoro() {
     if (pomodoroRunning) return;
     pomodoroRunning = true;
-    pomodoroStartTime = new Date().getTime();
+    // Tính toán thời điểm bắt đầu dựa trên thời gian còn lại
+    // Để khi resume, nó tiếp tục từ thời gian đã pause, không reset
+    pomodoroStartTime = new Date().getTime() - (pomodoroDuration - pomodoroRemaining) * 1000;
     pomodoroStatus.textContent = 'Đang tập trung... Đừng chạm điện thoại / mạng xã hội.';
 
     if (pomodoroTimer) clearInterval(pomodoroTimer);
@@ -1644,6 +1968,13 @@
   renderTasks();
   renderTopTasks();
   renderImportantTasks();
+
+  // Re-render tasks every minute to update status in real-time
+  setInterval(() => {
+    if (document.getElementById('tasksContainer')) {
+      renderTasks();
+    }
+  }, 60000);
 
 </script>
 </body>
