@@ -863,6 +863,7 @@
   let pomodoroRemaining = pomodoroDuration;
   let pomodoroTimer = null;
   let pomodoroRunning = false;
+  let pomodoroStartTime = null;        // thời điểm thực bắt đầu
 
   const pomodoroDisplay = document.getElementById('pomodoroDisplay');
   const pomodoroStatus = document.getElementById('pomodoroStatus');
@@ -881,6 +882,7 @@
     pomodoroDuration = minutes * 60;
     pomodoroRemaining = pomodoroDuration;
     pomodoroRunning = false;
+    pomodoroStartTime = null;
     if (pomodoroTimer) {
       clearInterval(pomodoroTimer);
       pomodoroTimer = null;
@@ -889,32 +891,44 @@
     pomodoroStatus.textContent = `Đã đặt ${minutes} phút. Bấm Bắt đầu để tập trung.`;
   }
 
+  function updatePomodoroDisplay() {
+    if (!pomodoroRunning || !pomodoroStartTime) return;
+    
+    const now = new Date().getTime();
+    const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
+    const remaining = pomodoroDuration - elapsed;
+    
+    if (remaining > 0) {
+      pomodoroRemaining = remaining;
+      renderPomodoro();
+    } else {
+      pomodoroRemaining = 0;
+      renderPomodoro();
+      clearInterval(pomodoroTimer);
+      pomodoroTimer = null;
+      pomodoroRunning = false;
+      pomodoroStartTime = null;
+      pomodoroStatus.textContent = 'Hoàn thành! Nghỉ 5 phút rồi bắt đầu phiên mới.';
+      const minutes = pomodoroDuration / 60;
+      sendNotification('Hết phiên tập trung', `Bạn vừa hoàn thành ${minutes} phút tập trung. Nghỉ một chút nhé.`);
+    }
+  }
+
   function startPomodoro() {
     if (pomodoroRunning) return;
     pomodoroRunning = true;
+    pomodoroStartTime = new Date().getTime();
     pomodoroStatus.textContent = 'Đang tập trung... Đừng chạm điện thoại / mạng xã hội.';
 
     if (pomodoroTimer) clearInterval(pomodoroTimer);
 
-    pomodoroTimer = setInterval(() => {
-      if (pomodoroRemaining > 0) {
-        pomodoroRemaining--;
-        renderPomodoro();
-        if (pomodoroRemaining <= 0) {
-          clearInterval(pomodoroTimer);
-          pomodoroTimer = null;
-          pomodoroRunning = false;
-          pomodoroStatus.textContent = 'Hoàn thành! Nghỉ 5 phút rồi bắt đầu phiên mới.';
-          const minutes = pomodoroDuration / 60;
-          sendNotification('Hết phiên tập trung', `Bạn vừa hoàn thành ${minutes} phút tập trung. Nghỉ một chút nhé.`);
-        }
-      }
-    }, 1000);
+    pomodoroTimer = setInterval(updatePomodoroDisplay, 100);
   }
 
   function pausePomodoro() {
     if (!pomodoroRunning) return;
     pomodoroRunning = false;
+    pomodoroStartTime = null;
     if (pomodoroTimer) {
       clearInterval(pomodoroTimer);
       pomodoroTimer = null;
@@ -925,6 +939,7 @@
   function resetPomodoro() {
     pomodoroRemaining = pomodoroDuration;
     pomodoroRunning = false;
+    pomodoroStartTime = null;
     if (pomodoroTimer) {
       clearInterval(pomodoroTimer);
       pomodoroTimer = null;
@@ -932,6 +947,13 @@
     renderPomodoro();
     pomodoroStatus.textContent = 'Đã reset. Bấm Bắt đầu để bắt đầu lại phiên tập trung.';
   }
+
+  // Khi tab quay lại focus, cập nhật lại display
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && pomodoroRunning && pomodoroStartTime) {
+      updatePomodoroDisplay();
+    }
+  });
 
   document.getElementById('pomodoro25Btn').addEventListener('click', () => setPomodoroDuration(25));
   document.getElementById('pomodoro50Btn').addEventListener('click', () => setPomodoroDuration(50));
