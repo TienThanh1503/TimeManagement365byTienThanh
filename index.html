@@ -2233,6 +2233,207 @@
       height: 36px; padding: 4px 8px; font-size: 0.85rem;
       border: 1px solid #cbd5e1; border-radius: 6px;
     }
+    /* ================================================= */
+    /* --- FIX LỖI "CHƯA BẮT ĐẦU" (BADGE VÀNG) --- */
+    /* ================================================= */
+
+    .badge-pending {
+        display: inline-block !important;
+        background: #fef3c7 !important; /* Nền vàng nhạt */
+        color: #d97706 !important;      /* Chữ cam đậm */
+        font-weight: 800 !important;
+        font-size: 0.75rem !important;
+        padding: 6px 12px !important;
+        border-radius: 20px !important; /* Bo tròn viên thuốc */
+        border: 1px solid #fcd34d !important;
+        
+        /* QUAN TRỌNG: CẤM XUỐNG DÒNG */
+        white-space: nowrap !important; 
+        
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+        text-transform: uppercase; /* Viết hoa cho đồng bộ */
+    }
+    /* --- CẬP NHẬT BẢNG LỌC 3 CỘT --- */
+    .filter-grid {
+      grid-template-columns: 1fr 1fr 1fr !important; /* Chia đều 3 cột */
+      gap: 16px !important;
+    }
+    
+    /* Mobile thì vẫn dồn 1 cột */
+    @media (max-width: 768px) {
+        .filter-grid { grid-template-columns: 1fr !important; }
+    /* ================================================= */
+    /* --- FIX LỖI MENU LỌC LUÔN HIỆN (QUAN TRỌNG) --- */
+    /* ================================================= */
+
+    /* 1. Mặc định phải ẩn tuyệt đối */
+    #filterDropdown, .filter-dropdown {
+      display: none !important; 
+      opacity: 0;
+      visibility: hidden;
+      
+      /* Cấu hình vị trí để khi hiện ra nó nằm đè lên trên, không đẩy nội dung */
+      position: absolute !important; 
+      top: 50px !important; /* Cách nút bấm một chút */
+      left: 0 !important;
+      z-index: 999 !important; /* Đè lên tất cả */
+      background: white !important;
+      width: 100%;
+      max-width: 600px; /* Giới hạn chiều rộng cho đẹp */
+    }
+
+    /* 2. Chỉ hiện khi có class .show (do JS thêm vào khi bấm nút) */
+    #filterDropdown.show, .filter-dropdown.show {
+      display: block !important;
+      opacity: 1;
+      visibility: visible;
+      animation: slideDownFilter 0.3s ease forwards;
+    }
+
+    /* Hiệu ứng trượt xuống nhẹ nhàng */
+    @keyframes slideDownFilter {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    }
+    /* ================================================= */
+    /* --- FIX HIỂN THỊ MENU LỌC (FORCE) --- */
+    /* ================================================= */
+    
+    /* 1. Khi chưa có class show -> Ẩn tuyệt đối */
+    #filterDropdown:not(.show) {
+        display: none !important;
+    }
+
+    /* 2. Khi có class show -> Hiện ra và đè lên mọi thứ */
+    #filterDropdown.show {
+        display: block !important;
+        z-index: 99999 !important;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 8px;
+        width: 100%;
+        background: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+    }
+    /* ================================================= */
+    /* --- MODAL THÔNG BÁO (GIAO DIỆN MỚI ĐẸP) --- */
+    /* ================================================= */
+
+    /* 1. Lớp phủ nền (Overlay) - Kính mờ */
+    .notice-modal {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.6); /* Nền tối bán trong suốt */
+        backdrop-filter: blur(8px); /* Hiệu ứng làm mờ nền phía sau (Glassmorphism) */
+        z-index: 99999; /* Luôn nằm trên cùng */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        /* Mặc định ẩn, có hiệu ứng fade */
+        opacity: 0;
+        pointer-events: none; /* Không chặn chuột khi ẩn */
+        transition: all 0.3s ease;
+    }
+    /* Khi có class .show thì hiện lên */
+    .notice-modal.show {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* 2. Hộp nội dung chính */
+    .notice-modal-content {
+        background: #ffffff;
+        width: 90%;
+        max-width: 450px; /* Độ rộng tối đa */
+        border-radius: 24px; /* Bo tròn mạnh */
+        padding: 30px;
+        text-align: center;
+        position: relative; /* Để đặt nút đóng tuyệt đối */
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Bóng đổ sâu tạo chiều sâu */
+        border: 1px solid rgba(255,255,255,0.5);
+        
+        /* Hiệu ứng trồi lên khi xuất hiện */
+        transform: translateY(30px) scale(0.95);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Hiệu ứng nảy nhẹ */
+    }
+    .notice-modal.show .notice-modal-content {
+        transform: translateY(0) scale(1);
+    }
+
+    /* 3. Nút đóng (X) ở góc */
+    .notice-close-icon {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #f1f5f9;
+        border: none;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        font-size: 24px;
+        line-height: 36px;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .notice-close-icon:hover {
+        background: #e2e8f0;
+        color: #ef4444; /* Màu đỏ khi di chuột */
+        transform: rotate(90deg);
+    }
+
+    /* 4. Các thành phần bên trong */
+    .notice-modal-header h3 {
+        margin: 10px 0 20px;
+        color: #1e293b;
+        font-size: 1.5rem;
+    }
+
+    .notice-status-box {
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 12px;
+        color: #475569;
+        font-weight: 500;
+        margin-bottom: 25px;
+        border: 2px dashed #cbd5e1;
+    }
+
+    /* 5. Khu vực nút bấm hành động */
+    .notice-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+    /* Style chung cho các nút trong modal */
+    .notice-actions button {
+        padding: 12px 24px;
+        border-radius: 50px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        font-family: inherit;
+    }
+    .notice-actions button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -10px rgba(0,0,0,0.3);
+    }
+    /* Nút chính (Cấp quyền) - Màu gradient tím xanh */
+    .btn-allow {
+        background: linear-gradient(135deg, #6366f1, #3b82f6);
+        color: white;
+    }
+    /* Nút phụ (Để sau) - Màu xám */
+    .btn-deny {
+        background: #e2e8f0;
+        color: #475569;
+    } 
   </style>  
 </head>
 <body>
@@ -2252,13 +2453,21 @@
   <!-- NOTIFICATION MODAL -->
    
   <div id="noticeModal" class="notice-modal">
-    <div class="notice-modal-content">
-      <button class="notice-close-btn" id="noticeCloseBtn">✕</button>
-      <div class="notice-modal-title">🔔 Thông báo trình duyệt</div>
-      <div class="notice-status" id="noticeStatusDisplay">Chưa kiểm tra</div>
-      <div id="noticeButtonGroup" class="notice-button-group"></div>
+      <div class="notice-modal-content">
+         <button id="noticeCloseBtn" class="notice-close-icon">&times;</button>
+         
+         <div class="notice-modal-header">
+            <span style="font-size: 2rem;">🔔</span>
+            <h3>Thông báo trình duyệt</h3>
+         </div>
+         
+         <div id="noticeStatusDisplay" class="notice-status-box">
+            Đang kiểm tra trạng thái...
+         </div>
+         
+         <div id="noticeButtonGroup" class="notice-actions"></div>
+      </div>
     </div>
-  </div>
   
 
   <!-- FORM THÊM CÔNG VIỆC -->
@@ -2289,6 +2498,7 @@
           <div class="reward-menu-item" data-reward="☕ Nghỉ 10 phút">☕ Nghỉ 10 phút</div>
           <div class="reward-menu-item" data-reward="📺 Xem video yêu thích">📺 Xem video yêu thích</div>
           <div class="reward-menu-item" data-reward="🚶 Đi bộ ngoài trời">🚶 Đi bộ ngoài trời</div>
+          <div class="reward-menu-item" data-reward="Không thưởng gì">Không thưởng gì</div>
           <div class="reward-custom-input-wrapper">
             <input type="text" id="customRewardInput" placeholder="Hoặc nhập phần thưởng khác..." style="width: 100%;">
           </div>
@@ -2337,13 +2547,12 @@
       <h2>Công việc đã lên lịch</h2>
       <small id="taskSummary"></small>
     </div>
-    <div class="filter-container">
+    <div class="filter-container" style="position: relative; margin-bottom: 15px;">
       <button id="filterToggleBtn" class="filter-toggle-btn">
-        ⚡ Bộ lọc công việc
-        <span id="activeFilterCount" class="filter-badge" style="display:none">0</span>
+        ⚡ Bộ lọc: Hôm nay
       </button>
       
-      <div id="filterDropdown" class="filter-dropdown">
+      <div id="filterDropdown" class="filter-dropdown" style="display: none;">
         <div class="filter-grid">
           
           <div class="filter-column">
@@ -2353,7 +2562,6 @@
               <label class="filter-chip" data-val="week">Tuần này</label>
               <label class="filter-chip" data-val="month">Tháng này</label>
               <label class="filter-chip" data-val="all">Tất cả</label>
-              
               <div class="specific-date-wrapper">
                 <label class="filter-chip" data-val="specific">Ngày cụ thể:</label>
                 <input type="date" id="filterSpecificDate" disabled>
@@ -2368,6 +2576,14 @@
               <label class="filter-chip" data-val="pending">Chưa làm</label>
               <label class="filter-chip" data-val="in-progress">Đang làm</label>
               <label class="filter-chip" data-val="done">Đã xong</label>
+            </div>
+          </div>
+
+          <div class="filter-column">
+            <h4>🔃 Sắp xếp</h4>
+            <div class="filter-options" id="sortFilters">
+              <label class="filter-chip active" data-val="desc">⬇ Mới nhất trước</label>
+              <label class="filter-chip" data-val="asc">⬆ Cũ nhất trước</label>
             </div>
           </div>
 
@@ -2464,30 +2680,34 @@
   /* --- 3. LOGIC XỬ LÝ BỘ LỌC (DÁN CÁI NÀY VÀO ĐỂ NÚT CHẠY) --- */
   /* ============================================================ */
   
-  // 1. Cấu hình mặc định
+  /* ============================================================ */
+  /* --- LOGIC BỘ LỌC & SẮP XẾP (UPDATE: SORT TIME) --- */
+  /* ============================================================ */
+  
+  // 1. Cấu hình mặc định (Thêm sort: 'desc' - Lớn tới nhỏ)
   let filterConfig = {
     dateType: 'today', 
     dateValue: todayStr(), 
-    status: 'all' 
+    status: 'all',
+    sort: 'desc' // desc: Giảm dần (Mới -> Cũ), asc: Tăng dần (Cũ -> Mới)
   };
 
-  // 2. Lấy các phần tử từ HTML
+  // 2. Lấy phần tử
   const filterToggleBtn = document.getElementById('filterToggleBtn');
   const filterDropdown = document.getElementById('filterDropdown');
   const dateOptions = document.querySelectorAll('#dateFilters .filter-chip');
   const statusOptions = document.querySelectorAll('#statusFilters .filter-chip');
+  const sortOptions = document.querySelectorAll('#sortFilters .filter-chip'); // MỚI
   const specificDateInput = document.getElementById('filterSpecificDate');
 
-  // 3. Bắt sự kiện Click nút "Bộ lọc"
+  // 3. Sự kiện bật tắt menu
   if (filterToggleBtn) {
       filterToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Chặn sự kiện lan ra ngoài
-        filterDropdown.classList.toggle('show'); // Bật/tắt menu
+        e.stopPropagation();
+        filterDropdown.classList.toggle('show');
         filterToggleBtn.classList.toggle('active');
       });
   }
-
-  // 4. Đóng menu khi click ra ngoài
   document.addEventListener('click', (e) => {
     if (filterDropdown && filterToggleBtn) {
         if (!filterDropdown.contains(e.target) && e.target !== filterToggleBtn) {
@@ -2497,26 +2717,22 @@
     }
   });
 
-  // 5. Xử lý chọn Thời gian (Hôm nay, Tuần này...)
+  // 4. Xử lý chọn Thời gian
   if (dateOptions) {
       dateOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             const val = opt.dataset.val;
-            if (val === 'specific') return; // Nếu chọn ngày cụ thể thì bỏ qua ở đây
-
-            // Đổi màu nút đang chọn
+            if (val === 'specific') return;
             dateOptions.forEach(d => d.classList.remove('active'));
             opt.classList.add('active');
             if(specificDateInput) specificDateInput.disabled = true;
-
-            // Cập nhật cấu hình và vẽ lại bảng
             filterConfig.dateType = val;
             renderTasks();
         });
       });
   }
 
-  // 6. Xử lý chọn Ngày cụ thể (Input Date)
+  // 5. Xử lý chọn Ngày cụ thể
   const specificLabel = document.querySelector('.filter-chip[data-val="specific"]');
   if (specificLabel && specificDateInput) {
       specificLabel.addEventListener('click', () => {
@@ -2524,34 +2740,43 @@
           specificLabel.classList.add('active');
           specificDateInput.disabled = false;
           specificDateInput.focus();
-          
           filterConfig.dateType = 'specific';
           if(specificDateInput.value) {
               filterConfig.dateValue = specificDateInput.value;
               renderTasks();
           }
       });
-
       specificDateInput.addEventListener('change', (e) => {
           filterConfig.dateValue = e.target.value;
           renderTasks();
       });
   }
 
-  // 7. Xử lý chọn Trạng thái
+  // 6. Xử lý chọn Trạng thái
   if (statusOptions) {
       statusOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             statusOptions.forEach(s => s.classList.remove('active'));
             opt.classList.add('active');
-            
             filterConfig.status = opt.dataset.val;
             renderTasks();
         });
       });
   }
 
-  // 8. Các hàm tính toán ngày tháng bổ trợ
+  // 7. Xử lý chọn Sắp xếp (MỚI THÊM)
+  if (sortOptions) {
+      sortOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            sortOptions.forEach(s => s.classList.remove('active'));
+            opt.classList.add('active');
+            filterConfig.sort = opt.dataset.val; // 'desc' hoặc 'asc'
+            renderTasks(); // Vẽ lại bảng ngay
+        });
+      });
+  }
+
+  // Helper ngày tháng
   function isDateInThisWeek(d) {
     const today = new Date();
     const currentDay = today.getDay(); 
@@ -2564,21 +2789,22 @@
     const check = new Date(d);
     return check >= monday && check <= sunday;
   }
-
   function isDateInThisMonth(d) {
     const today = new Date();
     const check = new Date(d);
     return check.getMonth() === today.getMonth() && check.getFullYear() === today.getFullYear();
   }
-  // --- CẬP NHẬT HÀM RENDER ĐỂ HIỂU BỘ LỌC MỚI ---
+
+  // --- HÀM RENDER TASKS (CÓ SẮP XẾP) ---
   function renderTasks() {
     const container = document.getElementById('tasksContainer');
     if (!tasks.length) {
       container.innerHTML = '<p class="tasks-empty">Chưa có công việc nào.</p>';
+      if(document.getElementById('taskSummary')) document.getElementById('taskSummary').textContent = '';
       return;
     }
 
-    // --- LOGIC LỌC DỮ LIỆU MỚI ---
+    // --- LỌC ---
     let filtered = tasks.filter(t => {
         // Lọc thời gian
         let dateMatch = false;
@@ -2602,24 +2828,28 @@
         return dateMatch && statusMatch;
     });
 
-    // Sắp xếp
+    // --- SẮP XẾP (LOGIC MỚI) ---
     filtered.sort((a, b) => {
-      const ad = (a.date || '') + ' ' + (a.startTime || '');
-      const bd = (b.date || '') + ' ' + (b.startTime || '');
-      return ad.localeCompare(bd);
+      // Tạo chuỗi thời gian đầy đủ để so sánh (YYYY-MM-DD HH:MM)
+      const timeA = new Date(`${a.date}T${a.startTime}`).getTime();
+      const timeB = new Date(`${b.date}T${b.startTime}`).getTime();
+
+      if (filterConfig.sort === 'desc') {
+          return timeB - timeA; // Giảm dần (Lớn -> Nhỏ)
+      } else {
+          return timeA - timeB; // Tăng dần (Nhỏ -> Lớn)
+      }
     });
 
-    // Cập nhật chữ trên nút lọc
+    // Cập nhật nhãn nút
     let filterLabel = "Bộ lọc: ";
     filterLabel += (filterConfig.dateType === 'today') ? 'Hôm nay' : 
-                   (filterConfig.dateType === 'all') ? 'Tất cả ngày' : 
-                   (filterConfig.dateType === 'week') ? 'Tuần này' : 
-                   (filterConfig.dateType === 'month') ? 'Tháng này' : 'Ngày chọn';
-    
+                   (filterConfig.dateType === 'all') ? 'Tất cả' : 
+                   (filterConfig.dateType === 'week') ? 'Tuần này' : 'Khác';
     if(filterToggleBtn) filterToggleBtn.innerHTML = `⚡ ${filterLabel}`;
 
     if (!filtered.length) {
-      container.innerHTML = '<p class="tasks-empty">Không có công việc phù hợp với bộ lọc.</p>';
+      container.innerHTML = '<p class="tasks-empty">Không có công việc phù hợp.</p>';
     } else {
       let html = '<div class="table-wrapper"><table><thead><tr>' +
         '<th>Công việc</th>' +
@@ -2635,16 +2865,14 @@
       const now = new Date();
 
       for (const t of filtered) {
-        /* --- GIỮ NGUYÊN LOGIC HIỂN THỊ HTML CỦA BẠN Ở ĐÂY --- */
-        /* (Đoạn tạo HTML tr td actionButtons... bạn giữ nguyên như cũ nhé) */
         const start = buildDateTime(t.date, t.startTime);
         const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
         
         let statusContent = ''; 
-        if (t.done) statusContent = '<span class="badge badge-done">Đã hoàn thành</span>';
+        if (t.done) statusContent = '<span class="badge badge-done">ĐÃ HOÀN THÀNH</span>';
         else if (t.started) statusContent = '<span class="badge badge-in-progress">ĐANG THỰC HIỆN</span>';
-        else if (end && now > end) statusContent = '<span class="badge badge-late">Quá hạn</span>';
-        else statusContent = '<span class="status-dot status-pending"></span>Chưa bắt đầu';
+        else if (end && now > end) statusContent = '<span class="badge badge-late">QUÁ HẠN</span>';
+        else statusContent = '<span class="badge badge-pending">CHƯA BẮT ĐẦU</span>';
 
         let actionButtons = '';
         const isOverdue = end && now > end; 
@@ -2669,7 +2897,6 @@
       container.innerHTML = html;
     }
     
-    // Cập nhật thống kê
     const doneCount = tasks.filter(t => t.done).length;
     const sumEl = document.getElementById('taskSummary');
     if(sumEl) sumEl.textContent = `Hiển thị: ${filtered.length} / Tổng: ${tasks.length}`;
@@ -2690,10 +2917,11 @@
 
   window.markDone = markDone;
   window.deleteTask = deleteTask;
-  // --- HÀM XỬ LÝ NÚT BẮT ĐẦU ---
+  /* ================================================= */
+  /* --- HÀM BẮT ĐẦU: CHỈ SET started = true --- */
   /* ================================================= */
   /* ================================================= */
-  /* --- HÀM BẮT ĐẦU (TỰ TẠO POPUP NẾU KHÔNG TÌM THẤY) --- */
+  /* --- HÀM BẮT ĐẦU: KÍCH HOẠT GIAO DIỆN ĐẸP --- */
   /* ================================================= */
   function startTask(id) {
     const task = tasks.find(t => t.id === id);
@@ -2717,52 +2945,58 @@
     saveTasks();
     renderTasks();
 
-    // 2. BIỆN PHÁP MẠNH: Tự tạo Popup bằng JS
-    // Xóa popup cũ nếu có để tránh trùng
-    const oldModal = document.getElementById('dynamic-modal');
-    if (oldModal) oldModal.remove();
+    // 2. KÍCH HOẠT POPUP GIAO DIỆN MỚI (Thay vì tự vẽ)
+    const modal = document.getElementById('noticeModal');
+    const contentBox = document.getElementById('noticeStatusDisplay');
+    const actionBox = document.getElementById('noticeButtonGroup');
+    const closeBtn = document.getElementById('noticeCloseBtn');
 
-    // Tạo HTML cho Popup mới
-    const modalHtml = `
-      <div id="dynamic-modal" style="
-          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-          z-index: 999999; display: flex; align-items: center; justify-content: center;
-          animation: fadeIn 0.3s;
-      ">
-        <div style="
-            background: white; padding: 30px; border-radius: 20px;
-            width: 90%; max-width: 400px; text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            transform: scale(1); animation: popIn 0.3s;
-        ">
-            <div style="font-size: 3rem; margin-bottom: 10px;">🚀</div>
-            <h2 style="margin: 0 0 10px; color: #2563eb;">ĐANG THỰC HIỆN</h2>
-            <div style="background: #f0f9ff; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
-                <div style="font-weight: bold; color: #333; font-size: 1.1rem; margin-bottom: 5px;">
-                    ${task.title}
-                </div>
-                <div style="color: #666; font-size: 0.9rem;">
-                    ⏰ Bắt đầu: <strong>${timeString}</strong><br>
-                    🏁 Dự kiến xong: <strong>${task.endTime || '...'}</strong>
-                </div>
+    if (modal && contentBox) {
+        // Điền nội dung vào hộp đẹp
+        contentBox.innerHTML = `
+            <div style="font-size: 1.1rem; color: #1e293b; margin-bottom: 8px;">
+               Bạn đang tập trung vào:
             </div>
-            <button onclick="document.getElementById('dynamic-modal').remove()" style="
-                background: linear-gradient(135deg, #2563eb, #1d4ed8);
-                color: white; border: none; padding: 12px 30px;
-                border-radius: 50px; font-weight: bold; font-size: 1rem;
-                cursor: pointer; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-            ">Đã rõ, chiến thôi!</button>
-        </div>
-      </div>
-    `;
+            <div style="font-size: 1.3rem; font-weight: 800; color: #6366f1; margin-bottom: 15px;">
+               ${task.title}
+            </div>
+            <div style="display: flex; justify-content: center; gap: 20px; font-size: 0.9rem; color: #64748b;">
+               <span>🚀 Bắt đầu: <b>${timeString}</b></span>
+               <span>🏁 Kết thúc: <b>${task.endTime || '...'}</b></span>
+            </div>
+        `;
 
-    // Chèn vào cuối body
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+        // Thêm nút "Đã rõ" vào khu vực nút bấm
+        actionBox.innerHTML = `
+            <button class="btn-allow" onclick="document.getElementById('noticeModal').classList.remove('show')">
+               Đã rõ, chiến thôi!
+            </button>
+        `;
+        
+        // Kích hoạt nút đóng X
+        if(closeBtn) {
+            closeBtn.onclick = function() {
+                modal.classList.remove('show');
+            };
+        }
+
+        // Hiện Modal lên
+        modal.classList.add('show');
+    }
   }
-  
-  // Đưa hàm ra ngoài
   window.startTask = startTask;
+  window.startTask = startTask;
+
+  /* ================================================= */
+  /* --- HÀM HOÀN THÀNH: CHỈ SET done = true --- */
+  /* ================================================= */
+  function markDone(id) {
+    // Cập nhật: done = TRUE
+    tasks = tasks.map(t => t.id === id ? { ...t, done: true } : t);
+    saveTasks();
+    renderTasks(); // Vẽ lại bảng -> Lúc này trạng thái sẽ là "ĐÃ HOÀN THÀNH"
+  }
+  window.markDone = markDone;
   // ==========================
   // Xử lý form thêm công việc
   // ==========================
@@ -2827,7 +3061,7 @@
     const finalReward = selectedReward || customRewardInput.value.trim();
 
     const newTask = {
-      id: Date.now(),
+      id: Date.now() + Math.random(), // <--- SỬA Ở ĐÂY: Thêm đuôi ngẫu nhiên để ko bao giờ trùng
       title,
       date,
       startTime,
@@ -2842,11 +3076,7 @@
     saveTasks();
     renderTasks();
 
-    // ... (Đoạn code ở trên giữ nguyên) ...
-    
-    tasks.push(newTask);
-    saveTasks();
-    renderTasks();
+
 
     /* --- ĐOẠN MỚI: RESET FORM SẠCH SẼ --- */
     // 1. Xóa trắng các ô nhập liệu chính
