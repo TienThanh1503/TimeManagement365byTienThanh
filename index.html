@@ -384,6 +384,179 @@
       font-size: 0.85rem;
     }
 
+    /* Top Tasks */
+    .top-tasks-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .top-task-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 14px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border-left: 4px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .top-task-card:nth-child(2) {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+    }
+
+    .top-task-card:nth-child(3) {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .top-task-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .top-task-index {
+      font-size: 0.75rem;
+      font-weight: 700;
+      opacity: 0.9;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .top-task-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .top-task-time {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+
+    .top-task-reward {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .top-tasks-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    /* Important Tasks */
+    .important-tasks-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .important-tasks-form input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .important-tasks-form button {
+      padding: 8px 16px;
+    }
+
+    .important-tasks-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .important-task-item {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      color: white;
+      padding: 12px 14px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 3px 12px rgba(255, 107, 107, 0.25);
+      transition: all 0.2s;
+      border-left: 4px solid rgba(255, 255, 255, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .important-task-item::before {
+      content: '❗';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      opacity: 0.1;
+    }
+
+    .important-task-item:nth-child(2n) {
+      background: linear-gradient(135deg, #ffa502 0%, #ffb84d 100%);
+      box-shadow: 0 3px 12px rgba(255, 165, 2, 0.25);
+    }
+
+    .important-task-item:nth-child(3n) {
+      background: linear-gradient(135deg, #c84e89 0%, #f15245 100%);
+      box-shadow: 0 3px 12px rgba(200, 78, 137, 0.25);
+    }
+
+    .important-task-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 5px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .important-task-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      flex: 1;
+      word-break: break-word;
+      padding-right: 8px;
+    }
+
+    .important-task-delete {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .important-task-delete:hover {
+      background: rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: scale(1.05);
+    }
+
+    .important-tasks-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 0.9rem;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 2px dashed #d1d5db;
+    }
+
     @media (max-width: 768px) {
       form {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -392,6 +565,10 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
+      }
+      
+      .top-tasks-container {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -459,6 +636,16 @@
     </p>
   </section>
 
+  <!-- NHIỆM VỤ QUAN TRỌNG NGÀY HÔM NAY -->
+  <section class="card">
+    <div class="card-title">🔥 Nhiệm vụ quan trọng bắt buộc hôm nay</div>
+    <div class="important-tasks-form">
+      <input type="text" id="importantTaskInput" placeholder="VD: Hoàn thành báo cáo, gọi điện cho khách hàng..." />
+      <button type="button" id="addImportantTaskBtn" class="btn-primary">+ Thêm</button>
+    </div>
+    <div class="important-tasks-list" id="importantTasksList"></div>
+  </section>
+
   <!-- POMODORO TIMER -->
   <section class="card">
     <div class="card-title">Phiên tập trung 25 phút (Pomodoro)</div>
@@ -473,6 +660,12 @@
       <button class="btn-small btn-outline" id="pomodoroPauseBtn">⏸ Tạm dừng</button>
       <button class="btn-small btn-outline" id="pomodoroResetBtn">⟲ Reset</button>
     </div>
+  </section>
+
+  <!-- TOP TASKS NGÀY HÔM NAY -->
+  <section class="card">
+    <div class="card-title">⭐ Top nhiệm vụ hôm nay</div>
+    <div class="top-tasks-container" id="topTasksContainer"></div>
   </section>
 
   <!-- DANH SÁCH CÔNG VIỆC -->
@@ -532,7 +725,9 @@
   // ==========================
 
   const STORAGE_KEY = 'timefocus_tasks_v1';
+  const IMPORTANT_TASKS_KEY = 'timefocus_important_tasks_v1';
   let tasks = [];
+  let importantTasks = [];
 
   function loadTasks() {
     try {
@@ -544,8 +739,22 @@
     }
   }
 
+  function loadImportantTasks() {
+    try {
+      const raw = localStorage.getItem(IMPORTANT_TASKS_KEY);
+      importantTasks = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.error('Lỗi đọc important tasks', e);
+      importantTasks = [];
+    }
+  }
+
   function saveTasks() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  }
+
+  function saveImportantTasks() {
+    localStorage.setItem(IMPORTANT_TASKS_KEY, JSON.stringify(importantTasks));
   }
 
   // ==========================
@@ -658,6 +867,45 @@
     const pendingToday = tasks.filter(t => t.date === todayStr() && !t.done).length;
     document.getElementById('taskSummary').textContent =
       `${doneCount}/${total} đã xong • ${pendingToday} việc hôm nay`;
+    
+    renderTopTasks();
+  }
+
+  function renderTopTasks() {
+    const container = document.getElementById('topTasksContainer');
+    const tdy = todayStr();
+    
+    // Lấy các công việc hôm nay chưa xong, sắp xếp theo giờ bắt đầu
+    let todayTasks = tasks
+      .filter(t => t.date === tdy && !t.done)
+      .sort((a, b) => {
+        const ad = a.startTime || '';
+        const bd = b.startTime || '';
+        return ad.localeCompare(bd);
+      })
+      .slice(0, 3); // Lấy top 3
+    
+    if (!todayTasks.length) {
+      container.innerHTML = '<div class="top-tasks-empty">Không có nhiệm vụ hôm nay. Hãy thêm một công việc để bắt đầu! 🚀</div>';
+      return;
+    }
+    
+    let html = '';
+    todayTasks.forEach((task, index) => {
+      const icon = ['🥇', '🥈', '🥉'][index] || '⭐';
+      const duration = task.endTime ? ` • ${task.startTime} - ${task.endTime}` : ` • Từ ${task.startTime}`;
+      
+      html += `
+        <div class="top-task-card">
+          <div class="top-task-index">${icon} Ưu tiên ${index + 1}</div>
+          <div class="top-task-title">${task.title}</div>
+          <div class="top-task-time">⏰ ${duration}</div>
+          <div class="top-task-reward">🏆 ${task.reward || 'Chưa có phần thưởng'}</div>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
   }
 
   function markDone(id) {
@@ -762,6 +1010,64 @@
     customRewardInput.value = '';
     selectedReward = '';
     rewardTrigger.textContent = 'Chọn phần thưởng';
+  });
+
+  // ==========================
+  // Xử lý nhiệm vụ quan trọng
+  // ==========================
+
+  const importantTaskInput = document.getElementById('importantTaskInput');
+  const addImportantTaskBtn = document.getElementById('addImportantTaskBtn');
+  const importantTasksList = document.getElementById('importantTasksList');
+
+  function renderImportantTasks() {
+    if (!importantTasks.length) {
+      importantTasksList.innerHTML = '<div class="important-tasks-empty">Chưa có nhiệm vụ quan trọng. Thêm các việc cần ưu tiên hôm nay!</div>';
+      return;
+    }
+
+    let html = '';
+    importantTasks.forEach((task, index) => {
+      html += `
+        <div class="important-task-item">
+          <div class="important-task-text">${task.text}</div>
+          <button type="button" class="important-task-delete" onclick="deleteImportantTask(${task.id})">✕ Xoá</button>
+        </div>
+      `;
+    });
+    importantTasksList.innerHTML = html;
+  }
+
+  function deleteImportantTask(id) {
+    importantTasks = importantTasks.filter(t => t.id !== id);
+    saveImportantTasks();
+    renderImportantTasks();
+  }
+
+  window.deleteImportantTask = deleteImportantTask;
+
+  addImportantTaskBtn.addEventListener('click', () => {
+    const text = importantTaskInput.value.trim();
+    if (!text) {
+      alert('Vui lòng nhập nhiệm vụ quan trọng.');
+      return;
+    }
+
+    importantTasks.push({
+      id: Date.now(),
+      text: text
+    });
+
+    saveImportantTasks();
+    renderImportantTasks();
+    importantTaskInput.value = '';
+    importantTaskInput.focus();
+  });
+
+  importantTaskInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      addImportantTaskBtn.click();
+    }
   });
 
   // ==========================
@@ -896,14 +1202,12 @@
     
     const now = new Date().getTime();
     const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
-    const remaining = pomodoroDuration - elapsed;
+    const remaining = Math.max(0, pomodoroDuration - elapsed);
     
-    if (remaining > 0) {
-      pomodoroRemaining = remaining;
-      renderPomodoro();
-    } else {
-      pomodoroRemaining = 0;
-      renderPomodoro();
+    pomodoroRemaining = remaining;
+    renderPomodoro();
+    
+    if (remaining <= 0) {
       clearInterval(pomodoroTimer);
       pomodoroTimer = null;
       pomodoroRunning = false;
@@ -922,7 +1226,7 @@
 
     if (pomodoroTimer) clearInterval(pomodoroTimer);
 
-    pomodoroTimer = setInterval(updatePomodoroDisplay, 100);
+    pomodoroTimer = setInterval(updatePomodoroDisplay, 500);
   }
 
   function pausePomodoro() {
@@ -969,7 +1273,10 @@
   // ==========================
 
   loadTasks();
+  loadImportantTasks();
   renderTasks();
+  renderTopTasks();
+  renderImportantTasks();
 
 </script>
 </body>
