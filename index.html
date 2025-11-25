@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <meta charset="UTF-8">
   <title>Quản lý thời gian hiệu quả</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
 
   <style>
     * {
@@ -2434,17 +2436,98 @@
         background: #e2e8f0;
         color: #475569;
     } 
+    /* Hiệu ứng khi xóa */
+    .slide-out {
+        animation: slideOutLeft 0.4s forwards cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideOutLeft {
+        from { opacity: 1; transform: translateX(0); max-height: 100px; }
+        to { opacity: 0; transform: translateX(-50px); max-height: 0; margin: 0; padding: 0; }
+    }
+    /* --- DARK MODE --- */
+    body.dark-mode {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+        color: #f1f5f9 !important;
+    }
+    
+    body.dark-mode .app {
+        background: rgba(30, 41, 59, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+    }
+    
+    body.dark-mode .card, 
+    body.dark-mode .notice-modal-content {
+        background: #1e293b !important;
+        color: #fff !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+    }
+    
+    body.dark-mode .card-title, 
+    body.dark-mode h1, 
+    body.dark-mode h2, 
+    body.dark-mode label,
+    body.dark-mode td {
+        color: #e2e8f0 !important;
+    }
+    
+    body.dark-mode input, 
+    body.dark-mode select, 
+    body.dark-mode .reward-trigger,
+    body.dark-mode .reward-box {
+        background: #334155 !important;
+        border-color: #475569 !important;
+        color: #fff !important;
+    }
+    
+    body.dark-mode .table-wrapper {
+        background: #1e293b !important;
+        border-color: #334155;
+    }
+    
+    body.dark-mode table thead th {
+        background: #334155 !important;
+        color: #94a3b8 !important;
+        border-bottom-color: #475569 !important;
+    }
+    
+    body.dark-mode table tbody tr {
+        background: #1e293b !important;
+        border-bottom-color: #334155;
+    }
+    
+    body.dark-mode table tbody tr:hover {
+        background: #293548 !important;
+    }
   </style>  
 </head>
 <body>
+
 <div class="app">
   <header>
     <div>
       <h1>TimeFocus – Quản lý thời gian</h1>
       <p class="tagline">Giảm trì hoãn từng bước nhỏ, mỗi việc một thời điểm.</p>
     </div>
-    <div class="clock" id="clock"></div>
-  </header>
+    
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="clock" id="clock"></div>
+        
+        <button id="darkModeBtn" title="Chế độ tối" style="
+            background: rgba(255,255,255,0.2); 
+            border: 1px solid rgba(255,255,255,0.3); 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            width: 40px; height: 40px; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+        ">
+            🌙
+        </button>
+    </div>
+    </header>
 
   <div class="top-row">
     <button id="noticeBtn" class="notice-btn" title="Thông báo trình duyệt">🔔</button>
@@ -2476,7 +2559,7 @@
     <form id="taskForm">
       <div>
         <label for="title">Tên công việc</label>
-        <input type="text" id="title" placeholder="VD: Ôn CS115, làm assignment 3" required>
+        <input type="text" id="title" placeholder="VD:Làm assignment, Soạn bài trước,..." required>
       </div>
       <div>
         <label for="date">Ngày</label>
@@ -2544,6 +2627,7 @@
   <!-- DANH SÁCH CÔNG VIỆC -->
   <section class="card">
     <div class="tasks-header">
+      
       <h2>Công việc đã lên lịch</h2>
       <small id="taskSummary"></small>
     </div>
@@ -2592,6 +2676,9 @@
     </div>
     <div id="tasksContainer"></div>
   </section>
+  <footer style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); color: #94a3b8; font-size: 0.85rem;">
+    <p>&copy; 2025 TimeFocus. Thiết kế cho sự tập trung tối đa.</p>
+  </footer>
 </div>
 
 <script>
@@ -2799,7 +2886,13 @@
   function renderTasks() {
     const container = document.getElementById('tasksContainer');
     if (!tasks.length) {
-      container.innerHTML = '<p class="tasks-empty">Chưa có công việc nào.</p>';
+      container.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+            <div style="font-size: 4rem; margin-bottom: 10px; opacity: 0.6;">📝</div>
+            <h3 style="margin: 0; color: #475569;">Danh sách trống trơn!</h3>
+            <p style="margin-top: 5px; font-size: 0.9rem;">Hãy thêm một công việc nhỏ để bắt đầu ngày mới năng suất nhé.</p>
+        </div>
+      `;
       if(document.getElementById('taskSummary')) document.getElementById('taskSummary').textContent = '';
       return;
     }
@@ -2903,17 +2996,61 @@
   }
 
   function markDone(id) {
+    // 1. Cập nhật dữ liệu
     tasks = tasks.map(t => t.id === id ? { ...t, done: true } : t);
     saveTasks();
     renderTasks();
+
+    // 2. KÍCH HOẠT PHÁO HOA
+    // Bắn bên trái
+    confetti({
+      origin: { x: 0.3, y: 0.8 },
+      angle: 60,
+      spread: 55,
+      particleCount: 60,
+      colors: ['#6366f1', '#ec4899', '#f59e0b']
+    });
+    // Bắn bên phải
+    confetti({
+      origin: { x: 0.7, y: 0.8 },
+      angle: 120,
+      spread: 55,
+      particleCount: 60,
+      colors: ['#6366f1', '#ec4899', '#f59e0b']
+    });
+    
+    // Âm thanh ting ting (Tùy chọn)
+    // const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-09.mp3');
+    // audio.play();
   }
+  window.markDone = markDone;
 
   function deleteTask(id) {
     if (!confirm('Xoá công việc này?')) return;
+    
+    // Tìm dòng cần xóa trong bảng để thêm hiệu ứng
+    const btn = document.querySelector(`button[onclick="deleteTask(${id})"]`);
+    if (btn) {
+        const row = btn.closest('tr');
+        if (row) {
+            row.classList.add('slide-out'); // Kích hoạt hiệu ứng CSS
+            
+            // Đợi 400ms cho hiệu ứng chạy xong rồi mới xóa dữ liệu thật
+            setTimeout(() => {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+            }, 350);
+            return;
+        }
+    }
+    
+    // Fallback nếu không tìm thấy dòng (xóa ngay)
     tasks = tasks.filter(t => t.id !== id);
     saveTasks();
     renderTasks();
   }
+  window.deleteTask = deleteTask;
 
   window.markDone = markDone;
   window.deleteTask = deleteTask;
@@ -2991,10 +3128,32 @@
   /* --- HÀM HOÀN THÀNH: CHỈ SET done = true --- */
   /* ================================================= */
   function markDone(id) {
-    // Cập nhật: done = TRUE
+    // 1. Cập nhật dữ liệu
     tasks = tasks.map(t => t.id === id ? { ...t, done: true } : t);
     saveTasks();
-    renderTasks(); // Vẽ lại bảng -> Lúc này trạng thái sẽ là "ĐÃ HOÀN THÀNH"
+    renderTasks();
+
+    // 2. KÍCH HOẠT PHÁO HOA
+    // Bắn bên trái
+    confetti({
+      origin: { x: 0.3, y: 0.8 },
+      angle: 60,
+      spread: 55,
+      particleCount: 60,
+      colors: ['#6366f1', '#ec4899', '#f59e0b']
+    });
+    // Bắn bên phải
+    confetti({
+      origin: { x: 0.7, y: 0.8 },
+      angle: 120,
+      spread: 55,
+      particleCount: 60,
+      colors: ['#6366f1', '#ec4899', '#f59e0b']
+    });
+    
+    // Âm thanh ting ting (Tùy chọn)
+    // const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-09.mp3');
+    // audio.play();
   }
   window.markDone = markDone;
   // ==========================
@@ -3590,7 +3749,29 @@
       renderTasks();
     }
   }, 60000);
-  
+  // --- XỬ LÝ DARK MODE ---
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    const body = document.body;
+    
+    // Kiểm tra cài đặt cũ
+    if (localStorage.getItem('timefocus_darkmode') === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeBtn.textContent = '☀️';
+    }
+    
+    if (darkModeBtn) {
+        darkModeBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('timefocus_darkmode', 'enabled');
+                darkModeBtn.textContent = '☀️'; // Đổi thành mặt trời
+            } else {
+                localStorage.setItem('timefocus_darkmode', 'disabled');
+                darkModeBtn.textContent = '🌙'; // Đổi thành mặt trăng
+            }
+        });
+    }
 
 </script>
 </body>
