@@ -2639,6 +2639,27 @@
         background-color: #fef2f2 !important; /* Nền màu đỏ rất nhạt */
         transition: all 0.5s ease;
     }
+    /* --- DRAG & DROP STYLES --- */
+    tr.task-item {
+        cursor: grab; /* Thay đổi con trỏ chuột */
+    }
+    
+    tr.task-item:active {
+        cursor: grabbing; /* Con trỏ khi đang kéo */
+    }
+
+    /* Hiệu ứng khi KÉO đi */
+    tr.dragging {
+        opacity: 0.5;
+        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+        transform: translateY(-5px);
+    }
+    
+    /* Hiệu ứng nơi thả (Drag Over) */
+    tr.drag-over {
+        border-bottom: 3px solid var(--primary) !important;
+        background-color: rgba(99, 102, 241, 0.1) !important;
+    }
 
     tr.task-overdue td {
         color: #ef4444 !important; /* Chữ màu đỏ nhạt */
@@ -2753,36 +2774,432 @@
     body.dark-mode td:first-child div {
         color: #f1f5f9 !important; 
     }
+    /* ================================================= */
+    /* --- GÓI NÂNG CẤP TINH TẾ (FINAL POLISH) --- */
+    /* ================================================= */
+
+    /* 1. MÀU CHỌN CHỮ (Custom Selection Color) */
+    /* Đổi màu highlight khi bôi đen chữ sang màu tím chủ đạo */
+    ::selection {
+        background-color: rgba(99, 102, 241, 0.65); /* Tím đậm mờ */
+        color: white;
+    }
+
+    /* 2. CUSTOM SCROLLBAR (Làm cho mỏng và tím) */
+    /* Áp dụng cho toàn bộ web, ghi đè scrollbar mặc định */
+    ::-webkit-scrollbar {
+        width: 8px !important; 
+        height: 8px !important;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #94a3b8 !important; /* Màu xám tím nhạt */
+        border-radius: 10px !important;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #6366f1 !important; /* Tím đậm khi di chuột */
+    }
+    
+    /* DARK MODE: Scrollbar chuyển màu */
+    body.dark-mode ::-webkit-scrollbar-thumb {
+        background: #475569 !important; 
+    }
+    
+    /* 3. NÂNG CẤP BÓNG ĐỔ VÀ HIỆU ỨNG NÚT CHÍNH (FAB/SUBMIT) */
+    
+    /* Áp dụng cho nút Submit (Thêm công việc) */
+    form button[type="submit"] {
+        /* Hiệu ứng bóng mạnh và tỏa rộng hơn */
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5) !important;
+    }
+    
+    /* Hover/Active cho các nút Gradient */
+    .btn-gradient:hover, form button[type="submit"]:hover, .fab-btn:hover {
+        /* Nâng cao và đổ bóng hồng mạnh hơn */
+        box-shadow: 0 15px 40px rgba(236, 72, 153, 0.7) !important; 
+        transform: translateY(-5px) scale(1.02) !important;
+    }
+    /* --- CSS CHO LỜI CHÀO NHỎ MỚI (smallGreeting) --- */
+    .dynamic-greeting-text {
+        font-size: 0.95rem; /* Kích thước nhỏ */
+        font-weight: 700;
+        color: var(--primary, #6366f1); /* Màu tím chủ đạo */
+        margin-bottom: 4px;
+    }
+    
+    /* Fix cho Dark Mode */
+    body.dark-mode .dynamic-greeting-text {
+        color: #a5b4fc;
+    }
+    /* --- FIX LỖI ĐƯỜNG KẺ VÀ DÃN CÁCH HEADER --- */
+    header {
+        /* Buộc header phải có khoảng cách và đường viền ở dưới */
+        padding-bottom: 15px !important;
+        border-bottom: 2px solid var(--color-border) !important;
+    }
+    /* Đảm bảo Dark Mode vẫn hiển thị viền */
+    body.dark-mode header {
+        border-bottom-color: #334155 !important;
+    }
+
+    /* Đảm bảo tagline có màu mặc định và không bị ẩn */
+    #subGreeting {
+        color: var(--color-text-secondary) !important;
+        opacity: 1 !important;
+        text-shadow: none !important;
+    }
+    /* ================================================= */
+    /* --- FIX CUỐI CÙNG: ÁP DỤNG BORDER DÀY VÀ ĐẬM --- */
+    /* ================================================= */
+
+    /* 1. Reset Header về trạng thái sạch để không gây xung đột */
+    header {
+        border-bottom: none !important; 
+        padding-bottom: 0 !important;
+        position: relative !important;
+    }
+
+    /* 2. Áp dụng đường kẻ DÀY (3px) và màu TÍM chủ đạo cho DIV chứa Lời Chào */
+    header #greetingContainer {
+        /* Tăng độ dày đường kẻ và chuyển sang màu TÍM chủ đạo */
+        border-bottom: 3px solid var(--color-primary) !important; 
+        
+        /* Đảm bảo khoảng cách phân cách rõ ràng */
+        padding-bottom: 18px !important; 
+        margin-bottom: 18px !important; 
+        width: 100%;
+    }
+
+    /* 3. FIX Dark Mode: Đảm bảo đường kẻ nổi bật bằng màu trắng */
+    body.dark-mode header #greetingContainer {
+        border-bottom-color: #f1f5f9 !important; /* Màu trắng sáng trong Dark Mode */
+    }
+    /* ================================================= */
+    /* --- SỬA LỖI CUỐI CÙNG: CĂN GIỮA VÀ XÓA BORDER XANH --- */
+    /* ================================================= */
+
+    /* 1. Xóa bỏ đường viền XANH DƯƠNG bị lỗi trên khối tiêu đề và CĂN GIỮA */
+    header #greetingContainer {
+        /* Bắt buộc căn giữa */
+        text-align: center !important;
+        
+        /* Xóa đường viền xanh đậm bị lạc */
+        border-bottom: none !important; 
+        
+        /* Đảm bảo không có padding hay margin nội bộ thừa */
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+        width: 100% !important;
+    }
+
+    /* 2. Khôi phục đường kẻ phân cách chính thức (thin gray line) */
+    header {
+        /* Buộc đường kẻ mỏng chuẩn (2px) phải hiển thị */
+        border-bottom: 2px solid var(--color-border) !important; 
+        padding-bottom: 20px !important; 
+    }
+
+    /* 3. FIX Dark Mode: Đảm bảo viền phân cách là màu tối */
+    body.dark-mode header {
+        border-bottom-color: #334155 !important;
+    }
+    /* --- TÙY CHỈNH HEADER CUỐI CÙNG (NEW) --- */
+    header {
+        /* Reset về trạng thái sạch */
+        justify-content: flex-start !important; 
+        gap: 25px !important;
+        border-bottom: none !important;
+        padding-bottom: 20px !important;
+        position: relative !important; /* Quan trọng cho ::after */
+    }
+
+    /* Đảm bảo khối Title có đủ không gian (FIX) */
+    header #greetingContainer {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+        margin-right: auto; /* Đẩy phần tử tiếp theo ra xa */
+    }
+
+    /* Nút Cài đặt Gộp (⚙️) */
+    .settings-toggle-btn {
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 50%;
+        width: 40px; height: 40px;
+        font-size: 1.2rem;
+        color: #475569;
+        transition: all 0.2s;
+    }
+    .settings-toggle-btn:hover { transform: rotate(45deg); }
+    
+    /* Style cho Menu thả xuống */
+    .settings-dropdown {
+        display: none;
+        position: absolute;
+        top: 50px; right: 0;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        padding: 10px;
+        min-width: 200px;
+        z-index: 100;
+    }
+    .settings-dropdown.show { display: block; }
+    .menu-item-btn { 
+        background: none; 
+        border: none; 
+        text-align: left; 
+        padding: 8px; 
+        width: 100%; 
+        color: #334155;
+        font-weight: 600;
+    }
+
+    /* --- ĐƯỜNG KẺ PHÂN CÁCH CUỐI CÙNG (GRADIENT) --- */
+    header::after {
+        content: '';
+        position: absolute;
+        bottom: 0px; /* Đặt ở đáy header */
+        left: 0;
+        width: 100%;
+        height: 3px; /* Dày hơn */
+        background: linear-gradient(to right, #6366f1, #ec4899); /* Đường kẻ gradient */
+        z-index: 10;
+    }
+
+    /* Dark Mode cho đường kẻ */
+    body.dark-mode header::after {
+        background: linear-gradient(to right, #6366f1, #e2e8f0);
+    }
+    /* --- DỌN DẸP LỖI THỊ GIÁC HEADER (FINAL) --- */
+    /* 1. Reset các border/padding gây lỗi */
+    header {
+        border-bottom: 2px solid var(--color-border) !important; /* Khôi phục đường kẻ mỏng chuẩn */
+        padding-bottom: 20px !important;
+        position: relative !important; /* Cần cho căn chỉnh */
+    }
+    
+    /* 2. Xóa các border nội bộ bị lỗi (cái gây ra đường kẻ xanh/tím) */
+    header #greetingContainer {
+        border-bottom: none !important; 
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    
+      /* 3. Xóa các thành phần HTML bị thừa (ví dụ: cái chuông bị lạc) */
+      .top-row {
+          display: none !important; /* Ẩn cái div top-row đang chứa cái chuông lạc chỗ */
+      }
+      /* ================================================= */
+      /* --- TINH CHỈNH CUỐI CÙNG (ĐỒNG HỒ & ICON) --- */
+      /* ================================================= */
+
+      /* 1. FIX ĐỒNG HỒ: Căn giữa tuyệt đối và làm cho đẹp hơn */
+      .clock {
+          padding: 10px 18px !important;
+          height: 40px !important;
+          display: flex !important;
+          align-items: center !important; /* Căn giữa dọc */
+          justify-content: center !important; /* Căn giữa ngang */
+          text-align: center !important;
+          /* Thêm bóng đổ nhẹ cho nổi bật */
+          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+      }
+
+      /* 2. FIX ICON CÀI ĐẶT: Khôi phục hình dáng và màu sắc */
+      .settings-toggle-btn {
+          /* Đảm bảo hình dáng tròn chuẩn */
+          width: 38px !important;
+          height: 38px !important;
+          border-radius: 50% !important;
+          
+          /* Đảm bảo màu hiển thị rõ ràng trên nền sáng/tối */
+          background: #f1f5f9 !important; 
+          border: 1px solid #cbd5e1 !important;
+          color: #475569 !important; 
+          font-size: 1.1rem !important;
+          
+          /* Tắt mọi transform tĩnh (khả năng gây lỗi lệch) */
+          transform: none !important;
+          opacity: 1 !important;
+      }
+
+      /* 3. Tinh chỉnh lại khoảng cách tổng thể */
+      .header-right-actions {
+          align-items: center !important;
+      }
+      /* --- FIX CUỐI CÙNG: KHÔI PHỤC CẤU TRÚC HEADER --- */
+
+    /* 1. Reset Header Layout và Dãn cách */
+    header {
+        border-bottom: 2px solid var(--color-border) !important; /* Phục hồi đường kẻ phân cách */
+        padding-bottom: 20px !important;
+        
+        /* Căn chỉnh các khối Title và Clock */
+        justify-content: space-between !important; 
+        align-items: center !important; /* Căn giữa dọc */
+        gap: 10px; /* Thêm khoảng cách nhẹ giữa các khối */
+    }
+
+    /* 2. Khối nội dung chính (Đảm bảo căn giữa text và không có border thừa) */
+    header #greetingContainer {
+        border-bottom: none !important; 
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+        text-align: center !important;
+        flex-shrink: 1; 
+    }
+
+    /* 3. Khối Đồng hồ và Setting (Đảm bảo chúng đi chung với nhau) */
+    .header-right-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 15px !important; /* Khoảng cách giữa đồng hồ và icon */
+        flex-shrink: 0;
+    }
+
+    /* --- FINAL VISUAL FIX CHO NÚT CÀI ĐẶT --- */
+.settings-toggle-btn {
+    /* Reset kích thước và màu nền */
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    
+    /* Đảm bảo icon ⚙️ nhìn rõ */
+    font-size: 1.15rem !important;
+    color: #475569 !important; 
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    
+    /* Xóa rotation tĩnh và cho hover mượt */
+    transform: none !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+}
+.settings-toggle-btn:hover {
+    transform: rotate(45deg) scale(1.05) !important; /* Thêm hiệu ứng xoay nhẹ nhàng */
+}
+/* ================================================= */
+    /* --- FIX LỖI MENU CÀI ĐẶT BỊ ẨN (ULTIMATE CSS) --- */
+    /* ================================================= */
+
+    /* 1. Đẩy Menu lên lớp Z-Index cao nhất tuyệt đối */
+    #settingsMenu {
+        z-index: 100000 !important; /* Đảm bảo nó nổi lên trên mọi thứ */
+        position: absolute !important;
+        
+        /* Căn chỉnh vị trí xuất hiện (ngay dưới nút cài đặt) */
+        top: 50px !important; 
+        right: 0px !important; /* Căn lề phải */
+        left: auto !important;
+    }
+
+    /* 2. Buộc Menu phải hiển thị khi có class .show */
+    #settingsMenu.show {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        
+        /* Thêm bóng đổ mạnh mẽ để nổi bật */
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* 3. Đảm bảo khối chứa nút không bị ẩn */
+    .header-right-actions {
+        overflow: visible !important;
+        position: relative !important; /* Giúp menu căn chỉnh đúng */
+    }
+    /* --- FIX LỖI CĂN GIỮA NGANG TRONG MODAL --- */
+    .notice-modal {
+        /* Bắt buộc phải căn giữa ngang */
+        justify-content: center !important; 
+    }
+    
+    .notice-modal-content {
+        /* Đảm bảo nội dung bên trong được căn giữa ngang hoàn toàn */
+        margin-left: auto !important;
+        margin-right: auto !important;
+        
+        transform: translateY(0) !important; 
+        left: auto !important;
+        right: auto !important;
+    }
+    /* ================================================= */
+    /* --- FIX LỖI CĂN GIỮA KHI ZOOM (VỊ TRÍ MỚI) --- */
+    /* ================================================= */
+
+    .notice-modal {
+        /* Bỏ căn giữa dọc (align-items: center) */
+        align-items: flex-start !important; 
+        
+        /* Giữ căn giữa ngang (justify-content: center) */
+        justify-content: center !important; 
+        
+        /* Đẩy Popup xuống một khoảng cách cố định từ mép trên */
+        padding-top: 50px !important; 
+    }
+
+    .notice-modal.show .notice-modal-content {
+        /* Đảm bảo nội dung không bị transform lệch */
+        transform: none !important;
+    }
+    /* ================================================= */
+    /* --- FIX TRIỆT ĐỂ: LOẠI BỎ KHOẢNG TRỐNG ĐÁY --- */
+    /* ================================================= */
+
+    /* 1. Reset Margin/Padding của thẻ Task List cuối cùng (Độ ưu tiên cao nhất) */
+    .app > section.card:last-of-type {
+        margin-bottom: 0 !important; 
+        padding-bottom: 0 !important;
+    }
+
+    /* 2. Xóa toàn bộ Margin và Padding trên Footer (kéo chữ bản quyền lên) */
+    footer {
+        margin: 0 !important; 
+        padding: 0 15px 10px 15px !important; /* Giữ padding đáy nhỏ cho chữ */
+    }
+
+    /* 3. Giảm padding đáy của khối ứng dụng chính (.app) */
+    .app {
+        padding-bottom: 10px !important; /* Mức padding tối thiểu */
+    }
+    
   </style>  
 </head>
 <body>
 
 <div class="app">
   <header>
-    
-    <div>
-      <h1>TimeFocus – Quản lý thời gian</h1>
-      <p class="tagline">Giảm trì hoãn từng bước nhỏ, mỗi việc một thời điểm.</p>
+    <div id="greetingContainer" style="flex-grow: 1; max-width: 65%;">
+        <p id="smallGreeting" class="dynamic-greeting-text"></p>
+        <h1 id="mainTitle">TimeFocus – Quản lý thời gian</h1>
+        <p id="subGreeting" class="tagline">Giảm trì hoãn từng bước nhỏ, mỗi việc một thời điểm.</p>
     </div>
-    
-    <div style="display: flex; align-items: center; gap: 15px;">
-        <div class="clock" id="clock"></div>
-        
-        <button id="darkModeBtn" title="Chế độ tối" style="
-            background: rgba(255,255,255,0.2); 
-            border: 1px solid rgba(255,255,255,0.3); 
-            font-size: 1.2rem; 
-            cursor: pointer; 
-            width: 40px; height: 40px; 
-            border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease;
-        ">
-            🌙
-        </button>
-    </div>
-    </header>
 
+    <div class="header-right-actions" style="display: flex; align-items: center; gap: 15px;">
+        <div class="clock" id="clock">16:33:11 Th 4</div>
+        
+        <button id="settingsToggle" title="Tùy chọn" class="settings-toggle-btn">
+            ⚙️
+        </button>
+        
+        <div id="settingsMenu" class="settings-dropdown">
+            <button id="darkModeBtn" class="menu-item-btn" data-mode-toggle title="Chế độ tối/sáng">
+                🌙 Chế độ hiển thị
+            </button>
+            <button id="noticeBtn" class="menu-item-btn" title="Thông báo trình duyệt">
+                🔔 Quản lý thông báo
+            </button>
+        </div>
+    </div>
+</header>
+<div id="settingsMenu" class="settings-dropdown">
+    <button id="darkModeBtn" class="menu-item-btn" data-mode-toggle title="Chế độ tối/sáng">
+        ☀️ Chế độ hiển thị
+    </button>
+    <button id="noticeBtn" class="menu-item-btn" title="Thông báo trình duyệt">
+        🔔 Quản lý thông báo
+    </button>
+</div>
   <div class="top-row">
     <button id="noticeBtn" class="notice-btn" title="Thông báo trình duyệt">🔔</button>
   </div>
@@ -2807,60 +3224,60 @@
     </div>
   
 
-  <!-- FORM THÊM CÔNG VIỆC -->
-  <section class="card">
-    <div class="card-title">Thêm công việc cần tập trung</div>
-    <form id="taskForm">
-      <div>
-        <label for="title">Tên công việc</label>
-        <input type="text" id="title" placeholder="VD:Làm assignment, Soạn bài trước,..." required>
-      </div>
-      <div>
-        <label for="date">Ngày</label>
-        <input type="date" id="date" required>
-      </div>
-      <div>
-        <label for="startTime">Giờ bắt đầu</label>
-        <input type="time" id="startTime" required>
-      </div>
-      <div>
-        <label for="endTime">Giờ kết thúc</label>
-        <input type="time" id="endTime">
-      </div>
-      <div class="reward-dropdown">
-        <label style="font-size: 0.75rem; font-weight: 600; color: #555; display: block; margin-bottom: 4px;">🏆 Phần thưởng</label>
-        <button type="button" class="reward-trigger" id="rewardTrigger">Chọn phần thưởng</button>
-        <div class="reward-menu" id="rewardMenu">
-          <div class="reward-menu-item" data-reward="🎮 Chơi 1 ván game">🎮 Chơi 1 ván game</div>
-          <div class="reward-menu-item" data-reward="☕ Nghỉ 10 phút">☕ Nghỉ 10 phút</div>
-          <div class="reward-menu-item" data-reward="📺 Xem video yêu thích">📺 Xem video yêu thích</div>
-          <div class="reward-menu-item" data-reward="🚶 Đi bộ ngoài trời">🚶 Đi bộ ngoài trời</div>
-          <div class="reward-menu-item" data-reward="Không thưởng gì">Không thưởng gì</div>
-          <div class="reward-custom-input-wrapper">
-            <input type="text" id="customRewardInput" placeholder="Hoặc nhập phần thưởng khác..." style="width: 100%;">
+    <!-- FORM THÊM CÔNG VIỆC -->
+    <section class="card">
+      <div class="card-title">Thêm công việc cần tập trung</div>
+      <form id="taskForm">
+        <div>
+          <label for="title">Tên công việc</label>
+          <input type="text" id="title" placeholder="VD:Làm assignment, Soạn bài trước,..." required>
+        </div>
+        <div>
+          <label for="date">Ngày</label>
+          <input type="date" id="date" required>
+        </div>
+        <div>
+          <label for="startTime">Giờ bắt đầu</label>
+          <input type="time" id="startTime" required>
+        </div>
+        <div>
+          <label for="endTime">Giờ kết thúc</label>
+          <input type="time" id="endTime">
+        </div>
+        <div class="reward-dropdown">
+          <label style="font-size: 0.75rem; font-weight: 600; color: #555; display: block; margin-bottom: 4px;">🏆 Phần thưởng</label>
+          <button type="button" class="reward-trigger" id="rewardTrigger">Chọn phần thưởng</button>
+          <div class="reward-menu" id="rewardMenu">
+            <div class="reward-menu-item" data-reward="🎮 Chơi 1 ván game">🎮 Chơi 1 ván game</div>
+            <div class="reward-menu-item" data-reward="☕ Nghỉ 10 phút">☕ Nghỉ 10 phút</div>
+            <div class="reward-menu-item" data-reward="📺 Xem video yêu thích">📺 Xem video yêu thích</div>
+            <div class="reward-menu-item" data-reward="🚶 Đi bộ ngoài trời">🚶 Đi bộ ngoài trời</div>
+            <div class="reward-menu-item" data-reward="Không thưởng gì">Không thưởng gì</div>
+            <div class="reward-custom-input-wrapper">
+              <input type="text" id="customRewardInput" placeholder="Hoặc nhập phần thưởng khác..." style="width: 100%;">
+            </div>
           </div>
         </div>
-      </div>
-      <div>
-        <label for="reminder">Nhắc trước (phút)</label>
-        <input type="number" id="reminder" min="0" value="10">
-      </div>
-      <button type="submit" class="btn-primary" style="align-self: end; padding: 8px 14px;">+ Thêm công việc</button>
-    </form>
-    <p class="focus-tips">
-      Gợi ý: chia việc lớn thành các block 25–50 phút, chỉ tập trung một việc trong khung giờ đó.
-    </p>
-  </section>
+        <div>
+          <label for="reminder">Nhắc trước (phút)</label>
+          <input type="number" id="reminder" min="0" value="10">
+        </div>
+        <button type="submit" class="btn-primary" style="align-self: end; padding: 8px 14px;">+ Thêm công việc</button>
+      </form>
+      <p class="focus-tips">
+        Gợi ý: chia việc lớn thành các block 25–50 phút, chỉ tập trung một việc trong khung giờ đó.
+      </p>
+    </section>
 
-  <!-- NHIỆM VỤ QUAN TRỌNG NGÀY HÔM NAY -->
-  <section class="card">
-    <div class="card-title">🔥 Nhiệm vụ quan trọng bắt buộc hôm nay</div>
-    <div class="important-tasks-form">
-      <input type="text" id="importantTaskInput" placeholder="VD: Hoàn thành báo cáo, gọi điện cho khách hàng..." />
-      <button type="button" id="addImportantTaskBtn" class="btn-primary">+ Thêm</button>
-    </div>
-    <div class="important-tasks-list" id="importantTasksList"></div>
-  </section>
+    <!-- NHIỆM VỤ QUAN TRỌNG NGÀY HÔM NAY -->
+    <section class="card">
+      <div class="card-title">🔥 Nhiệm vụ quan trọng bắt buộc hôm nay</div>
+      <div class="important-tasks-form">
+        <input type="text" id="importantTaskInput" placeholder="VD: Hoàn thành báo cáo, gọi điện cho khách hàng..." />
+        <button type="button" id="addImportantTaskBtn" class="btn-primary">+ Thêm</button>
+      </div>
+      <div class="important-tasks-list" id="importantTasksList"></div>
+    </section>
 
   <!-- POMODORO TIMER -->
   <section class="card card-pomodoro">
@@ -3333,7 +3750,9 @@
         }
         actionButtons += `<button class="btn-small btn-danger" onclick="deleteTask(${t.id})" title="Xóa">✕</button>`;
 
-        html += `<tr class="${rowClass}">
+        html += `<tr class="${rowClass} task-item" draggable="true" data-id="${t.id}"
+            ondragstart="onDragStart(event)" ondragend="onDragEnd(event)"
+            ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
           <td><div style="font-weight:600;">${t.title}</div></td>
           <td>${getFriendlyDate(t.date) || '-'}</td>
           <td>${t.startTime || '-'}</td>
@@ -4085,6 +4504,27 @@
   function renderTopTasks() {
     return;
   } 
+  /* --- HÀM TẠO LỜI CHÀO VÀ QUOTE (ĐÃ SỬA LỖI HIỂN THỊ) --- */
+  const MOTIVATIONAL_QUOTES = ["Giảm trì hoãn từng bước nhỏ, mỗi việc một thời điểm.  "]; // Giữ nguyên array quotes
+
+  /* --- HÀM TẠO LỜI CHÀO (ĐÃ FIX XUNG ĐỘT) --- */
+  function updateGreetingAndQuote() {
+    const hour = (new Date()).getHours();
+    let greeting = (hour < 12) ? "Chào buổi sáng!" : (hour < 18) ? "Chào buổi chiều!" : "Chào buổi tối!";
+    const randomQuote = MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)];
+
+    // NHẮM ĐẾN THẺ MỚI (chỉ chứa lời chào)
+    const greetingTarget = document.getElementById('smallGreeting'); 
+    
+    // NHẮM ĐẾN THẺ TAGLINE (chứa châm ngôn)
+    const quoteTarget = document.getElementById('subGreeting'); 
+    
+    // GÁN NỘI DUNG
+    if (greetingTarget) greetingTarget.textContent = `${greeting}!`;
+    if (quoteTarget) quoteTarget.textContent = randomQuote;
+    
+    // QUAN TRỌNG: Không đụng vào mainTitle nữa
+  }
 
   /* --- KHỞI TẠO NÚT BẤM (FIX LỖI EVENT) --- */
   const oldBtn = document.getElementById('pomodoroStartBtn');
@@ -4101,6 +4541,7 @@
   // Load lại trạng thái cũ nếu có
   loadPomodoroState();
   renderPomodoro();
+  updateGreetingAndQuote();
 
   loadTasks();
   loadImportantTasks();
@@ -4299,7 +4740,261 @@ function resetTaskFormUI() {
     document.getElementById('title').focus();
     editingId = null; // Rất quan trọng: Thoát khỏi chế độ sửa
 }
+/* ================================================= */
+  /* --- HÀM HỖ TRỢ KÉO & THẢ (DRAG & DROP) --- */
+  /* ================================================= */
+  
+  let draggedId = null; // Biến tạm lưu ID của dòng đang kéo
 
+  function onDragStart(e) {
+    const el = e.currentTarget;
+    draggedId = parseInt(el.dataset.id, 10);
+    e.dataTransfer.setData('text/plain', draggedId);
+    
+    // Thêm hiệu ứng kéo
+    setTimeout(() => el.classList.add('dragging'), 0);
+    // Tạm thời hiển thị toàn bộ bảng để dễ kéo (chỉ dành cho Tabbed View nếu có)
+    // if(document.getElementById('taskFilter')) document.getElementById('taskFilter').value = 'all';
+    // renderTasks(); 
+  }
+
+  function onDragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    draggedId = null;
+    // Xóa hiệu ứng nơi thả
+    document.querySelectorAll('tr.drag-over').forEach(x => x.classList.remove('drag-over'));
+  }
+
+  function onDragOver(e) {
+    e.preventDefault(); // Cho phép thả
+    const targetEl = e.currentTarget;
+    if (targetEl.dataset.id && parseInt(targetEl.dataset.id, 10) !== draggedId) {
+        if (!targetEl.classList.contains('drag-over')) {
+            document.querySelectorAll('tr.drag-over').forEach(x => x.classList.remove('drag-over'));
+            targetEl.classList.add('drag-over');
+        }
+    }
+  }
+
+  function onDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+
+  function onDrop(e) {
+    e.preventDefault();
+    const targetEl = e.currentTarget;
+    targetEl.classList.remove('drag-over');
+
+    const sourceId = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    const targetId = parseInt(targetEl.dataset.id, 10);
+
+    if (sourceId && targetId && sourceId !== targetId) {
+        reorderTasks(sourceId, targetId);
+    }
+  }
+
+  // Hàm quan trọng nhất: Thay đổi vị trí trong mảng tasks
+  function reorderTasks(sourceId, targetId) {
+    const fromIndex = tasks.findIndex(t => t.id === sourceId);
+    const toIndex = tasks.findIndex(t => t.id === targetId);
+
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    // Di chuyển phần tử
+    const [movedTask] = tasks.splice(fromIndex, 1);
+    tasks.splice(toIndex, 0, movedTask);
+    
+    // Đặt lại sort tạm thời về 'created' để giữ thứ tự thủ công
+    currentSort = 'created'; 
+
+    saveTasks();
+    renderTasks();
+  }
+
+  /* --- JAVASCRIPT FIX: TÁI KHỞI TẠO SỰ KIỆN AN TOÀN --- */
+
+// Đảm bảo chạy sau khi toàn bộ HTML đã được tải (DOM ready)
+/* ================================================= */
+/* --- LOGIC KHỞI TẠO VÀ XỬ LÝ SỰ KIỆN HEADER (FIX FINAL) --- */
+/* ================================================= */
+
+window.addEventListener('DOMContentLoaded', () => {
+    // 1. Khai báo các phần tử DOM (Chắc chắn phải có)
+    const settingsToggleEl = document.getElementById('settingsToggle');
+    const settingsMenuEl = document.getElementById('settingsMenu');
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    const noticeBtn = document.getElementById('noticeBtn');
+    const body = document.body;
+
+    if (!settingsToggleEl || !settingsMenuEl) {
+        console.error("LỖI CẤU TRÚC: Không tìm thấy nút Settings Toggle hoặc Menu Dropdown.");
+        return; 
+    }
+
+    // --- LOGIC GẮN SỰ KIỆN CLICK (MENU TOGGLE) ---
+    const toggleMenu = (e) => {
+        if (e) e.stopPropagation();
+        console.log("DEBUG: Settings button CLICKED. Toggling menu."); 
+        settingsMenuEl.classList.toggle('show');
+    };
+
+    // Gắn listener cho nút ⚙️
+    settingsToggleEl.addEventListener('click', toggleMenu); 
+
+    // Logic đóng menu khi click ra ngoài
+    document.addEventListener('click', (e) => {
+        if (!settingsMenuEl.contains(e.target) && e.target !== settingsToggleEl) {
+            settingsMenuEl.classList.remove('show');
+        }
+    });
+
+    // --- LOGIC NÚT BÊN TRONG (DARK MODE & NOTIFICATION) ---
+
+    // 1. Dark Mode Toggle
+    // --- Khối logic cho Nút Dark Mode (Thay thế logic toggle cũ) ---
+    if (darkModeBtn) {
+        // Khôi phục trạng thái icon ban đầu
+        const isDarkMode = localStorage.getItem('timefocus_darkmode') === 'enabled';
+        if (isDarkMode) { body.classList.add('dark-mode'); darkModeBtn.innerHTML = '☀️ Chế độ hiển thị'; } 
+        else { darkModeBtn.innerHTML = '🌙 Chế độ hiển thị'; }
+
+        // GẮN SỰ KIỆN: Bấm mở Popup lựa chọn
+        darkModeBtn.addEventListener('click', () => {
+            showDarkModeSelection(); // Mở Popup lựa chọn Sáng/Tối
+            settingsMenuEl.classList.remove('show'); // Đóng menu cài đặt
+        });
+    }
+
+    // 2. Notification Button
+    if (noticeBtn) {
+        noticeBtn.addEventListener('click', () => {
+            // Mở Modal Thông báo trình duyệt
+            const noticeModal = document.getElementById('noticeModal');
+            if (noticeModal) {
+                if (typeof updateNotifyStatus === 'function') updateNotifyStatus(); 
+                noticeModal.classList.add('show');
+            }
+            settingsMenuEl.classList.remove('show'); // Đóng menu cài đặt
+        });
+    }
+});
+/* --- JAVASCRIPT FIX: CHUYỂN SANG HOVER (TỰ ĐỘNG HIỆN) --- */
+
+window.addEventListener('DOMContentLoaded', () => {
+    const settingsToggleEl = document.getElementById('settingsToggle');
+    const settingsMenuEl = document.getElementById('settingsMenu');
+    let timeout; // Biến này để tạo độ trễ khi rời chuột
+
+    if (settingsToggleEl && settingsMenuEl) {
+        // 1. SHOW MENU: Khi di chuột vào nút
+        settingsToggleEl.addEventListener('mouseenter', () => {
+            clearTimeout(timeout);
+            settingsMenuEl.classList.add('show');
+        });
+
+        // 2. HIDE MENU: Khi rời chuột khỏi nút (có độ trễ)
+        settingsToggleEl.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                settingsMenuEl.classList.remove('show');
+            }, 250); // 250ms delay
+        });
+
+        // 3. GIỮ MENU: Khi di chuột vào menu
+        settingsMenuEl.addEventListener('mouseenter', () => {
+            clearTimeout(timeout); // Hủy lệnh ẩn
+        });
+
+        // 4. HIDE MENU: Khi rời chuột khỏi menu
+        settingsMenuEl.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                settingsMenuEl.classList.remove('show');
+            }, 300); // 300ms delay để đóng menu
+        });
+
+        // 5. Logic cho nút Bật/Tắt (Dark Mode/Notification) vẫn dùng click
+        document.getElementById('darkModeBtn').addEventListener('click', () => {
+      const body = document.body;
+      const btn = document.getElementById('darkModeBtn'); // Lấy lại nút để thao tác
+      
+      // 1. Chuyển đổi class Dark Mode
+      body.classList.toggle('dark-mode');
+      
+      // 2. Cập nhật icon và text
+      const isDarkMode = body.classList.contains('dark-mode');
+
+      if (isDarkMode) {
+          // Kích hoạt Dark Mode
+          localStorage.setItem('timefocus_darkmode', 'enabled');
+          btn.innerHTML = '☀️ Chế độ hiển thị'; // Icon Mặt trời
+      } else {
+          // Kích hoạt Light Mode
+          localStorage.setItem('timefocus_darkmode', 'disabled');
+          btn.innerHTML = '🌙 Chế độ hiển thị'; // Icon Mặt trăng
+      }
+      
+      // 3. Tắt menu sau khi chọn
+      const settingsMenuEl = document.getElementById('settingsMenu');
+      if (settingsMenuEl) settingsMenuEl.classList.remove('show');
+  });
+
+        document.getElementById('noticeBtn').addEventListener('click', (e) => {
+             // ... (Chạy logic Notification của bạn) ...
+             settingsMenuEl.classList.remove('show'); // Đóng menu sau khi click
+        });
+
+        // Bổ sung: Nếu bạn có code đóng menu khi click ra ngoài, hãy đảm bảo nó còn đó.
+    }
+});
+
+
+// Bạn cần đảm bảo đã dán đoạn CSS FIX LỖI POPUP KHÔNG HIỆN ở cuối thẻ <style>!
+/* --- HÀM ẨN/HIỆN POPUP CHỌN CHẾ ĐỘ --- */
+  function showDarkModeSelection() {
+      const modal = document.getElementById('noticeModal');
+      const titleEl = modal.querySelector('.notice-modal-header h3');
+      const contentEl = document.getElementById('noticeStatusDisplay');
+      const btnGroup = document.getElementById('noticeButtonGroup');
+
+      if (modal && titleEl && contentEl && btnGroup) {
+          titleEl.textContent = "Chọn Chế độ Hiển thị";
+          contentEl.innerHTML = `
+              <p style="margin:0;">Tùy chỉnh giao diện để có trải nghiệm tốt nhất.</p>
+              <p style="font-size: 0.9rem; margin-top: 10px; color: #94a3b8;">Lựa chọn này sẽ được lưu lại.</p>
+          `;
+
+          btnGroup.innerHTML = `
+              <button class="btn-outline" onclick="setDarkMode(false)">🌙 Mode Sáng</button>
+              <button class="btn-primary" onclick="setDarkMode(true)">☀️ Mode Tối</button>
+          `;
+          
+          modal.classList.add('show');
+      }
+  }
+
+  /* --- HÀM ĐẶT CHẾ ĐỘ (THAY CHO HÀM TOGGLE CŨ) --- */
+  function setDarkMode(isDark) {
+      const body = document.body;
+      const darkModeBtn = document.getElementById('darkModeBtn');
+      
+      // 1. Áp dụng class và lưu storage
+      if (isDark) {
+          body.classList.add('dark-mode');
+          localStorage.setItem('timefocus_darkmode', 'enabled');
+      } else {
+          body.classList.remove('dark-mode');
+          localStorage.setItem('timefocus_darkmode', 'disabled');
+      }
+      
+      // 2. Cập nhật icon của nút trong Menu Cài đặt
+      if (darkModeBtn) {
+          darkModeBtn.innerHTML = isDark ? '☀️ Chế độ hiển thị' : '🌙 Chế độ hiển thị';
+      }
+      
+      // 3. Đóng Modal sau khi chọn
+      document.getElementById('noticeModal').classList.remove('show');
+  }
+  
+  window.setDarkMode = setDarkMode; // Đưa hàm ra global để nút bấm trong Modal gọi được
 </script>
 </body>
 </html>
