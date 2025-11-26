@@ -2677,6 +2677,82 @@
     body.dark-mode tr.task-done td {
         color: #7d8b9f !important; /* Màu xám trung tính */
     }
+    /* ================================================= */
+    /* --- FIX LỖI TEXT TÀNG HÌNH TRONG DARK MODE --- */
+    /* ================================================= */
+
+    /* Áp dụng cho tất cả Input, Select và Nút Reward Trigger */
+    body.dark-mode input:focus,
+    body.dark-mode input:hover,
+    body.dark-mode select:focus,
+    body.dark-mode select:hover,
+    body.dark-mode .reward-trigger:focus,
+    body.dark-mode .reward-trigger:hover,
+    body.dark-mode .important-tasks-form input:focus,
+    body.dark-mode .important-tasks-form input:hover {
+        /* Đảm bảo nền là trắng (như cũ) */
+        background: #ffffff !important; 
+        
+        /* QUAN TRỌNG: Ép màu chữ trở lại màu tối */
+        color: #1e293b !important; 
+        
+        /* Làm cho hiệu ứng nhấc lên nhẹ hơn để tránh lỗi chồng chéo */
+        transform: translateY(0) !important; 
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    }
+    /* ================================================= */
+    /* --- FIX LỖI TƯƠNG PHẢN & MỜ CHỮ (DARK MODE) --- */
+    /* ================================================= */
+
+    /* 1. FIX CỘT TIÊU ĐỀ BỊ MỜ */
+    body.dark-mode .tasks-header h2 {
+        /* Ép màu tiêu đề Task List phải sáng */
+        color: #e2e8f0 !important; 
+        /* Bỏ hiệu ứng gradient cũ đang làm mờ chữ */
+        -webkit-text-fill-color: #e2e8f0 !important;
+        background: none !important;
+    }
+    
+    /* 2. FIX HEADER BẢNG (CÔNG VIỆC, NGÀY...) */
+    body.dark-mode table thead th {
+        color: #e2e8f0 !important; 
+        background: #1e293b !important; /* Nền tối của header */
+    }
+
+    /* 3. FIX BỘ LỌC (FILTER CHIPS) BỊ TRÙNG MÀU */
+    
+    /* Khung chứa Menu (Dropdown) */
+    body.dark-mode .filter-dropdown {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+    }
+
+    /* Chip lọc mặc định (Chưa chọn) */
+    body.dark-mode .filter-chip {
+        background: #334155 !important; /* Nền tối cho chip */
+        color: #f1f5f9 !important; /* Chữ sáng */
+        border-color: #475569 !important;
+    }
+
+    /* Chip lọc Đang chọn (Active) */
+    body.dark-mode .filter-chip.active {
+        background: var(--primary) !important; /* Nền tím chính */
+        color: white !important; /* Chữ trắng */
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); /* Thêm glow nhẹ */
+    }
+    
+    /* Đảm bảo ô nhập ngày tháng cụ thể vẫn đọc được */
+    body.dark-mode .specific-date-wrapper input {
+        background: #0f172a !important; /* Đổi nền input tối */
+        color: #f1f5f9 !important;
+    }
+    
+    /* 4. FIX MỜ CHỮ TRONG DÒNG DỮ LIỆU */
+    /* Khắc phục lỗi màu tối #333 trong cột tên công việc */
+    body.dark-mode td:first-child div {
+        color: #f1f5f9 !important; 
+    }
   </style>  
 </head>
 <body>
@@ -3909,9 +3985,13 @@
     if (pomodoroRunning) return;
     pomodoroRunning = true;
     
-    if (pomodoroRemaining === pomodoroDuration || !pomodoroStartTime) {
+    console.log("START DEBUG: Reading remaining time:", pomodoroRemaining); // 👈 KIỂM TRA GIÁ TRỊ ĐỌC VÀO
+
+    if (pomodoroRemaining === pomodoroDuration) {
+        // Trường hợp 1: Bắt đầu mới tinh
         pomodoroStartTime = new Date().getTime();
     } else {
+        // Trường hợp 2: Tiếp tục (Resume) - Chỉ chạy khi còn thời gian
         pomodoroStartTime = new Date().getTime() - (pomodoroDuration - pomodoroRemaining) * 1000;
     }
 
@@ -3926,18 +4006,27 @@
     pomodoroRunning = false;
     
     if (pomodoroTimer) {
-        clearInterval(pomodoroTimer);
-        pomodoroTimer = null;
+      clearInterval(pomodoroTimer);
+      pomodoroTimer = null;
     }
     
-    const now = new Date().getTime();
-    const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
-    pomodoroRemaining = Math.max(0, pomodoroDuration - elapsed);
-    pomodoroStartTime = null;
+    // Tính toán và LƯU LẠI thời gian còn lại chính xác
+    if (pomodoroStartTime) {
+        const now = new Date().getTime();
+        const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
+        pomodoroRemaining = Math.max(0, pomodoroDuration - elapsed); // Cập nhật Remaining
+        
+        console.log("PAUSE DEBUG: Remaining time saved:", pomodoroRemaining); // 👈 LƯU GIÁ TRỊ LẠI
+    }
+    
+    pomodoroStartTime = null; // Đánh dấu đã tạm dừng
+
+    // QUAN TRỌNG: Cập nhật hiển thị ngay lập tức sau khi tính toán
+    renderPomodoro(); 
 
     updateButtonUI('resume');
-    statusEl.textContent = 'Đã tạm dừng.';
-    savePomodoroState();
+    statusEl.textContent = 'Đã tạm dừng. Bấm nút để tiếp tục.';
+    savePomodoroState(); // Lưu trạng thái
   }
 
   function resetPomodoro() {
