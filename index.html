@@ -3162,52 +3162,6 @@
     .app {
         padding-bottom: 10px !important; /* Mức padding tối thiểu */
     }
-    /* ================================================= */
-    /* --- FIX CUỐI CÙNG: KHÔI PHỤC MÀU NỀN MENU CÀI ĐẶT --- */
-    /* ================================================= */
-
-    /* 1. Áp dụng nền trắng cho khung chứa Menu (Light Mode) */
-    .settings-dropdown {
-        background: #fff !important; /* Nền trắng tinh khôi */
-        border: 1px solid #e2e8f0 !important; /* Viền xám nhạt */
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important; /* Đổ bóng nhẹ nhàng */
-        border-radius: 12px !important; /* Bo góc mềm mại */
-    }
-
-    /* 2. Đảm bảo nút bên trong có nền trong suốt và chữ màu tối (Light Mode) */
-    .settings-dropdown .menu-item-btn {
-        background: transparent !important; /* Nền trong suốt để thấy nền Menu */
-        color: #334155 !important; /* Chữ màu tối */
-        transition: all 0.2s;
-        padding: 10px 15px !important; /* Tăng padding để dễ bấm */
-        border-radius: 8px !important; /* Bo góc nhẹ cho nút */
-        text-align: left !important; /* Căn chữ sang trái */
-        width: 100% !important; /* Kéo dài nút hết chiều ngang */
-    }
-
-    /* 3. Hiệu ứng Hover: Nền xám nhạt hơn khi di chuột (Light Mode) */
-    .settings-dropdown .menu-item-btn:hover {
-        background: #f1f5f9 !important; /* Nền xám nhạt hơn khi di chuột */
-        color: #1a202c !important; 
-    }
-
-    /* --- ĐẢM BẢO CHẾ ĐỘ TỐI CŨNG ĐẸP --- */
-    body.dark-mode .settings-dropdown {
-        background: #1e293b !important; 
-        border: 1px solid #334155 !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
-        border-radius: 12px !important;
-    }
-
-    body.dark-mode .settings-dropdown .menu-item-btn {
-        background: transparent !important; /* Nền trong suốt để thấy nền Menu */
-        color: #f1f5f9 !important; 
-    }
-
-    body.dark-mode .settings-dropdown .menu-item-btn:hover {
-        background: #334155 !important; 
-        color: #fff !important; 
-    }
     
   </style>  
 </head>
@@ -3693,6 +3647,34 @@
 
   // --- HÀM RENDER TASKS (CÓ SẮP XẾP) ---
   function renderTasks() {
+      // ======================================================================
+    // FIX LOGIC: TỰ ĐỘNG DỪNG CÁC CÔNG VIỆC ĐANG CHẠY ĐÃ QUÁ HẠN (PERSISTENT FIX)
+    // Lệnh này chạy trước khi lọc để đảm bảo dữ liệu trong mảng tasks là chính xác.
+    // ======================================================================
+
+    (function() {
+        let tasksUpdated = false;
+        const now = new Date();
+
+        tasks = tasks.map(t => {
+            if (t.done || !t.endTime) return t; // Bỏ qua nếu đã xong hoặc không có giờ kết thúc
+
+            const endDateTime = buildDateTime(t.date, t.endTime);
+
+            // Nếu task ĐANG CHẠY (started=true) VÀ giờ hiện tại >= giờ kết thúc
+            if (t.started && endDateTime && now.getTime() >= endDateTime.getTime()) {
+                t.started = false; // BUỘC PHẢI DỪNG
+                tasksUpdated = true;
+            }
+            return t;
+        });
+
+        if (tasksUpdated) {
+            saveTasks(); // Lưu trạng thái đã sửa vào localStorage
+            // Không gọi renderTasks() ở đây để không tạo vòng lặp vô tận
+        }
+    })();
+    // ----------------------------------------------------------------------
     const container = document.getElementById('tasksContainer');
     if (!tasks.length) {
       container.innerHTML = `
