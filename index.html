@@ -4339,11 +4339,74 @@
   // ==========================
 
   /* --- KHAI BÁO BIẾN --- */
-  let pomodoroDuration = 25 * 60; 
+  let pomodoroDuration = 25 * 60;
   let pomodoroRemaining = pomodoroDuration;
   let pomodoroTimer = null;
   let pomodoroRunning = false;
-  let pomodoroStartTime = null; 
+  let pomodoroStartTime = null;
+  let currentWorkMode = 25;
+
+  // [MỚI] Biến này để theo dõi: true là đang làm, false là đang nghỉ
+  let isWorkSession = true;
+  // Hàm này dùng để tua nhanh thời gian (chạy trong Console F12: warpTime(60))
+  function warpTime(secondsToSkip) {
+      if (!pomodoroRunning) {
+          alert("⚠️ Hãy bấm nút 'Bắt đầu' trước khi tua thời gian!");
+          return;
+      }
+      // Mẹo: Dời thời điểm bắt đầu về quá khứ => Thời gian trôi qua sẽ tăng lên
+      pomodoroStartTime -= (secondsToSkip * 1000);
+
+      // Tính toán lại ngay lập tức để cập nhật màn hình
+      const now = new Date().getTime();
+      const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
+      pomodoroRemaining = pomodoroDuration - elapsed;
+
+      if (pomodoroRemaining <= 0) pomodoroRemaining = 0;
+
+      renderPomodoro();
+      console.log(`🚀 Đã tua nhanh ${secondsToSkip} giây!`);
+  }
+    // Đưa hàm này ra global để bạn gọi được từ Console
+    window.warpTime = warpTime;
+    function switchMode() {
+    playSound('success'); 
+    
+    if (pomodoroTimer) clearInterval(pomodoroTimer);
+    pomodoroRunning = false;
+    pomodoroStartTime = null;
+
+    if (isWorkSession) {
+        // --- KẾT THÚC GIỜ LÀM -> CHUYỂN SANG NGHỈ ---
+        
+        // [LOGIC MỚI] Tự động tính giờ nghỉ dựa trên chế độ làm
+        let breakMins = (currentWorkMode === 50) ? 10 : 5;
+        
+        sendNotification("🔔 HẾT GIỜ LÀM!", `Bạn làm tốt lắm. Bấm Start để nghỉ ${breakMins} phút nhé!`);
+        
+        isWorkSession = false; 
+        pomodoroDuration = breakMins * 60; // Set giờ nghỉ tương ứng
+        pomodoroRemaining = pomodoroDuration; 
+        
+        statusEl.textContent = `☕ Sẵn sàng nghỉ giải lao (${breakMins} phút). Bấm Bắt đầu để đếm ngược.`;
+    } else {
+        // --- KẾT THÚC GIỜ NGHỈ -> CHUYỂN VỀ LÀM ---
+        
+        // Quay lại đúng chế độ cũ (25 hoặc 50)
+        let workMins = currentWorkMode;
+        
+        sendNotification("🔔 HẾT GIỜ NGHỈ!", `Đã nạp đủ năng lượng chưa? Bấm Start để chiến tiếp ${workMins} phút!`);
+        
+        isWorkSession = true; 
+        pomodoroDuration = workMins * 60; 
+        pomodoroRemaining = pomodoroDuration; 
+        
+        statusEl.textContent = `🔥 Sẵn sàng làm việc (${workMins} phút). Bấm Bắt đầu để tập trung.`;
+    }
+
+    renderPomodoro();
+    updateButtonUI('start'); 
+}
 
   const startBtn = document.getElementById('pomodoroStartBtn');
   const display = document.getElementById('pomodoroDisplay');
@@ -4405,20 +4468,29 @@
     }
   }
 
+  // THAY THẾ HÀM startTimerInterval() BẰNG HÀM MỚI (FIXED)
   function startTimerInterval() {
-    if (pomodoroTimer) clearInterval(pomodoroTimer);
-    pomodoroTimer = setInterval(() => {
-        const now = new Date().getTime();
-        const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
-        pomodoroRemaining = pomodoroDuration - elapsed;
+  if (pomodoroTimer) clearInterval(pomodoroTimer);
+  pomodoroTimer = setInterval(() => {
+      const now = new Date().getTime();
+      const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
+      pomodoroRemaining = pomodoroDuration - elapsed;
 
-        if (pomodoroRemaining <= 0) {
-            finishPomodoro();
-        } else {
-            renderPomodoro();
-        }
-    }, 500);
-  }
+      // NẾU HẾT GIỜ
+      if (pomodoroRemaining <= 0) {
+          clearInterval(pomodoroTimer);
+          pomodoroTimer = null;
+          pomodoroRunning = false;
+          pomodoroRemaining = 0;
+          renderPomodoro();
+
+          // [QUAN TRỌNG] TỰ ĐỘNG CHUYỂN CHẾ ĐỘ
+          switchMode();
+      } else {
+          renderPomodoro();
+      }
+  }, 500);
+}
 
   function togglePomodoro() {
     if (pomodoroRunning) {
@@ -4429,52 +4501,44 @@
   }
 
   function startPomodoro() {
-    if (pomodoroRunning) return;
-    pomodoroRunning = true;
-    
-    console.log("START DEBUG: Reading remaining time:", pomodoroRemaining); // 👈 KIỂM TRA GIÁ TRỊ ĐỌC VÀO
+  if (pomodoroRunning) return;
+  pomodoroRunning = true;
 
-    if (pomodoroRemaining === pomodoroDuration) {
-        // Trường hợp 1: Bắt đầu mới tinh
-        pomodoroStartTime = new Date().getTime();
-    } else {
-        // Trường hợp 2: Tiếp tục (Resume) - Chỉ chạy khi còn thời gian
-        pomodoroStartTime = new Date().getTime() - (pomodoroDuration - pomodoroRemaining) * 1000;
-    }
-
-    startTimerInterval();
-    updateButtonUI('pause');
-    statusEl.textContent = 'Đang tập trung... Đừng chạm điện thoại!';
-    savePomodoroState();
+  // Logic: Nếu là bắt đầu mới hay tiếp tục sau khi pause
+  if (pomodoroRemaining >= pomodoroDuration) {
+      pomodoroStartTime = new Date().getTime();
+  } else {
+      // Tính ngược lại thời điểm bắt đầu giả định để khớp với thời gian còn lại
+      pomodoroStartTime = new Date().getTime() - ((pomodoroDuration - pomodoroRemaining) * 1000);
   }
+
+  startTimerInterval();
+  updateButtonUI('pause');
+  // Cập nhật dòng chữ trạng thái dựa trên chế độ Làm hay Nghỉ
+  statusEl.textContent = isWorkSession ? 'Đang tập trung... Cố lên!' : 'Đang nghỉ ngơi... Thư giãn nhé.';
+}
 
   function pausePomodoro() {
-    if (!pomodoroRunning) return;
-    pomodoroRunning = false;
-    
-    if (pomodoroTimer) {
-      clearInterval(pomodoroTimer);
-      pomodoroTimer = null;
-    }
-    
-    // Tính toán và LƯU LẠI thời gian còn lại chính xác
-    if (pomodoroStartTime) {
-        const now = new Date().getTime();
-        const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
-        pomodoroRemaining = Math.max(0, pomodoroDuration - elapsed); // Cập nhật Remaining
-        
-        console.log("PAUSE DEBUG: Remaining time saved:", pomodoroRemaining); // 👈 LƯU GIÁ TRỊ LẠI
-    }
-    
-    pomodoroStartTime = null; // Đánh dấu đã tạm dừng
+  if (!pomodoroRunning) return;
+  pomodoroRunning = false;
 
-    // QUAN TRỌNG: Cập nhật hiển thị ngay lập tức sau khi tính toán
-    renderPomodoro(); 
-
-    updateButtonUI('resume');
-    statusEl.textContent = 'Đã tạm dừng. Bấm nút để tiếp tục.';
-    savePomodoroState(); // Lưu trạng thái
+  if (pomodoroTimer) {
+    clearInterval(pomodoroTimer);
+    pomodoroTimer = null;
   }
+
+  // [QUAN TRỌNG] Lưu lại chính xác thời gian còn lại
+  if (pomodoroStartTime) {
+      const now = new Date().getTime();
+      const elapsed = Math.floor((now - pomodoroStartTime) / 1000);
+      pomodoroRemaining = Math.max(0, pomodoroDuration - elapsed);
+  }
+
+  pomodoroStartTime = null;
+  renderPomodoro();
+  updateButtonUI('resume');
+  statusEl.textContent = 'Đã tạm dừng.';
+}
 
   function resetPomodoro() {
     pomodoroRemaining = pomodoroDuration;
@@ -4488,26 +4552,13 @@
     localStorage.removeItem('timefocus_pomodoro');
   }
 
-  function finishPomodoro() {
-    pomodoroRemaining = 0;
-    pomodoroRunning = false;
-    pomodoroStartTime = null;
-    if (pomodoroTimer) clearInterval(pomodoroTimer);
-    
-    renderPomodoro();
-    updateButtonUI('start');
-    statusEl.textContent = 'Hoàn thành tuyệt vời! Hãy nghỉ ngơi.';
-    
-    // --- THÔNG BÁO MÁY TÍNH ---
-    const minutes = Math.floor(pomodoroDuration / 60);
-    sendNotification(
-        "🎉 HOÀN THÀNH POMODORO!", 
-        `Bạn đã tập trung tuyệt vời trong ${minutes} phút. Hãy đứng dậy vươn vai và nghỉ ngơi nhé!`
-    );
-    // ---------------------------
-
-    localStorage.removeItem('timefocus_pomodoro');
+  // ĐỔI TÊN HÀM: Hàm finishPomodoro() cũ chỉ nên là hàm thông báo
+  function notifyFinish() {
+      // Logic gửi notification desktop
+      const minutes = Math.floor(pomodoroDuration / 60);
+      sendNotification("🎉 HOÀN THÀNH!", `Bạn đã tập trung tuyệt vời trong ${minutes} phút.`);
   }
+  // ...
 
   function updateButtonUI(state) {
     const btn = document.getElementById('pomodoroStartBtn');
@@ -4525,10 +4576,19 @@
     }
   }
 
-  function setPomodoroDuration(minutes) {
-    pomodoroDuration = minutes * 60;
+  // [MỚI] Hàm này để xử lý khi bấm nút "25 phút" hoặc "50 phút"
+function setPomodoroDuration(mins) {
+    // [MỚI] Lưu lại chế độ vừa chọn (25 hoặc 50)
+    currentWorkMode = mins; 
+
+    pomodoroDuration = mins * 60;
+    pomodoroRemaining = pomodoroDuration;
+    
+    isWorkSession = true; 
     resetPomodoro();
-  }
+    
+    statusEl.textContent = `Sẵn sàng (${mins} phút)`;
+}
   function renderTopTasks() {
     return;
   } 
