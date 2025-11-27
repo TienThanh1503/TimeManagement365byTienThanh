@@ -3772,6 +3772,206 @@
         from { opacity: 0; transform: translateY(-5px); }
         to { opacity: 1; transform: translateY(0); }
     }
+    .timer-progress-track {
+        width: 80%; /* Chiều rộng thanh */
+        height: 6px; /* Độ dày */
+        background: rgba(0, 0, 0, 0.05); /* Nền mờ của đường ray */
+        border-radius: 10px;
+        margin: 0 auto 15px auto; /* Căn giữa và cách các phần khác */
+        overflow: hidden; /* Cắt phần thừa */
+        position: relative;
+    }
+
+    .timer-progress-fill {
+        height: 100%;
+        width: 100%;
+        background: #22c55e; /* Màu mặc định (Xanh) */
+        border-radius: 10px;
+        
+        /* Hiệu ứng chuyển động siêu mượt */
+        transition: width 1s linear, background-color 1s ease;
+        
+        /* Hiệu ứng phát sáng nhẹ */
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+    }
+
+    /* DARK MODE */
+    body.dark-mode .timer-progress-track {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    /* ================================================= */
+    /* --- FIX FINAL VIP: ZEN MODE (SẠCH SẼ 100%) --- */
+    /* ================================================= */
+
+    /* 1. BIẾN SCALE */
+    body.zen-active { 
+        /* 👇👇👇 SỬA SỐ NÀY ĐỂ TO/NHỎ (VD: 1.0, 1.3, 2.0...) 👇👇👇 */
+        --zen-scale: 2.2; 
+        /* ------------------------------------------------ */
+        overflow: hidden !important; 
+    }
+
+    /* 2. ẨN PHẦN THỪA */
+    body.zen-active header,
+    body.zen-active .top-row,
+    body.zen-active .card:not(.card-pomodoro),
+    body.zen-active footer,
+    body.zen-active::after,
+    body.zen-active .timer-tabs::after { 
+        display: none !important;
+    }
+
+    /* 3. RESET BODY */
+    body.zen-active .app {
+        padding: 0 !important; margin: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        max-width: none !important;
+        background: transparent !important; border: none !important; box-shadow: none !important;
+    }
+
+    /* 4. CARD POMODORO (QUAN TRỌNG: CHỈ LẤY CÁI ĐANG HIỆN) */
+    /* Thêm :not([style*="none"]) để bỏ qua những cái đang bị ẩn bởi Tab */
+    body.zen-active .card-pomodoro {
+        position: fixed !important;
+        top: 0 !important; left: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        max-width: none !important; margin: 0 !important;
+        
+        border-radius: 0 !important; border: none !important; box-shadow: none !important;
+        
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        
+        /* Gap thông minh để không dính chùm */
+        gap: calc(40px * var(--zen-scale)) !important;
+        
+        background: #f8fafc !important; 
+        z-index: 99999 !important;
+    }
+
+    /* 5. PHÓNG TO NỘI DUNG */
+
+    /* Đồng hồ */
+    /* ĐỒNG HỒ (SỬA SIZE CƠ SỞ ĐỂ BÙ TRỪ 2.2X) */
+    body.zen-active .pomodoro-display {
+        /* 👇👇👇 THAY THẾ DÒNG FONT-SIZE CŨ BẰNG DÒNG NÀY 👇👇👇 */
+        font-size: calc(8rem * var(--zen-scale)) !important; 
+        /* -------------------------------------------------------- */
+        
+        font-weight: 900 !important;
+        margin: 0 !important; 
+        line-height: 1.2 !important; /* Đảm bảo không bị chèn */
+        /* ... các thuộc tính khác giữ nguyên ... */
+    }
+
+    /* Cụm điều khiển */
+    body.zen-active .focus-studio,
+    body.zen-active .timer-tabs,
+    body.zen-active .pomodoro-controls {
+        transform: scale(var(--zen-scale)) !important;
+        margin: 0 !important; 
+        width: auto !important;
+    }
+
+    /* Khung chứa (Fix lỗi dính chùm) */
+    body.zen-active #pomodoroContainer,
+    body.zen-active #taskTimerContainer {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: calc(30px * var(--zen-scale)) !important;
+    }
+    
+    /* Ẩn các khung con đang bị tắt (Quan trọng để không hiện 2 cái) */
+    body.zen-active #pomodoroContainer[style*="none"],
+    body.zen-active #taskTimerContainer[style*="none"] {
+        display: none !important;
+    }
+
+    /* Tiêu đề & Trạng thái */
+    body.zen-active .card-title {
+        font-size: calc(1rem * var(--zen-scale)) !important;
+        margin: 0 !important;
+        opacity: 0.6; letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    body.zen-active .pomodoro-status {
+        font-size: calc(1rem * var(--zen-scale)) !important;
+        margin: 0 !important;
+        opacity: 0.8;
+    }
+
+    /* Thanh tiến độ */
+    body.zen-active .timer-progress-track {
+        position: absolute !important;
+        bottom: 0 !important; left: 0 !important;
+        width: 100% !important;
+        height: calc(12px * var(--zen-scale)) !important;
+        margin: 0 !important; border-radius: 0 !important;
+    }
+
+    /* Nút Thoát */
+    #exitZenBtn {
+        position: fixed; bottom: 30px; right: 30px; left: auto; transform: none;
+        padding: calc(12px * var(--zen-scale)) calc(30px * var(--zen-scale)); 
+        font-size: calc(1rem * var(--zen-scale));
+        border-radius: 50px;
+        background: rgba(0, 0, 0, 0.1); color: #333; 
+        border: 1px solid rgba(0,0,0,0.1); font-weight: 700;
+        cursor: pointer; z-index: 100000; display: none;
+    }
+    #exitZenBtn:hover { background: rgba(0,0,0,0.2); }
+    body.zen-active #exitZenBtn { display: block; }
+
+    /* Dark Mode */
+    body.zen-active.dark-mode .card-pomodoro {
+        background: #0f172a !important; color: #fff !important;
+    }
+    body.zen-active.dark-mode #exitZenBtn {
+        background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2);
+    }
+    /* [QUAN TRỌNG] FIX MENU CHỌN VIỆC TRONG ZEN MODE (FINAL) */
+    body.zen-active #inlineTaskMenu {
+        /* Cố định kích thước đã chỉnh */
+        width: 700px !important; 
+        max-height: 500px !important; 
+        
+        /* Bỏ ảnh hưởng của Zen Mode Scaling */
+        font-size: 1rem !important;
+        scale: 1 !important;
+        
+        /* ĐỊNH VỊ CỐ ĐỊNH */
+        position: absolute !important;
+        left: 50% !important;
+        z-index: 100000 !important;
+
+        /* ÁP DỤNG CĂN CHỈNH BẰNG PHẦN TRĂM (%) */
+        /* Căn chỉnh 20% từ đáy (giả định) */
+        bottom: 20% !important; 
+        
+        /* Dùng margin-left để căn giữa (700px / 2 = 350px) */
+        margin-left: -350px !important; 
+
+        /* TINH CHỈNH CUỐI CÙNG (Dịch chuyển lên 40px) */
+        /* Nếu menu vẫn còn hơi thấp, dùng translateY để dịch chuyển lên */
+        transform: translateY(-20px) !important; 
+        
+        /* Giao diện */
+        overflow-y: auto !important;
+        background: #1e293b !important; 
+        border-radius: 20px !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+    }
+    
+    /* FIX: Đảm bảo chữ bên trong vẫn có kích thước chuẩn */
+    body.zen-active #inlineTaskMenu .inline-task-item * {
+        font-size: 1rem !important;
+        color: #f1f5f9 !important;
+    }
+    
     
   </style>  
 </head>
@@ -3796,8 +3996,13 @@
             <button id="darkModeBtn" class="menu-item-btn" data-mode-toggle title="Chế độ tối/sáng">
                 🌙 Chế độ hiển thị
             </button>
+            
             <button id="noticeBtn" class="menu-item-btn" title="Thông báo trình duyệt">
                 🔔 Quản lý thông báo
+            </button>
+
+            <button id="zenModeBtn" class="menu-item-btn" onclick="toggleZenMode()" title="Chế độ tập trung">
+                🧘 Chế độ tập trung
             </button>
         </div>
     </div>
@@ -3922,7 +4127,13 @@
 
     <div id="pomodoroContainer">
         <div class="card-title">Phiên tập trung (Pomodoro)</div>
+        
         <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
+        
+        <div class="timer-progress-track">
+            <div id="timerProgressBar" class="timer-progress-fill" style="width: 100%;"></div>
+        </div>
+
         <div class="pomodoro-status" id="pomodoroStatus">
           Sẵn sàng. Chọn thời lượng và bấm Bắt đầu.
         </div>
@@ -3938,6 +4149,10 @@
         <div class="card-title" id="activeTaskLabel">Chưa chọn công việc nào</div>
         
         <div class="pomodoro-display" id="taskTimerDisplay" style="opacity: 0.5;">00:00:00</div>
+
+        <div class="timer-progress-track" style="margin-bottom: 20px;">
+            <div id="taskProgressBar" class="timer-progress-fill" style="width: 0%; background: #3b82f6;"></div>
+        </div>
         
         <div class="pomodoro-status" id="taskTimerStatus">
           Sẵn sàng. Hãy chọn một công việc để bắt đầu.
@@ -4581,81 +4796,109 @@ function startTask(id) {
     runTaskTimer(task);     // Gọi hàm đếm ngược
 }
   // [MỚI] Logic đếm ngược cho Công việc cụ thể
+// [CẬP NHẬT VIP] Hàm đếm ngược công việc + Thanh Deadline + Pháo hoa
 function runTaskTimer(task) {
     const titleEl = document.getElementById('activeTaskLabel');
     const displayEl = document.getElementById('taskTimerDisplay');
     const statusEl = document.getElementById('taskTimerStatus');
-    // 1. Ẩn nút "Chọn việc"
+    const progressBar = document.getElementById('taskProgressBar'); // Lấy thanh tiến độ
+
+    // 1. Cập nhật giao diện nút bấm
     document.getElementById('btnSelectTask').style.display = 'none';
-    
-    // 2. Reset nút "Dừng" về trạng thái màu Đỏ và chữ "Dừng"
     const btnStop = document.getElementById('btnStopTask');
     btnStop.style.display = 'inline-flex';
     btnStop.innerHTML = "⏹ Dừng làm việc";
-    btnStop.className = "btn-small btn-danger"; // Về màu đỏ
-    btnStop.setAttribute('onclick', 'stopTaskTimer()'); // Gán lại hàm dừng
-    
-    // 3. Làm sáng màn hình
+    btnStop.className = "btn-small btn-danger"; 
+    btnStop.setAttribute('onclick', 'stopTaskTimer()');
     displayEl.style.opacity = "1";
-    // ------------------------------------
 
     titleEl.textContent = `Đang làm: ${task.title}`;
-    // Ẩn nút "Chọn việc", Hiện nút "Dừng"
-    document.getElementById('btnSelectTask').style.display = 'none';
-    document.getElementById('btnStopTask').style.display = 'inline-flex';
-    document.getElementById('taskTimerDisplay').style.opacity = "1"; // Sáng lên
-    // -----------------------------------
     
-    // Xóa timer cũ nếu có
     if (taskTimerInterval) clearInterval(taskTimerInterval);
 
-    // Kiểm tra giờ kết thúc
-    if (!task.endTime) {
+    // Kiểm tra dữ liệu giờ
+    if (!task.endTime || !task.startTime) {
         displayEl.textContent = "00:00:00";
-        statusEl.textContent = "⚠️ Công việc này chưa đặt giờ kết thúc!";
+        if(progressBar) progressBar.style.width = "0%";
         return;
     }
 
-    // Parse giờ kết thúc
-    const now = new Date();
-    // Giả định endTime là giờ trong ngày hôm nay (VD: "15:45")
-    const [endH, endM] = task.endTime.split(':').map(Number);
-    const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endH, endM, 0);
+    // Parse thời gian (Giả định cùng ngày)
+    const nowRef = new Date();
+    const [sH, sM] = task.startTime.split(':').map(Number);
+    const [eH, eM] = task.endTime.split(':').map(Number);
+    
+    const startDate = new Date(nowRef.getFullYear(), nowRef.getMonth(), nowRef.getDate(), sH, sM, 0);
+    const endDate = new Date(nowRef.getFullYear(), nowRef.getMonth(), nowRef.getDate(), eH, eM, 0);
+    
+    // Tổng thời gian dự kiến (Total Duration)
+    const totalDuration = endDate - startDate;
 
-    // Hàm cập nhật mỗi giây
     function updateTimer() {
         const current = new Date();
-        const diff = endDate - current; // Miliseconds
+        const diff = endDate - current; // Thời gian còn lại
+        const elapsed = current - startDate; // Thời gian đã trôi qua
 
+        // --- A. XỬ LÝ HẾT GIỜ ---
         if (diff <= 0) {
-            // Hết giờ
             clearInterval(taskTimerInterval);
             displayEl.textContent = "00:00:00";
             statusEl.textContent = "⚠️ Đã hết thời gian dự kiến!";
-            playSound('success'); // Báo chuông
-            sendNotification("HẾT GIỜ LÀM VIỆC", `Công việc "${task.title}" đã đến hạn.`);
+            
+            // Full thanh đỏ
+            if(progressBar) {
+                progressBar.style.width = "100%";
+                progressBar.style.backgroundColor = "#ef4444";
+            }
+            
+            playSound('success'); 
+            sendNotification("HẾT GIỜ!", `Công việc "${task.title}" đã đến hạn.`);
+            
+            // Tự động bắn pháo hoa chúc mừng (hoặc cảnh báo)
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            
+            updateBrowserTitle(null);
             return;
         }
 
-        // Quy đổi ra Giờ:Phút:Giây
+        // --- B. HIỂN THỊ SỐ ---
         const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const minutes = Math.floor((diff / (1000 * 60)) % 60);
         const seconds = Math.floor((diff / 1000) % 60);
+        const timeString = String(hours).padStart(2, '0') + ':' + 
+                           String(minutes).padStart(2, '0') + ':' + 
+                           String(seconds).padStart(2, '0');
 
-        displayEl.textContent = 
-            String(hours).padStart(2, '0') + ':' + 
-            String(minutes).padStart(2, '0') + ':' + 
-            String(seconds).padStart(2, '0');
+        displayEl.textContent = timeString;
+        updateBrowserTitle(timeString, 'task');
+        statusEl.textContent = `Hãy hoàn thành trước ${task.endTime}`;
+
+        // --- C. XỬ LÝ THANH TIẾN ĐỘ (DEADLINE VISUALIZER) ---
+        if (progressBar && totalDuration > 0) {
+            // Tính % đã trôi qua
+            let percent = (elapsed / totalDuration) * 100;
+            percent = Math.max(0, Math.min(100, percent)); // Giới hạn 0-100%
             
-        statusEl.textContent = `Hãy tập trung hoàn thành trước ${task.endTime}`;
-        // ... (code cũ) ...
-        const timeStr = displayEl.textContent;
-        
-        // [MỚI] Cập nhật tiêu đề Tab
-        updateBrowserTitle(timeStr, 'task');
+            progressBar.style.width = `${percent}%`;
+
+            // Logic đổi màu theo mức độ "Cháy"
+            if (percent < 50) {
+                // < 50%: Màu Xanh dương (Thư thái)
+                progressBar.style.backgroundColor = '#3b82f6'; 
+                progressBar.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.4)';
+            } else if (percent < 85) {
+                // 50% - 85%: Màu Vàng (Cảnh báo)
+                progressBar.style.backgroundColor = '#f59e0b';
+                progressBar.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.4)';
+            } else {
+                // > 85%: Màu Đỏ (Sắp hết giờ!)
+                progressBar.style.backgroundColor = '#ef4444'; 
+                progressBar.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.6)';
+            }
+        }
     }
 
-    updateTimer(); // Chạy ngay lập tức 1 lần
+    updateTimer(); 
     taskTimerInterval = setInterval(updateTimer, 1000);
 }
   window.startTask = startTask;
@@ -4787,10 +5030,23 @@ function resumeTaskTimer() {
     const customRewardInput = document.getElementById('customRewardInput');
     const rewardTrigger = document.getElementById('rewardTrigger');
     
-    // ... (Kiểm tra dữ liệu bắt buộc giữ nguyên) ...
+    // Kiểm tra dữ liệu bắt buộc (Title, Date, StartTime)
+    if (!title || !date || !startTime) {
+        alert("Vui lòng nhập tên công việc, ngày và giờ bắt đầu!");
+        return;
+    }
 
     const reminderMinutes = Math.max(0, Number(reminderVal) || 0);
-    const finalReward = customRewardInput.value.trim() || rewardTrigger.textContent;
+
+    // --- [LOGIC MỚI] XỬ LÝ PHẦN THƯỞNG ---
+    // 1. Lấy giá trị từ ô nhập tay HOẶC nút chọn
+    let finalReward = customRewardInput.value.trim() || rewardTrigger.textContent;
+    
+    // 2. Nếu vẫn là chữ mặc định "Chọn phần thưởng" hoặc rỗng -> Gán thành "Không có thưởng"
+    if (finalReward === 'Chọn phần thưởng' || finalReward.trim() === '') {
+        finalReward = 'Không có thưởng';
+    }
+    // --------------------------------------
 
     const taskData = {
         title, date, startTime, endTime: endTime || '', reminderMinutes,
@@ -5189,17 +5445,34 @@ function resumeTaskTimer() {
   }
 
   // [CẬP NHẬT] Render Pomodoro + Update Title Tab
+// [CẬP NHẬT] Render Pomodoro + Thanh Tiến Độ "VIP"
 function renderPomodoro() {
     const displayEl = document.getElementById('pomodoroDisplay');
-    const timeStr = formatSeconds(pomodoroRemaining);
+    const progressBar = document.getElementById('timerProgressBar');
     
-    if(displayEl) displayEl.textContent = timeStr;
+    // 1. Hiển thị số
+    if(displayEl) displayEl.textContent = formatSeconds(pomodoroRemaining);
     
-    // Cập nhật tiêu đề Tab
-    if (pomodoroRunning) {
-        updateBrowserTitle(timeStr, isWorkSession ? 'work' : 'break');
-    } else if (pomodoroRemaining === pomodoroDuration) {
-        updateBrowserTitle(null); // Reset khi chưa chạy
+    // 2. Tính toán phần trăm (Còn lại / Tổng số)
+    if (progressBar && pomodoroDuration > 0) {
+        const percent = (pomodoroRemaining / pomodoroDuration) * 100;
+        progressBar.style.width = `${percent}%`;
+
+        // 3. Logic Đổi màu thông minh
+        // > 50%: Màu Xanh (Thư thái)
+        // 20% - 50%: Màu Vàng (Cảnh báo nhẹ)
+        // < 20%: Màu Đỏ (Khẩn cấp - Sắp hết giờ)
+        
+        if (percent > 50) {
+            progressBar.style.backgroundColor = '#22c55e'; // Xanh lá
+            progressBar.style.boxShadow = '0 0 10px rgba(34, 197, 94, 0.4)';
+        } else if (percent > 20) {
+            progressBar.style.backgroundColor = '#f59e0b'; // Vàng cam
+            progressBar.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.4)';
+        } else {
+            progressBar.style.backgroundColor = '#ef4444'; // Đỏ rực
+            progressBar.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.6)';
+        }
     }
 }
 
@@ -5876,6 +6149,7 @@ window.addEventListener('DOMContentLoaded', () => {
 function toggleInlineTaskMenu() {
     const menu = document.getElementById('inlineTaskMenu');
     
+    
     if (menu.style.display === 'block') {
         menu.style.display = 'none';
         return;
@@ -5901,7 +6175,7 @@ function toggleInlineTaskMenu() {
             <div class="inline-task-item" onclick="selectInlineTask(${t.id})">
                 <div style="flex: 1; padding-right: 10px;">
                     <div style="font-weight:700; font-size:0.95rem; margin-bottom:4px;" class="item-title">
-                        ${t.title} ${t.started ? '<span style="color:#22c55e; font-size:0.8em">(ĐANG LÀM)</span>' : ''}
+                        ${t.title} ${t.started ? '<span style="color:#22c55e; font-weight:800; font-size:0.8em; -webkit-text-fill-color: #4ade80;">(ĐANG LÀM)</span>' : ''}
                     </div>
                     <div style="font-size:0.85rem;" class="item-sub">
                         ${t.reward ? '🎁 '+t.reward : '✨ Chưa có thưởng'}
@@ -6039,6 +6313,90 @@ function changeVolume(val) {
   // Gắn sự kiện: Cứ thay đổi là kiểm tra ngay
   startTimeInput.addEventListener('input', validateTimes);
   endTimeInput.addEventListener('input', validateTimes);
+// ================================================= */
+// --- HÀM ZEN MODE & FULLSCREEN (HỢP NHẤT) ---
+// ================================================= */
+
+function toggleZenMode() {
+    const body = document.body;
+    const isZenActive = body.classList.contains('zen-active');
+    
+    // 1. TẮT ZEN MODE (Nút bấm chuột)
+    if (isZenActive) {
+        body.classList.remove('zen-active');
+        // Luôn tắt Fullscreen khi tắt Zen Mode, nếu Fullscreen đang bật
+        if (document.exitFullscreen && document.fullscreenElement) {
+             document.exitFullscreen().catch((e) => {});
+        }
+    } 
+    
+    // 2. BẬT ZEN MODE (Nút bấm chuột)
+    else {
+        body.classList.add('zen-active');
+        sendNotification("🧘 ZEN MODE", "Đã bật chế độ tập trung tuyệt đối.");
+        
+        // Yêu cầu Fullscreen CHỈ KHI CHƯA Ở FULLSCREEN
+        if (!document.fullscreenElement) {
+             document.documentElement.requestFullscreen().catch((e) => {});
+        }
+    }
+}
+
+// ================================================= */
+// --- CHỈ GẮN MỘT LISTENER DUY NHẤT (FIX F11/ESC) ---
+// ================================================= */
+
+document.addEventListener('fullscreenchange', function() {
+    const body = document.body;
+    const isZenActive = body.classList.contains('zen-active');
+    const isFullscreen = document.fullscreenElement;
+    
+    // Logic 1: TỰ ĐỘNG BẬT ZEN MODE khi vào Fullscreen (bằng F11)
+    if (isFullscreen && !isZenActive) {
+        // Thêm class Zen Mode (không gọi toggleZenMode để tránh lỗi Fullscreen)
+        body.classList.add('zen-active');
+        sendNotification("🧘 ZEN MODE", "Đã bật chế độ tập trung tuyệt đối.");
+    } 
+    
+    // Logic 2: TỰ ĐỘNG TẮT ZEN MODE khi thoát Fullscreen (bằng Esc/F11)
+    else if (!isFullscreen && isZenActive) {
+        // Tắt Zen Mode để khôi phục giao diện hoàn chỉnh
+        body.classList.remove('zen-active');
+        
+        // Khôi phục UI
+        const exitBtn = document.getElementById('exitZenBtn');
+        if (exitBtn) exitBtn.style.display = 'none';
+        if (typeof renderTasks === 'function') renderTasks();
+    }
+});
+// ================================================= */
+// --- FIX CUỐI CÙNG: BẮT PHÍM F11 BẰNG KEYDOWN ---
+// ================================================= */
+
+document.addEventListener('keydown', function(event) {
+    // Kiểm tra nếu phím bấm là F11 (keyCode 122 hoặc key 'F11')
+    if (event.key === 'F11' || event.keyCode === 122) {
+        event.preventDefault(); // Ngăn trình duyệt tự vào Fullscreen (RẤT QUAN TRỌNG)
+        
+        const body = document.body;
+        
+        // Chỉ kích hoạt nếu đang TẮT Zen Mode
+        if (!body.classList.contains('zen-active')) {
+            // Thực hiện các bước bật Zen Mode
+            body.classList.add('zen-active');
+            sendNotification("🧘 ZEN MODE", "Đã bật chế độ tập trung tuyệt đối.");
+            
+            // Tự bật Fullscreen (vì ta đã chặn lệnh F11 mặc định)
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch((e) => {});
+            }
+        }
+        // Nếu đã bật rồi (đang Zen Mode), thì tắt nó đi (ngược lại của F11)
+        else {
+            toggleZenMode(); // Gọi hàm tắt Zen Mode/Fullscreen
+        }
+    }
+});
 </script>
 </body>
 </html>
