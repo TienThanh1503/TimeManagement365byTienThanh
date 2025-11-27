@@ -3162,7 +3162,317 @@
     .app {
         padding-bottom: 10px !important; /* Mức padding tối thiểu */
     }
+    /* --- CSS CHO TAB CHUYỂN ĐỔI (NEW) --- */
+    .timer-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        padding-bottom: 10px;
+    }
+
+    .tab-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: rgba(255, 255, 255, 0.7);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: #fff;
+    }
+
+    .tab-btn.active {
+        background: #fff;
+        color: #db2777; /* Màu hồng đậm theo theme Pomodoro */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Hiệu ứng hiển thị đồng hồ công việc (Màu xanh dương cho khác biệt) */
+    .task-timer-active .pomodoro-display {
+        background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3));
+    }
+    /* ================================================= */
+    /* --- CSS DANH SÁCH NHÚNG (INLINE LIST) --- */
+    /* ================================================= */
+
+    #inlineTaskMenu {
+        margin-top: 20px;
+        background: #f8fafc; /* Nền sáng nhẹ */
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        
+        /* Giới hạn chiều cao 4 dòng (khoảng 300px) */
+        max-height: 320px;
+        overflow-y: auto; /* Tự động hiện thanh cuộn */
+        
+        padding: 10px;
+        animation: slideDownFade 0.3s ease; /* Hiệu ứng trượt xuống nhẹ */
+    }
+
+    /* Hiệu ứng xuất hiện */
+    @keyframes slideDownFade {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Style cho từng dòng task bên trong */
+    .inline-task-item {
+        background: #fff;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 8px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s;
+    }
     
+    .inline-task-item:last-child { margin-bottom: 0; }
+
+    .inline-task-item:hover {
+        border-color: #6366f1;
+        background: #f0f9ff;
+        transform: translateX(4px);
+    }
+
+    /* DARK MODE SUPPORT */
+    body.dark-mode #inlineTaskMenu {
+        background: rgba(255, 255, 255, 0.05); /* Nền trong suốt tối */
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    body.dark-mode .inline-task-item {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    body.dark-mode .inline-task-item:hover {
+        background: #334155;
+        border-color: #818cf8;
+    }
+    /* ======================================================== */
+    /* --- FIX CỨNG: ÉP MÀU CHỮ DANH SÁCH (BẤT CHẤP CHẾ ĐỘ) --- */
+    /* ======================================================== */
+
+    /* 1. Mặc định (Light Mode): Ép toàn bộ chữ thành màu ĐEN ĐẬM */
+    #inlineTaskMenu, 
+    #inlineTaskMenu * {
+        color: #1f2937 !important; /* Màu đen xám đậm */
+    }
+
+    /* 2. Riêng các ô thời gian (Badge): Ép màu chữ riêng cho đẹp */
+    #inlineTaskMenu .time-badge.start-time {
+        color: #1e40af !important; /* Xanh đậm */
+        background-color: #dbeafe !important;
+        border: 1px solid #bfdbfe !important;
+    }
+    
+    #inlineTaskMenu .time-badge.end-time {
+        color: #374151 !important; /* Xám đậm */
+        background-color: #f3f4f6 !important;
+        border: 1px solid #e5e7eb !important;
+    }
+
+    /* 3. Chữ "ĐANG LÀM" (Màu xanh lá) */
+    #inlineTaskMenu span[style*="color:#22c55e"] {
+        color: #16a34a !important; 
+    }
+
+    /* --- PHẦN DARK MODE (KHI BẬT CHẾ ĐỘ TỐI) --- */
+    /* Chỉ khi body có class 'dark-mode' thì mới đổi sang chữ TRẮNG */
+    body.dark-mode #inlineTaskMenu, 
+    body.dark-mode #inlineTaskMenu * {
+        color: #f1f5f9 !important; /* Chữ trắng sáng */
+        border-color: #475569 !important;
+    }
+
+    /* Màu nền Dark Mode cho Badge */
+    body.dark-mode #inlineTaskMenu .time-badge.start-time {
+        background-color: #1e3a8a !important; /* Xanh tối */
+        color: #dbeafe !important; /* Chữ xanh nhạt */
+    }
+    body.dark-mode #inlineTaskMenu .time-badge.end-time {
+        background-color: #334155 !important; /* Xám tối */
+        color: #e5e7eb !important; /* Chữ xám nhạt */
+    }
+    
+    /* Màu nền Dark Mode cho Item hover */
+    body.dark-mode .inline-task-item:hover {
+        background-color: #475569 !important;
+    }
+    /* ======================================================== */
+    /* --- FIX FINAL V2: XÓA VIỀN BẰNG QUYỀN ƯU TIÊN ID --- */
+    /* ======================================================== */
+
+    /* Dùng ID #inlineTaskMenu để đảm bảo mạnh hơn code cũ */
+    body.dark-mode #inlineTaskMenu .time-badge {
+        border: 0px solid transparent !important; /* Xóa viền tuyệt đối */
+        box-shadow: none !important; /* Xóa bóng nếu có */
+        
+        /* Chỉnh lại màu nền mờ cho đẹp */
+        background-color: rgba(255, 255, 255, 0.1) !important; 
+    }
+
+    /* Đảm bảo cả nút Start/End đều bị xóa viền */
+    body.dark-mode #inlineTaskMenu .time-badge.start-time,
+    body.dark-mode #inlineTaskMenu .time-badge.end-time {
+        border: none !important;
+    }
+    /* ======================================================== */
+    /* --- FIX FINAL V3: XÓA SẠCH NỀN BADGE (TRANSPARENT) --- */
+    /* ======================================================== */
+
+    /* Áp dụng cho cả Start và End time trong Dark Mode */
+    body.dark-mode #inlineTaskMenu .time-badge,
+    body.dark-mode #inlineTaskMenu .time-badge.start-time,
+    body.dark-mode #inlineTaskMenu .time-badge.end-time {
+        background: transparent !important; /* Không màu nền */
+        background-color: transparent !important; /* Chắc chắn trong suốt */
+        border: none !important; /* Không viền */
+        box-shadow: none !important; /* Không bóng */
+    }
+
+    /* Tinh chỉnh lại màu chữ để nó vẫn nổi bật trên nền đen */
+    body.dark-mode #inlineTaskMenu .time-badge.start-time {
+        color: #60a5fa !important; /* Chữ xanh sáng */
+    }
+    
+    body.dark-mode #inlineTaskMenu .time-badge.end-time {
+        color: #cbd5e1 !important; /* Chữ xám sáng */
+    }
+    /* ======================================================== */
+    /* --- FIX FINAL V4: XÓA SẠCH NỀN & KHUNG Ở CHẾ ĐỘ SÁNG --- */
+    /* ======================================================== */
+
+    /* 1. Xóa nền và viền cho các ô thời gian ở chế độ Sáng */
+    /* body:not(.dark-mode) nghĩa là: Khi KHÔNG PHẢI chế độ tối */
+    body:not(.dark-mode) #inlineTaskMenu .time-badge,
+    body:not(.dark-mode) #inlineTaskMenu .time-badge.start-time,
+    body:not(.dark-mode) #inlineTaskMenu .time-badge.end-time {
+        background: transparent !important; /* Xóa nền màu */
+        background-color: transparent !important; /* Chắc chắn trong suốt */
+        border: none !important; /* Xóa viền */
+        box-shadow: none !important; /* Xóa bóng */
+    }
+
+    /* 2. Giữ màu chữ đậm để dễ đọc trên nền trắng */
+    body:not(.dark-mode) #inlineTaskMenu .time-badge.start-time {
+        color: #2563eb !important; /* Chữ màu xanh dương đậm */
+        font-weight: 700 !important;
+    }
+    
+    body:not(.dark-mode) #inlineTaskMenu .time-badge.end-time {
+        color: #4b5563 !important; /* Chữ màu xám đậm */
+        font-weight: 600 !important;
+    }
+    /* ======================================================== */
+    /* --- FIX MENU CÀI ĐẶT (RÕ RÀNG & DỄ DÙNG HƠN) --- */
+    /* ======================================================== */
+
+    /* 2. Style cho từng nút bấm trong menu */
+    .menu-item-btn {
+        width: 100% !important;
+        text-align: left !important;
+        padding: 12px 16px !important; /* Tăng khoảng cách bấm cho dễ */
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        color: #374151 !important;
+        background: transparent !important;
+        border: none !important;
+        
+        /* Tạo đường kẻ ngăn cách */
+        border-bottom: 1px solid #f3f4f6 !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        
+        /* Căn chỉnh icon và chữ */
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    /* Xóa đường kẻ của mục cuối cùng cho đẹp */
+    .menu-item-btn:last-child {
+        border-bottom: none !important;
+    }
+
+    /* 3. Hiệu ứng khi di chuột (Hover) - CỰC QUAN TRỌNG */
+    .menu-item-btn:hover {
+        background-color: #eff6ff !important; /* Nền xanh nhạt */
+        color: #2563eb !important; /* Chữ xanh dương đậm */
+        font-weight: 700 !important; /* Tô đậm chữ */
+        padding-left: 20px !important; /* Hiệu ứng trượt nhẹ sang phải */
+    }
+
+    /* --- HỖ TRỢ DARK MODE --- */
+    body.dark-mode #settingsMenu {
+        background: #1e293b !important;
+        border-color: #475569 !important;
+    }
+    
+    body.dark-mode .menu-item-btn {
+        color: #e2e8f0 !important;
+        border-bottom-color: #334155 !important;
+    }
+    
+    body.dark-mode .menu-item-btn:hover {
+        background-color: #334155 !important;
+        color: #60a5fa !important; /* Xanh sáng trong nền tối */
+    }
+    /* ======================================================== */
+    /* --- FIX FINAL: SỬA ĐƯỜNG KẺ TAB POMODORO --- */
+    /* ======================================================== */
+
+    /* 1. Xóa border cũ của khung Tab */
+    .timer-tabs {
+        border-bottom: none !important; /* Xóa vạch cũ */
+        position: relative !important;
+        margin-bottom: 25px !important; /* Tăng khoảng cách ra */
+        padding-bottom: 0 !important;
+    }
+
+    /* 2. Xóa border thừa của khung Âm thanh bên dưới */
+    .focus-studio {
+        border-top: none !important; /* Xóa vạch thừa thứ 2 */
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* 3. VẼ LẠI 1 ĐƯỜNG DUY NHẤT (ĐẸP & SẮC NÉT) */
+    .timer-tabs::after {
+        content: '';
+        position: absolute;
+        bottom: -12px; /* Đặt nằm giữa 2 khung */
+        left: 10%; /* Thụt vào 2 bên cho tinh tế (không kẻ hết 100%) */
+        width: 80%;
+        height: 2px; /* Độ dày */
+        
+        /* Màu Gradient: Trong suốt -> Trắng -> Trong suốt (Tạo hiệu ứng tỏa sáng) */
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent) !important;
+        
+        opacity: 0.8;
+        display: block !important;
+    }
+
+    /* 4. CHỈNH MÀU ĐƯỜNG KẺ CHO DARK MODE */
+    body.dark-mode .timer-tabs::after {
+        /* Màu Gradient: Trong suốt -> Tím -> Trong suốt */
+        background: linear-gradient(90deg, transparent, #6366f1, transparent) !important;
+        height: 3px !important; /* Đậm hơn chút trong nền tối */
+        opacity: 1 !important;
+    }
   </style>  
 </head>
 <body>
@@ -3281,6 +3591,11 @@
 
   <!-- POMODORO TIMER -->
   <section class="card card-pomodoro">
+    <div class="timer-tabs">
+        <button class="tab-btn active" id="tabPomodoroBtn" onclick="switchTimerTab('pomodoro')">🍅 Pomodoro</button>
+        <button class="tab-btn" id="tabTaskBtn" onclick="switchTimerTab('task')">💼 Công việc</button>
+    </div>
+
     <div class="focus-studio">
         <div class="studio-title">🎵 Âm thanh tập trung</div>
         <div class="sound-controls">
@@ -3291,18 +3606,43 @@
         </div>
         <div id="nowPlaying" class="now-playing">Đang tắt</div>
     </div>
-    <div class="card-title">Phiên tập trung 25 phút (Pomodoro)</div>
-    <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
-    <div class="pomodoro-status" id="pomodoroStatus">
-      Sẵn sàng. Chọn thời lượng và bấm Bắt đầu.
+
+    <div id="pomodoroContainer">
+        <div class="card-title">Phiên tập trung (Pomodoro)</div>
+        <div class="pomodoro-display" id="pomodoroDisplay">25:00</div>
+        <div class="pomodoro-status" id="pomodoroStatus">
+          Sẵn sàng. Chọn thời lượng và bấm Bắt đầu.
+        </div>
+        <div class="pomodoro-controls">
+          <button class="btn-small btn-outline" id="pomodoro25Btn">25 phút</button>
+          <button class="btn-small btn-outline" id="pomodoro50Btn">50 phút</button>
+          <button class="btn-small btn-primary" id="pomodoroStartBtn">▶ Bắt đầu</button>
+          <button class="btn-small btn-outline" id="pomodoroResetBtn">⟲ Reset</button>
+        </div>
     </div>
-    <div class="pomodoro-controls">
-      <button class="btn-small btn-outline" id="pomodoro25Btn">25 phút</button>
-      <button class="btn-small btn-outline" id="pomodoro50Btn">50 phút</button>
-      <button class="btn-small btn-primary" id="pomodoroStartBtn">▶ Bắt đầu</button>
-      <button class="btn-small btn-outline" id="pomodoroPauseBtn">⏸ Tạm dừng</button>
-      <button class="btn-small btn-outline" id="pomodoroResetBtn">⟲ Reset</button>
-    </div>
+
+    <div id="taskTimerContainer" style="display: none;">
+        <div class="card-title" id="activeTaskLabel">Chưa chọn công việc nào</div>
+        
+        <div class="pomodoro-display" id="taskTimerDisplay" style="opacity: 0.5;">00:00:00</div>
+        
+        <div class="pomodoro-status" id="taskTimerStatus">
+          Sẵn sàng. Hãy chọn một công việc để bắt đầu.
+        </div>
+
+        <div class="pomodoro-controls">
+             <button id="btnSelectTask" class="btn-primary btn-glow" onclick="toggleInlineTaskMenu()">
+                📋 Chọn việc cần làm
+             </button>
+
+             <button id="btnStopTask" class="btn-small btn-danger" style="display: none;" onclick="stopTaskTimer()">
+                ⏹ Dừng làm việc
+             </button>
+        </div>
+
+        <div id="inlineTaskMenu" style="display: none;">
+            </div>
+        </div>
   </section>
 
   <!-- DANH SÁCH CÔNG VIỆC -->
@@ -3487,7 +3827,28 @@
   const IMPORTANT_TASKS_KEY = 'timefocus_important_tasks_v1';
   let tasks = [];
   let importantTasks = [];
+    // --- BIẾN CHO CHẾ ĐỘ CÔNG VIỆC (MỚI) ---
+  let taskTimerInterval = null; // Biến đếm giờ riêng cho công việc
+  let activeTaskId = null;      // ID của công việc đang làm
+  // [MỚI] Hàm chuyển Tab hiển thị
+function switchTimerTab(tabName) {
+    const pomoContainer = document.getElementById('pomodoroContainer');
+    const taskContainer = document.getElementById('taskTimerContainer');
+    const tabPomo = document.getElementById('tabPomodoroBtn');
+    const tabTask = document.getElementById('tabTaskBtn');
 
+    if (tabName === 'pomodoro') {
+        pomoContainer.style.display = 'block';
+        taskContainer.style.display = 'none';
+        tabPomo.classList.add('active');
+        tabTask.classList.remove('active');
+    } else {
+        pomoContainer.style.display = 'none';
+        taskContainer.style.display = 'block';
+        tabPomo.classList.remove('active');
+        tabTask.classList.add('active');
+    }
+}
   function loadTasks() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -3866,70 +4227,165 @@
   /* ================================================= */
   /* --- HÀM BẮT ĐẦU: KÍCH HOẠT GIAO DIỆN ĐẸP --- */
   /* ================================================= */
-  function startTask(id) {
+  // [CẬP NHẬT] Hàm Bắt đầu công việc -> Kích hoạt Tab Công việc
+function startTask(id) {
     playSound('start');
     const task = tasks.find(t => t.id === id);
     if (!task) return;
 
-    // 1. Cập nhật dữ liệu
+    // 1. Nếu Pomodoro đang chạy thì dừng lại để tập trung vào Task
+    if (pomodoroRunning) {
+        pausePomodoro(); // Hoặc resetPomodoro() nếu muốn tắt hẳn
+    }
+
+    // 2. Cập nhật dữ liệu Task (Start time = Now)
     const now = new Date();
     const h = String(now.getHours()).padStart(2, '0');
     const m = String(now.getMinutes()).padStart(2, '0');
     const timeString = `${h}:${m}`;
 
+    // Lưu giờ bắt đầu vào task (nếu chưa có)
     tasks = tasks.map(t => {
-      if (t.id === id) {
-        return { 
-          ...t, date: todayStr(), startTime: timeString, done: false, started: true 
-        };
-      }
-      return t;
+        if (t.id === id) {
+            // Nếu chưa có giờ bắt đầu thì gán giờ hiện tại
+            // Nếu đã có rồi thì giữ nguyên để tính đúng tiến độ
+            const newStart = t.startTime ? t.startTime : timeString;
+            return { ...t, started: true, startTime: newStart }; 
+        }
+        // Dừng các task khác đang chạy (chỉ làm 1 việc 1 lúc)
+        if (t.id !== id && t.started) {
+             return { ...t, started: false };
+        }
+        return t;
     });
     
     saveTasks();
     renderTasks();
 
-    // 2. KÍCH HOẠT POPUP GIAO DIỆN MỚI (Thay vì tự vẽ)
-    const modal = document.getElementById('noticeModal');
-    const contentBox = document.getElementById('noticeStatusDisplay');
-    const actionBox = document.getElementById('noticeButtonGroup');
-    const closeBtn = document.getElementById('noticeCloseBtn');
+    // 3. CHUYỂN SANG TAB CÔNG VIỆC VÀ ĐẾM NGƯỢC
+    activeTaskId = id;
+    switchTimerTab('task'); // Chuyển giao diện
+    runTaskTimer(task);     // Gọi hàm đếm ngược
+}
+  // [MỚI] Logic đếm ngược cho Công việc cụ thể
+function runTaskTimer(task) {
+    const titleEl = document.getElementById('activeTaskLabel');
+    const displayEl = document.getElementById('taskTimerDisplay');
+    const statusEl = document.getElementById('taskTimerStatus');
+    // 1. Ẩn nút "Chọn việc"
+    document.getElementById('btnSelectTask').style.display = 'none';
+    
+    // 2. Reset nút "Dừng" về trạng thái màu Đỏ và chữ "Dừng"
+    const btnStop = document.getElementById('btnStopTask');
+    btnStop.style.display = 'inline-flex';
+    btnStop.innerHTML = "⏹ Dừng làm việc";
+    btnStop.className = "btn-small btn-danger"; // Về màu đỏ
+    btnStop.setAttribute('onclick', 'stopTaskTimer()'); // Gán lại hàm dừng
+    
+    // 3. Làm sáng màn hình
+    displayEl.style.opacity = "1";
+    // ------------------------------------
 
-    if (modal && contentBox) {
-        // Điền nội dung vào hộp đẹp
-        contentBox.innerHTML = `
-            <div style="font-size: 1.1rem; color: #1e293b; margin-bottom: 8px;">
-               Bạn đang tập trung vào:
-            </div>
-            <div style="font-size: 1.3rem; font-weight: 800; color: #6366f1; margin-bottom: 15px;">
-               ${task.title}
-            </div>
-            <div style="display: flex; justify-content: center; gap: 20px; font-size: 0.9rem; color: #64748b;">
-               <span>🚀 Bắt đầu: <b>${timeString}</b></span>
-               <span>🏁 Kết thúc: <b>${task.endTime || '...'}</b></span>
-            </div>
-        `;
+    titleEl.textContent = `Đang làm: ${task.title}`;
+    // Ẩn nút "Chọn việc", Hiện nút "Dừng"
+    document.getElementById('btnSelectTask').style.display = 'none';
+    document.getElementById('btnStopTask').style.display = 'inline-flex';
+    document.getElementById('taskTimerDisplay').style.opacity = "1"; // Sáng lên
+    // -----------------------------------
+    
+    // Xóa timer cũ nếu có
+    if (taskTimerInterval) clearInterval(taskTimerInterval);
 
-        // Thêm nút "Đã rõ" vào khu vực nút bấm
-        actionBox.innerHTML = `
-            <button class="btn-allow" onclick="document.getElementById('noticeModal').classList.remove('show')">
-               Đã rõ, chiến thôi!
-            </button>
-        `;
-        
-        // Kích hoạt nút đóng X
-        if(closeBtn) {
-            closeBtn.onclick = function() {
-                modal.classList.remove('show');
-            };
+    // Kiểm tra giờ kết thúc
+    if (!task.endTime) {
+        displayEl.textContent = "00:00:00";
+        statusEl.textContent = "⚠️ Công việc này chưa đặt giờ kết thúc!";
+        return;
+    }
+
+    // Parse giờ kết thúc
+    const now = new Date();
+    // Giả định endTime là giờ trong ngày hôm nay (VD: "15:45")
+    const [endH, endM] = task.endTime.split(':').map(Number);
+    const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), endH, endM, 0);
+
+    // Hàm cập nhật mỗi giây
+    function updateTimer() {
+        const current = new Date();
+        const diff = endDate - current; // Miliseconds
+
+        if (diff <= 0) {
+            // Hết giờ
+            clearInterval(taskTimerInterval);
+            displayEl.textContent = "00:00:00";
+            statusEl.textContent = "⚠️ Đã hết thời gian dự kiến!";
+            playSound('success'); // Báo chuông
+            sendNotification("HẾT GIỜ LÀM VIỆC", `Công việc "${task.title}" đã đến hạn.`);
+            return;
         }
 
-        // Hiện Modal lên
-        modal.classList.add('show');
+        // Quy đổi ra Giờ:Phút:Giây
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diff / (1000 * 60)) % 60);
+        const seconds = Math.floor((diff / 1000) % 60);
+
+        displayEl.textContent = 
+            String(hours).padStart(2, '0') + ':' + 
+            String(minutes).padStart(2, '0') + ':' + 
+            String(seconds).padStart(2, '0');
+            
+        statusEl.textContent = `Hãy tập trung hoàn thành trước ${task.endTime}`;
+        // ... (code cũ) ...
+        const timeStr = displayEl.textContent;
+        
+        // [MỚI] Cập nhật tiêu đề Tab
+        updateBrowserTitle(timeStr, 'task');
     }
-  }
+
+    updateTimer(); // Chạy ngay lập tức 1 lần
+    taskTimerInterval = setInterval(updateTimer, 1000);
+}
   window.startTask = startTask;
   window.startTask = startTask;
+  // [MỚI] Dừng đếm giờ công việc
+// [SỬA LẠI] Dừng đếm giờ nhưng GIỮ NGUYÊN số hiển thị
+// [CẬP NHẬT] Dừng đếm giờ -> Hiện lại nút chọn
+// [CẬP NHẬT] Hàm Dừng: Biến nút Dừng thành nút Tiếp tục
+function stopTaskTimer() {
+    // 1. Ngừng đếm giờ
+    if (taskTimerInterval) {
+        clearInterval(taskTimerInterval);
+        taskTimerInterval = null;
+    }
+    
+    document.getElementById('taskTimerStatus').textContent = "⏸ Đã tạm dừng. Bấm Tiếp tục hoặc chọn việc khác.";
+    document.getElementById('taskTimerDisplay').style.opacity = "0.6"; 
+
+    // 2. Xử lý Nút "Chọn việc" (Chỉ hiện chữ chọn việc)
+    const btnSelect = document.getElementById('btnSelectTask');
+    btnSelect.style.display = 'inline-flex';
+    btnSelect.textContent = "📋 Chọn việc khác"; 
+
+    // 3. Xử lý Nút "Dừng" -> Biến thành "Tiếp tục"
+    const btnStop = document.getElementById('btnStopTask');
+    btnStop.style.display = 'inline-flex'; // Vẫn cho hiện
+    btnStop.innerHTML = "▶ Tiếp tục";      // Đổi chữ
+    btnStop.className = "btn-small btn-success"; // Đổi sang màu Xanh (btn-success) cho đẹp
+    btnStop.setAttribute('onclick', 'resumeTaskTimer()'); // Gán hàm mới
+    // [MỚI] Reset tiêu đề về mặc định
+    updateBrowserTitle(null);
+}
+// [MỚI] Hàm Tiếp tục: Gọi lại hàm chạy giờ
+function resumeTaskTimer() {
+    // activeTaskId là biến toàn cục lưu ID công việc đang làm (đã khai báo ở các bước trước)
+    const task = tasks.find(t => t.id === activeTaskId);
+    
+    if (task) {
+        runTaskTimer(task); // Chạy lại đồng hồ
+    } else {
+        alert("Không tìm thấy công việc đang làm dở. Vui lòng chọn lại.");
+    }
+}
 
   /* ================================================= */
   /* --- HÀM HOÀN THÀNH: CHỈ SET done = true --- */
@@ -4419,10 +4875,20 @@
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
   }
 
-  function renderPomodoro() {
+  // [CẬP NHẬT] Render Pomodoro + Update Title Tab
+function renderPomodoro() {
     const displayEl = document.getElementById('pomodoroDisplay');
-    if(displayEl) displayEl.textContent = formatSeconds(pomodoroRemaining);
-  }
+    const timeStr = formatSeconds(pomodoroRemaining);
+    
+    if(displayEl) displayEl.textContent = timeStr;
+    
+    // Cập nhật tiêu đề Tab
+    if (pomodoroRunning) {
+        updateBrowserTitle(timeStr, isWorkSession ? 'work' : 'break');
+    } else if (pomodoroRemaining === pomodoroDuration) {
+        updateBrowserTitle(null); // Reset khi chưa chạy
+    }
+}
 
   // Lưu trạng thái vào localStorage
   function savePomodoroState() {
@@ -5077,12 +5543,95 @@ window.addEventListener('DOMContentLoaded', () => {
       if (darkModeBtn) {
           darkModeBtn.innerHTML = isDark ? '☀️ Chế độ hiển thị' : '🌙 Chế độ hiển thị';
       }
-      
-      // 3. Đóng Modal sau khi chọn
+
       document.getElementById('noticeModal').classList.remove('show');
-  }
+  } 
   
   window.setDarkMode = setDarkMode; // Đưa hàm ra global để nút bấm trong Modal gọi được
+  
+function toggleInlineTaskMenu() {
+    const menu = document.getElementById('inlineTaskMenu');
+    
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+        return;
+    }
+
+    const now = new Date(); 
+
+    const validTasks = tasks.filter(t => {
+        if (t.done) return false;
+        if (t.date && t.endTime) {
+            const [y, m, d] = t.date.split('-').map(Number);
+            const [h, min] = t.endTime.split(':').map(Number);
+            const taskEnd = new Date(y, m - 1, d, h, min);
+            if (now > taskEnd) return false;
+        }
+        return true;
+    });
+
+    if (validTasks.length === 0) {
+        menu.innerHTML = '<div style="text-align:center; padding:20px; color:#999; font-size:0.9rem;">Không có công việc nào phù hợp.</div>';
+    } else {
+        menu.innerHTML = validTasks.map(t => `
+            <div class="inline-task-item" onclick="selectInlineTask(${t.id})">
+                <div style="flex: 1; padding-right: 10px;">
+                    <div style="font-weight:700; font-size:0.95rem; margin-bottom:4px;" class="item-title">
+                        ${t.title} ${t.started ? '<span style="color:#22c55e; font-size:0.8em">(ĐANG LÀM)</span>' : ''}
+                    </div>
+                    <div style="font-size:0.85rem;" class="item-sub">
+                        ${t.reward ? '🎁 '+t.reward : '✨ Chưa có thưởng'}
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-end;">
+                    <div class="time-badge start-time">
+                        🚀 ${t.startTime || '--:--'}
+                    </div>
+                    ${t.endTime ? `
+                    <div class="time-badge end-time">
+                        🏁 ${t.endTime}
+                    </div>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    menu.style.display = 'block';
+}
+
+// [MỚI] Hàm chọn task từ menu inline
+function selectInlineTask(id) {
+    // 1. Ẩn menu đi
+    document.getElementById('inlineTaskMenu').style.display = 'none';
+    
+    // 2. Bắt đầu tính giờ
+    startTask(id);
+}
+/* ================================================= */
+/* --- TÍNH NĂNG VIP: SMART TITLE & ANTI-CLOSE --- */
+/* ================================================= */
+
+// 1. Hàm cập nhật tiêu đề Tab trình duyệt
+function updateBrowserTitle(timeString, mode) {
+    const defaultTitle = "TimeFocus – Quản lý thời gian";
+    
+    if (timeString) {
+        // Nếu có thời gian -> Hiện: [24:59] 🍅 Đang làm
+        let icon = mode === 'work' ? '🍅' : (mode === 'break' ? '☕' : '💼');
+        document.title = `${timeString} ${icon} - TimeFocus`;
+    } else {
+        // Trả về mặc định
+        document.title = defaultTitle;
+    }
+}
+
+// 2. Chặn tắt trình duyệt khi đang chạy giờ (Tránh lỡ tay)
+window.onbeforeunload = function() {
+    if (pomodoroRunning || taskTimerInterval) {
+        return "Đồng hồ đang chạy, bạn có chắc muốn thoát không?";
+    }
+};
 </script>
 </body>
 </html>
