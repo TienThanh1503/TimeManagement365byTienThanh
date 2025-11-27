@@ -3971,8 +3971,58 @@
         font-size: 1rem !important;
         color: #f1f5f9 !important;
     }
+    /* ======================================================== */
+    /* --- FIX LỖI ZEN MODE LIGHT (SỬ DỤNG SELECTOR CỰC MẠNH) --- */
+    /* ======================================================== */
+
+    /* Áp dụng cho body khi KHÔNG phải Dark Mode VÀ đang ở Zen Mode */
+    body:not(.dark-mode).zen-active {
+        /* Đảm bảo nền là trắng */
+        background: #fff !important; 
+    }
+
+    /* ÉP MÀU NỘI DUNG TỐI LÊN TẤT CẢ CÁC PHẦN TỬ TRONG KHUNG ZEN MODE */
+    body:not(.dark-mode).zen-active .card-pomodoro * {
+        /* Bắt buộc màu chữ là Xám Đen */
+        color: #1f2937 !important; 
+        
+        /* Bắt buộc độ mờ là 1 (Hiển thị 100%) */
+        opacity: 1 !important; 
+        
+        /* Bỏ các hiệu ứng bóng, filter của Dark Mode */
+        text-shadow: none !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* FIX CHO CÁC NÚT ĐIỀU KHIỂN (BUTTONS) VÀ THANH TIẾN ĐỘ */
     
+    /* 1. Nút Bắt đầu/Tiếp tục (màu xanh dương) */
+    body:not(.dark-mode).zen-active #pomodoroStartBtn,
+    body:not(.dark-mode).zen-active #btnSelectTask {
+        background: #6366f1 !important;
+        color: white !important;
+    }
+
+    /* 2. Nút nhỏ (25, 50, Reset) */
+    body:not(.dark-mode).zen-active .pomodoro-controls button {
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1f2937 !important;
+    }
     
+    /* 3. Thanh tiến độ */
+    body:not(.dark-mode).zen-active .timer-progress-track {
+        background: #e5e7eb !important; 
+        opacity: 1 !important;
+    }
+    
+    /* 4. Icon âm thanh */
+    body:not(.dark-mode).zen-active .sound-btn {
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1f2937 !important;
+    }
   </style>  
 </head>
 <body>
@@ -5452,6 +5502,19 @@ function renderPomodoro() {
     
     // 1. Hiển thị số
     if(displayEl) displayEl.textContent = formatSeconds(pomodoroRemaining);
+    // THÊM: CẬP NHẬT TIÊU ĐỀ TAB BẰNG JAVASCRIPT
+    // ===================================
+    const timeString = formatSeconds(pomodoroRemaining);
+    // Kiểm tra nếu đồng hồ đang chạy, thì cập nhật tiêu đề
+    if (pomodoroRunning) {
+        // Mode: 'work' nếu đang làm, 'break' nếu đang nghỉ
+        const mode = isWorkSession ? 'work' : 'break';
+        updateBrowserTitle(timeString, mode);
+    } else {
+        // Nếu không chạy (đã dừng hoặc reset), trả về mặc định
+        updateBrowserTitle(null); 
+    }
+    // ------------------------------------
     
     // 2. Tính toán phần trăm (Còn lại / Tổng số)
     if (progressBar && pomodoroDuration > 0) {
@@ -6324,21 +6387,20 @@ function toggleZenMode() {
     // 1. TẮT ZEN MODE (Nút bấm chuột)
     if (isZenActive) {
         body.classList.remove('zen-active');
-        // Luôn tắt Fullscreen khi tắt Zen Mode, nếu Fullscreen đang bật
         if (document.exitFullscreen && document.fullscreenElement) {
              document.exitFullscreen().catch((e) => {});
         }
+        updateGlowOnZenMode(); // <--- GỌI HÀM CẬP NHẬT (TẮT HIỆU ỨNG)
     } 
     
     // 2. BẬT ZEN MODE (Nút bấm chuột)
     else {
         body.classList.add('zen-active');
         sendNotification("🧘 ZEN MODE", "Đã bật chế độ tập trung tuyệt đối.");
-        
-        // Yêu cầu Fullscreen CHỈ KHI CHƯA Ở FULLSCREEN
         if (!document.fullscreenElement) {
              document.documentElement.requestFullscreen().catch((e) => {});
         }
+        updateGlowOnZenMode(); // <--- GỌI HÀM CẬP NHẬT (BẬT HIỆU ỨNG)
     }
 }
 
@@ -6353,20 +6415,21 @@ document.addEventListener('fullscreenchange', function() {
     
     // Logic 1: TỰ ĐỘNG BẬT ZEN MODE khi vào Fullscreen (bằng F11)
     if (isFullscreen && !isZenActive) {
-        // Thêm class Zen Mode (không gọi toggleZenMode để tránh lỗi Fullscreen)
         body.classList.add('zen-active');
         sendNotification("🧘 ZEN MODE", "Đã bật chế độ tập trung tuyệt đối.");
+        updateGlowOnZenMode(); // <--- GỌI HÀM CẬP NHẬT
     } 
     
     // Logic 2: TỰ ĐỘNG TẮT ZEN MODE khi thoát Fullscreen (bằng Esc/F11)
     else if (!isFullscreen && isZenActive) {
-        // Tắt Zen Mode để khôi phục giao diện hoàn chỉnh
         body.classList.remove('zen-active');
         
         // Khôi phục UI
         const exitBtn = document.getElementById('exitZenBtn');
-        if (exitBtn) exitBtn.style.display = 'none';
+        if (exitBtn) exitZenBtn.style.display = 'none';
         if (typeof renderTasks === 'function') renderTasks();
+        
+        updateGlowOnZenMode(); // <--- GỌI HÀM CẬP NHẬT (XÓA HIỆU ỨNG)
     }
 });
 // ================================================= */
@@ -6397,6 +6460,50 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+// ================================================= */
+// --- FIX BÓNG ĐỒNG HỒ BẰNG JAVASCRIPT (FINAL - BẮT BUỘC HIỂN THỊ) ---
+// ================================================= */
+
+function applyNeonGlow() {
+    const display = document.getElementById('pomodoroDisplay');
+    
+    if (display) {
+        // Thay thế chuỗi màu cũ bằng màu Xanh Cyan (#06b6d4)
+        display.style.cssText = `
+            /* Bắt buộc màu Xanh Cyan */
+            color: #06b6d4 !important;
+            
+            /* Bắt buộc hiệu ứng bóng Xanh */
+            text-shadow: 
+                0 0 5px rgba(6, 182, 212, 0.5), /* Dùng màu #06b6d4 cho lớp bóng */
+                0 0 15px rgba(6, 182, 212, 0.7), 
+                0 0 25px rgba(6, 182, 212, 0.9) !important;
+            
+            /* RẤT QUAN TRỌNG: Đảm bảo không bị xóa bởi filter:none */
+            filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.8)) !important; 
+        `;
+    }
+}
+// LƯU Ý: Giữ nguyên các hàm gọi applyNeonGlow() và updateGlowOnZenMode() như đã hướng dẫn trước đó.
+
+// Hàm này được gọi khi trang tải xong và khi Zen Mode bật
+function updateGlowOnZenMode() {
+    const isZen = document.body.classList.contains('zen-active');
+    
+    if (isZen) {
+        applyNeonGlow();
+    } else {
+        // Xóa hiệu ứng khi Zen Mode tắt
+        const display = document.getElementById('pomodoroDisplay');
+        if (display) {
+             display.style.cssText = ''; // Xóa toàn bộ inline style
+             // Có thể cần gọi lại renderPomodoro() nếu bạn có hàm đó
+        }
+    }
+}
+
+// LƯU Ý: Đảm bảo bạn gọi hàm applyNeonGlow() khi cần, ví dụ: 
+// document.addEventListener('DOMContentLoaded', applyNeonGlow);
 </script>
 </body>
 </html>
