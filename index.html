@@ -2556,9 +2556,6 @@
         color: rgba(255,255,255,0.8); margin-bottom: 10px; font-weight: 700;
     }
 
-    .sound-controls {
-        display: flex; justify-content: center; gap: 10px;
-    }
 
     .sound-btn {
         width: 45px !important; height: 45px !important;
@@ -3473,6 +3470,309 @@
         height: 3px !important; /* Đậm hơn chút trong nền tối */
         opacity: 1 !important;
     }
+    /* ================================================= */
+    /* --- FIX: HIỆU ỨNG BẬT/TẮT THANH VOLUME --- */
+    /* ================================================= */
+
+    /* Khi thanh volume hiện ra, thêm chút hiệu ứng trượt */
+    #volumeControlPanel {
+        animation: slideDownVolume 0.3s ease forwards;
+        margin-top: 15px;
+    }
+
+    @keyframes slideDownVolume {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Đổi màu nút Volume khi đang mở */
+    #btnVolumeToggle.active {
+        background: #fff !important;
+        border-color: #fff !important;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    /* Dark mode cho nút active */
+    body.dark-mode #btnVolumeToggle.active {
+        background: rgba(255, 255, 255, 0.2) !important;
+        box-shadow: none !important;
+    }
+    /* ================================================= */
+    /* --- FIX FINAL VIP: THANH VOLUME BONG BÓNG (NO SHIFT) --- */
+    /* ================================================= */
+
+    /* 1. Định vị khung chứa nút */
+    .sound-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        position: relative; /* Làm mỏ neo cho popup */
+    }
+
+    /* ================================================= */
+    /* --- FIX FINAL VIP: VOLUME BONG BÓNG (ĐẸP & RÕ) --- */
+    /* ================================================= */
+
+    /* 1. Khung Thanh trượt (Bong bóng nổi) */
+    .volume-wrapper {
+        position: absolute;
+        /* Hạ thấp xuống: Từ 60px -> 50px */
+        bottom: 50px; 
+        left: 50%;
+        transform: translateX(-50%);
+        
+        width: 200px;
+        background: #ffffff; /* Nền trắng */
+        padding: 8px 12px;
+        border-radius: 50px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* Bóng đổ mềm */
+        border: 1px solid rgba(0,0,0,0.05);
+        
+        display: none;
+        align-items: center;
+        gap: 8px;
+        z-index: 100;
+        
+        animation: floatUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes floatUp {
+        from { opacity: 0; transform: translate(-50%, 10px); scale: 0.9; }
+        to { opacity: 1; transform: translate(-50%, 0); scale: 1; }
+    }
+
+    /* 2. Mũi tên chỉ xuống (Tam giác) */
+    .volume-arrow {
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 12px; height: 12px;
+        background: #ffffff;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        border-right: 1px solid rgba(0,0,0,0.05);
+        z-index: 101; /* Đè lên trên bóng đổ */
+    }
+
+    /* 3. Icon loa nhỏ 2 bên (SỬA MÀU: XÁM ĐẬM) */
+    .vol-icon {
+        font-size: 1rem;
+        color: #64748b !important; /* Màu xám xanh đậm -> Rõ trên nền trắng */
+        line-height: 1;
+        cursor: default;
+        opacity: 1;
+    }
+
+    /* 4. Thanh trượt (Input Range) */
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]:focus { outline: none; }
+
+    /* Thanh ray (Track) - Màu xám nhạt */
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%; height: 4px; cursor: pointer;
+        background: #e2e8f0; 
+        border-radius: 10px;
+    }
+
+    /* Cục trượt (Thumb) - Màu tím */
+    input[type=range]::-webkit-slider-thumb {
+        height: 14px; width: 14px; border-radius: 50%;
+        background: #6366f1;
+        cursor: pointer;
+        -webkit-appearance: none; margin-top: -5px;
+        box-shadow: 0 2px 4px rgba(99, 102, 241, 0.4);
+        transition: transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+    /* --- DARK MODE (TỰ ĐỘNG ĐỔI MÀU KHI NỀN TỐI) --- */
+    body.dark-mode .volume-wrapper {
+        background: #1e293b; /* Nền xanh đen */
+        border: 1px solid #334155;
+    }
+    body.dark-mode .volume-arrow {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    body.dark-mode .vol-icon { 
+        color: #cbd5e1 !important; /* Chữ trắng xám */
+    }
+    body.dark-mode input[type=range]::-webkit-slider-runnable-track { 
+        background: #334155; 
+    }
+    @keyframes floatUp {
+        from { opacity: 0; transform: translate(-50%, 10px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* 3. Mũi tên nhỏ chỉ xuống nút (Trang trí) */
+    .volume-arrow {
+        position: absolute;
+        bottom: -6px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 12px; height: 12px;
+        background: #fff;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        border-right: 1px solid rgba(0,0,0,0.05);
+    }
+    /* 5. Thanh trượt (Input Range) - Màu Tím */
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]:focus { outline: none; }
+
+    /* Thanh ray */
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%; height: 4px; cursor: pointer;
+        background: #e2e8f0; /* Xám nhạt */
+        border-radius: 10px;
+    }
+
+    /* Cục trượt */
+    input[type=range]::-webkit-slider-thumb {
+        height: 16px; width: 16px; border-radius: 50%;
+        background: #6366f1; /* Tím chủ đạo */
+        cursor: pointer;
+        -webkit-appearance: none; margin-top: -6px;
+        box-shadow: 0 2px 5px rgba(99, 102, 241, 0.4);
+        transition: transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+    /* --- DARK MODE SUPPORT (QUAN TRỌNG) --- */
+    body.dark-mode .volume-wrapper {
+        background: #1e293b; /* Nền tối */
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        border: 1px solid #334155;
+    }
+    body.dark-mode .volume-arrow {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    body.dark-mode .vol-icon { color: #94a3b8; }
+    body.dark-mode input[type=range]::-webkit-slider-runnable-track { background: #334155; }
+    /* Hiệu ứng mở rộng */
+    @keyframes expandWidth {
+        from { opacity: 0; transform: scaleX(0.5); }
+        to { opacity: 1; transform: scaleX(1); }
+    }
+
+    /* 3. Icon loa mới */
+    .vol-icon {
+        font-size: 1.1rem;
+        color: #fff;
+        opacity: 0.9;
+        line-height: 1;
+        cursor: default;
+    }
+
+    /* 4. Thanh trượt (Input Range) - Giữ nguyên style đẹp cũ */
+    input[type=range] {
+        -webkit-appearance: none;
+        width: 100%;
+        background: transparent;
+    }
+    input[type=range]:focus { outline: none; }
+
+    /* Thanh ray */
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%; height: 4px; cursor: pointer;
+        background: rgba(255, 255, 255, 0.4); /* Trắng mờ */
+        border-radius: 10px;
+    }
+
+    /* Cục trượt */
+    input[type=range]::-webkit-slider-thumb {
+        height: 14px; width: 14px; border-radius: 50%;
+        background: #fff; cursor: pointer;
+        -webkit-appearance: none; margin-top: -5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* --- DARK MODE --- */
+    body.dark-mode .volume-wrapper {
+        background: rgba(0, 0, 0, 0.3); /* Nền tối hơn */
+    }
+    /* ======================================================== */
+    /* --- FIX FINAL V5: CÂN CHỈNH MÀU SẮC VOLUME (RÕ NÉT) --- */
+    /* ======================================================== */
+
+    /* --- 1. CHẾ ĐỘ SÁNG (Light Mode - Mặc định) --- */
+    /* Khi nền bong bóng là Trắng, chữ và icon phải Đậm */
+    
+    /* Icon loa: Màu xanh đen đậm */
+    body:not(.dark-mode) .vol-icon {
+        color: #1e293b !important; 
+        font-weight: bold !important;
+        opacity: 1 !important; /* Bỏ mờ */
+    }
+
+    /* Thanh ray: Màu xám rõ ràng */
+    body:not(.dark-mode) input[type=range]::-webkit-slider-runnable-track {
+        background: #cbd5e1 !important; /* Xám trung tính, dễ nhìn trên nền trắng */
+    }
+
+    /* --- 2. CHẾ ĐỘ TỐI (Dark Mode) --- */
+    /* Khi bật chế độ tối, bong bóng chuyển sang màu tối */
+
+    /* Nền bong bóng và mũi tên: Màu xanh đen */
+    body.dark-mode .volume-wrapper {
+        background: #1e293b !important;
+        border: 1px solid #475569 !important; /* Viền sáng nhẹ để tách biệt */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    }
+    body.dark-mode .volume-arrow {
+        background: #1e293b !important;
+        border-bottom: 1px solid #475569 !important;
+        border-right: 1px solid #475569 !important;
+    }
+
+    /* Icon loa: Màu trắng sáng */
+    body.dark-mode .vol-icon {
+        color: #f1f5f9 !important; 
+    }
+
+    /* Thanh ray: Màu xám sáng hơn nền */
+    body.dark-mode input[type=range]::-webkit-slider-runnable-track {
+        background: #475569 !important;
+    }
+    
+    /* Cục trượt (Thumb): Màu tím sáng trong nền tối */
+    body.dark-mode input[type=range]::-webkit-slider-thumb {
+        background: #a5b4fc !important;
+    }
+    /* ======================================================== */
+    /* --- FIX LỖI FORM: THÔNG BÁO LỖI KHÔNG ĐẨY KHUNG --- */
+    /* ======================================================== */
+
+    /* 1. Thiết lập vị trí cha để làm mỏ neo */
+    form > div {
+        position: relative !important; /* Quan trọng để con neo theo cha */
+    }
+
+    /* 2. Biến dòng thông báo lỗi thành dạng "Nổi" (Floating) */
+    #timeError {
+        position: absolute !important; /* Tách khỏi dòng chảy văn bản -> Không đẩy khung */
+        top: 100% !important; /* Đẩy xuống ngay mép dưới của ô input */
+        left: 0 !important;
+        margin-top: 5px !important; /* Cách ra một chút cho thoáng */
+        
+        width: 200% !important; /* Cho phép dài ra thoải mái */
+        white-space: nowrap !important; /* Không xuống dòng */
+        z-index: 10 !important; /* Nổi lên trên các phần tử khác nếu bị che */
+        
+        font-weight: 600 !important;
+        pointer-events: none !important; /* Không chặn chuột click vào cái gì bên dưới */
+        
+        /* Hiệu ứng hiện ra nhẹ nhàng */
+        animation: fadeInError 0.2s ease-out;
+    }
+
+    @keyframes fadeInError {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
   </style>  
 </head>
 <body>
@@ -3553,6 +3853,9 @@
         <div>
           <label for="endTime">Giờ kết thúc</label>
           <input type="time" id="endTime">
+          <small id="timeError" style="color: #ef4444; font-size: 0.8rem; display: none; margin-top: 4px;">
+            ⚠️ Giờ kết thúc phải lớn hơn giờ bắt đầu!
+          </small>
         </div>
         <div class="reward-dropdown">
           <label style="font-size: 0.75rem; font-weight: 600; color: #555; display: block; margin-bottom: 4px;">🏆 Phần thưởng</label>
@@ -3598,12 +3901,22 @@
 
     <div class="focus-studio">
         <div class="studio-title">🎵 Âm thanh tập trung</div>
-        <div class="sound-controls">
+        
+        <div class="sound-controls" style="position: relative;">
             <button class="sound-btn" onclick="toggleAmbience('rain')" title="Tiếng mưa">🌧️</button>
             <button class="sound-btn" onclick="toggleAmbience('fire')" title="Lửa trại">🔥</button>
             <button class="sound-btn" onclick="toggleAmbience('night')" title="Đêm tĩnh lặng">🦗</button>
-            <button class="sound-btn" onclick="stopAmbience()" title="Tắt nhạc" style="color: #ff4757;">🔇</button>
+            
+            <button class="sound-btn" id="btnVolumeToggle" onclick="toggleVolumePanel()" title="Chỉnh âm lượng">🔊</button>
+
+            <div class="volume-wrapper" id="volumeControlPanel" style="display: none;">
+                <span class="vol-icon">🔉</span>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" oninput="changeVolume(this.value)">
+                <span class="vol-icon">🔊</span>
+                <div class="volume-arrow"></div>
+            </div>
         </div>
+
         <div id="nowPlaying" class="now-playing">Đang tắt</div>
     </div>
 
@@ -5293,6 +5606,17 @@ function resetTaskFormUI() {
     
     document.getElementById('title').focus();
     editingId = null; // Rất quan trọng: Thoát khỏi chế độ sửa
+    // [MỚI] Reset trạng thái lỗi khi form được làm mới
+    document.getElementById('timeError').style.display = 'none';
+    document.getElementById('endTime').style.borderColor = '#e5e7eb';
+    
+    // Mở lại nút submit (đề phòng bị khóa từ lần nhập lỗi trước)
+    const btn = document.querySelector('#taskForm button[type="submit"]');
+    if(btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+    }
 }
 /* ================================================= */
   /* --- HÀM HỖ TRỢ KÉO & THẢ (DRAG & DROP) --- */
@@ -5632,6 +5956,89 @@ window.onbeforeunload = function() {
         return "Đồng hồ đang chạy, bạn có chắc muốn thoát không?";
     }
 };
+// [MỚI] Hàm Bật/Tắt hiển thị thanh Volume
+function toggleVolumePanel() {
+    const panel = document.getElementById('volumeControlPanel');
+    const btn = document.getElementById('btnVolumeToggle');
+
+    if (panel.style.display === 'none') {
+        panel.style.display = 'flex'; // Đổi thành flex để dàn ngang
+        btn.classList.add('active'); 
+    } else {
+        panel.style.display = 'none';
+        btn.classList.remove('active');
+    }
+}
+// [QUAN TRỌNG] Hàm này giúp thanh trượt điều khiển được âm lượng thật
+function changeVolume(val) {
+    if (ambienceAudio) {
+        ambienceAudio.volume = val; // Gán giá trị từ thanh trượt (0.0 -> 1.0) vào loa
+    }
+}
+/* ================================================= */
+    /* --- FIX FINAL: BẤM RA NGOÀI TỰ TẮT VOLUME --- */
+    /* ================================================= */
+
+    document.addEventListener('click', function(event) {
+        const panel = document.getElementById('volumeControlPanel');
+        const btn = document.getElementById('btnVolumeToggle');
+
+        // Kiểm tra xem panel và btn có tồn tại không để tránh lỗi
+        if (!panel || !btn) return;
+
+        // Nếu thanh volume đang MỞ (display không phải none)
+        if (panel.style.display !== 'none') {
+            
+            // Logic: Nếu chỗ bạn click chuột KHÔNG nằm trong cái khung Volume
+            // VÀ cũng KHÔNG phải là cái nút bấm bật tắt
+            if (!panel.contains(event.target) && !btn.contains(event.target)) {
+                
+                // Thì ẩn nó đi
+                panel.style.display = 'none';
+                btn.classList.remove('active');
+            }
+        }
+    });
+// [MỚI] Logic Validate Giờ Bắt đầu < Giờ Kết thúc
+  const startTimeInput = document.getElementById('startTime');
+  const endTimeInput = document.getElementById('endTime');
+  const timeErrorMsg = document.getElementById('timeError');
+  const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+
+  function validateTimes() {
+      const start = startTimeInput.value;
+      const end = endTimeInput.value;
+
+      // Chỉ kiểm tra khi cả 2 ô đều đã có dữ liệu
+      if (start && end) {
+          if (end <= start) {
+              // Lỗi: Hiện thông báo, viền đỏ, khóa nút
+              timeErrorMsg.style.display = 'block';
+              endTimeInput.style.borderColor = '#ef4444';
+              submitBtn.disabled = true;
+              submitBtn.style.opacity = '0.5';
+              submitBtn.style.cursor = 'not-allowed';
+          } else {
+              // Hợp lệ: Ẩn lỗi, reset viền, mở nút
+              timeErrorMsg.style.display = 'none';
+              endTimeInput.style.borderColor = '#e5e7eb'; // Màu viền gốc
+              submitBtn.disabled = false;
+              submitBtn.style.opacity = '1';
+              submitBtn.style.cursor = 'pointer';
+          }
+      } else {
+          // Chưa nhập đủ thì cứ để yên (hoặc reset về bình thường)
+          timeErrorMsg.style.display = 'none';
+          endTimeInput.style.borderColor = '#e5e7eb';
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = '1';
+          submitBtn.style.cursor = 'pointer';
+      }
+  }
+
+  // Gắn sự kiện: Cứ thay đổi là kiểm tra ngay
+  startTimeInput.addEventListener('input', validateTimes);
+  endTimeInput.addEventListener('input', validateTimes);
 </script>
 </body>
 </html>
