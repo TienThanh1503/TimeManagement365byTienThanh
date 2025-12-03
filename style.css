@@ -2130,14 +2130,19 @@ table thead th {
 .table-wrapper::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
-/* ================================================= */
-/* --- BỘ LỌC NÂNG CAO (FILTER DROPDOWN) --- */
+//* ================================================= */
+/* --- BỘ LỌC NÂNG CAO (ULTIMATE - FIX MÀU) --- */
 /* ================================================= */
 
 .filter-container {
     position: relative;
     margin-bottom: 12px;
-    z-index: 200; /* Đảm bảo menu đè lên bảng */
+    z-index: 200; 
+    /* ĐẢM BẢO CÁC NÚT THẲNG HÀNG */
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 12px; 
 }
 
 /* Nút mở bộ lọc */
@@ -2153,23 +2158,30 @@ table thead th {
     transition: all 0.2s;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
+
+/* FIX MÀU: Khi bấm vào nút mở lọc, nó phải có màu xanh */
 .filter-toggle-btn:hover, .filter-toggle-btn.active {
-    background: #eff6ff; border-color: #3b82f6; color: #2563eb;
+    background: #eff6ff !important; 
+    border-color: #3b82f6 !important; 
+    color: #2563eb !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
 }
 
 /* Khung Menu Lọc (Ẩn/Hiện) */
 .filter-dropdown {
-    display: none; /* Mặc định ẩn */
+    display: none; 
     position: absolute;
-    top: 110%; left: 0;
+    top: 110%; 
+    right: 0; /* Căn lề phải để không bị tràn màn hình */
+    left: auto; /* Tự động tính lề trái */
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.5);
     box-shadow: 0 20px 50px rgba(0,0,0,0.15);
     border-radius: 16px;
     padding: 20px;
-    width: 100%;
-    max-width: 500px;
+    width: clamp(300px, 90vw, 650px); /* Tăng chiều rộng để chứa 3 cột */
     animation: slideDownFilter 0.3s ease;
 }
 .filter-dropdown.show { display: block; }
@@ -2179,20 +2191,25 @@ table thead th {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Bố cục 2 cột bên trong */
+/* Bố cục 3 cột bên trong */
 .filter-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    grid-template-columns: repeat(3, 1fr) !important; /* BẮT BUỘC 3 CỘT */
+    gap: 16px !important;
 }
 
-/* Mobile thì dồn về 1 cột */
-@media (max-width: 600px) {
-    .filter-grid { grid-template-columns: 1fr; gap: 16px; }
+/* Mobile: Về 1 cột */
+@media (max-width: 768px) {
+    .filter-grid { grid-template-columns: 1fr !important; }
+    .filter-dropdown { left: 0; right: 0; margin: 0 10px; max-width: none; }
 }
 
 .filter-column h4 {
-    margin: 0 0 12px 0; font-size: 0.85rem; text-transform: uppercase; color: #94a3b8;
+    margin: 0 0 12px 0; 
+    font-size: 0.85rem; 
+    text-transform: uppercase; 
+    color: #94a3b8;
+    font-weight: 800;
 }
 
 /* Các nút chọn (Chips) */
@@ -2208,16 +2225,18 @@ table thead th {
     transition: all 0.2s;
     border: 1px solid transparent;
     text-align: left;
+    font-weight: 600;
 }
 .filter-chip:hover { background: #e2e8f0; }
 
-/* Trạng thái được chọn */
+/* 🔥 FIX QUAN TRỌNG: MÀU TRẠNG THÁI ACTIVE */
 .filter-chip.active {
-    background: #eff6ff;
-    color: #2563eb;
-    border-color: #bfdbfe;
-    font-weight: 700;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+    background: #eff6ff !important;
+    color: #2563eb !important;
+    border-color: #60a5fa !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2) !important;
+    transform: translateX(4px); /* Hiệu ứng trượt nhẹ */
 }
 .filter-chip.active::before { content: '✓ '; }
 
@@ -2227,101 +2246,35 @@ table thead th {
     height: 36px; padding: 4px 8px; font-size: 0.85rem;
     border: 1px solid #cbd5e1; border-radius: 6px;
 }
-/* ================================================= */
-/* --- FIX LỖI "CHƯA BẮT ĐẦU" (BADGE VÀNG) --- */
-/* ================================================= */
 
-.badge-pending {
-    display: inline-block !important;
-    background: #fef3c7 !important; /* Nền vàng nhạt */
-    color: #d97706 !important;      /* Chữ cam đậm */
-    font-weight: 800 !important;
-    font-size: 0.75rem !important;
-    padding: 6px 12px !important;
-    border-radius: 20px !important; /* Bo tròn viên thuốc */
-    border: 1px solid #fcd34d !important;
-    
-    /* QUAN TRỌNG: CẤM XUỐNG DÒNG */
-    white-space: nowrap !important; 
-    
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
-    text-transform: uppercase; /* Viết hoa cho đồng bộ */
-}
-/* --- CẬP NHẬT BẢNG LỌC 3 CỘT --- */
-.filter-grid {
-    grid-template-columns: 1fr 1fr 1fr !important; /* Chia đều 3 cột */
-    gap: 16px !important;
+/* --- DARK MODE FIX CỰC GẮT CHO BỘ LỌC --- */
+body.dark-mode .filter-dropdown {
+    background: #1e293b !important;
+    border-color: #475569 !important;
 }
 
-/* Mobile thì vẫn dồn 1 cột */
-@media (max-width: 768px) {
-    .filter-grid { grid-template-columns: 1fr !important; }
-} 
-
-/* ================================================= */
-/* --- FIX MODAL HIỆN SÁT NÚT (POPOVER STYLE) --- */
-/* ================================================= */
-
-#taskModal {
-position: fixed !important;
-top: 0 !important; 
-left: 0 !important;
-
-/* 👇 SỬA Ở ĐÂY: Dùng 100% thay vì 100vw để trừ thanh cuộn ra */
-width: 100% !important; 
-height: 100% !important; 
-
-/* Căn giữa tuyệt đối */
-display: none;
-justify-content: center !important;
-align-items: center !important;
-
-background: rgba(0, 0, 0, 0.6) !important;
-backdrop-filter: blur(4px);
-z-index: 2147483647 !important;
-} 
-
-/* ================================================= */
-/* --- FIX MODAL TRIỆT ĐỂ (V2) --- */
-/* ================================================= */
-
-/* 1. Lớp nền đen mờ bao phủ toàn màn hình */
-#taskModal {
-display: none; /* Mặc định ẩn */
-position: fixed !important; /* Cố định so với màn hình */
-top: 0 !important;
-left: 0 !important;
-width: 100vw !important; /* Full chiều ngang */
-height: 100vh !important; /* Full chiều dọc */
-background: rgba(0, 0, 0, 0.6) !important; /* Nền tối */
-backdrop-filter: blur(4px); /* Làm mờ nền sau */
-z-index: 2147483647 !important; /* Lớp cao nhất có thể */
-
-/* Căn giữa nội dung bên trong */
-justify-content: center !important;
-align-items: center !important;
+body.dark-mode .filter-column h4 {
+    color: #a5b4fc;
 }
 
-/* Khi có class .show thì hiện lên (dạng flex để căn giữa) */
-#taskModal.show {
-display: flex !important;
+/* Chip lọc mặc định (Chưa chọn) */
+body.dark-mode .filter-chip {
+    background: #334155 !important;
+    color: #e2e8f0 !important;
+    border-color: #475569 !important;
 }
 
-/* 2. Hộp nội dung (Form) */
-.task-modal-content {
-width: 95% !important; /* Chiếm 95% chiều ngang màn hình đt */
-max-width: 900px !important; /* Giới hạn tối đa 900px trên máy tính (Rộng gấp rưỡi cũ) */
-padding: 30px !important; /* Tăng khoảng cách lề cho thoáng */
-border-radius: 24px !important; /* Bo góc mềm mại hơn */
+/* Chip lọc Đang chọn (Active) */
+body.dark-mode .filter-chip.active {
+    background: #4f46e5 !important; /* Tím chủ đạo */
+    color: white !important;
+    border-color: #818cf8 !important;
+    box-shadow: 0 0 10px rgba(129, 140, 248, 0.5) !important;
 }
-/* ================================================= */
-/* --- FIX LỆCH NÚT ĐÓNG MODAL (FINAL) --- */
-/* ================================================= */
 
-/* ================================================= */
-/* --- FIX LỆCH NÚT ĐÓNG MODAL (FINAL V2 - CÂN BẰNG) --- */
-/* ================================================= */
-
+body.dark-mode .filter-chip:hover {
+    background: #475569 !important;
+}
 #closeTaskModalBtn {
 /* [VỊ TRÍ CHÍNH XÁC] */
 position: absolute !important;

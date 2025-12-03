@@ -186,118 +186,132 @@ let currentFilter = 'today';
 /* --- LOGIC BỘ LỌC & SẮP XẾP (UPDATE: SORT TIME) --- */
 /* ============================================================ */
 
-// 1. Cấu hình mặc định (Thêm sort: 'desc' - Lớn tới nhỏ)
+/* ============================================================ */
+/* --- LOGIC BỘ LỌC & SẮP XẾP (ULTIMATE VERSION) --- */
+/* ============================================================ */
+
+// 1. Cấu hình mặc định (ĐÃ THÊM SORT: 'desc')
 let filterConfig = {
-dateType: 'today', 
-dateValue: todayStr(), 
-status: 'all',
-sort: 'desc' // desc: Giảm dần (Mới -> Cũ), asc: Tăng dần (Cũ -> Mới)
+    dateType: 'today', 
+    dateValue: todayStr(), 
+    status: 'all',
+    sort: 'desc' // desc: Giảm dần (Mới -> Cũ), asc: Tăng dần (Cũ -> Mới)
 };
 
-// 2. Lấy phần tử
+// 2. Lấy phần tử (ĐÃ GỘP TẤT CẢ VÀO ĐÂY)
 const filterToggleBtn = document.getElementById('filterToggleBtn');
 const filterDropdown = document.getElementById('filterDropdown');
 const dateOptions = document.querySelectorAll('#dateFilters .filter-chip');
 const statusOptions = document.querySelectorAll('#statusFilters .filter-chip');
-const sortOptions = document.querySelectorAll('#sortFilters .filter-chip'); // MỚI
+const sortOptions = document.querySelectorAll('#sortFilters .filter-chip');
 const specificDateInput = document.getElementById('filterSpecificDate');
 
-// 3. Sự kiện bật tắt menu
+// 3. Sự kiện bật tắt menu (Sử dụng logic Toggling đơn giản)
 if (filterToggleBtn) {
     filterToggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    filterDropdown.classList.toggle('show');
-    filterToggleBtn.classList.toggle('active');
+        e.stopPropagation();
+        filterDropdown.classList.toggle('show');
     });
 }
+
+// Logic đóng menu khi click ra ngoài
 document.addEventListener('click', (e) => {
-if (filterDropdown && filterToggleBtn) {
-    if (!filterDropdown.contains(e.target) && e.target !== filterToggleBtn) {
-        filterDropdown.classList.remove('show');
-        filterToggleBtn.classList.remove('active');
+    if (filterDropdown && filterToggleBtn) {
+        if (!filterDropdown.contains(e.target) && e.target !== filterToggleBtn) {
+            filterDropdown.classList.remove('show');
+        }
     }
-}
 });
 
-// 4. Xử lý chọn Thời gian
-if (dateOptions) {
-    dateOptions.forEach(opt => {
-    opt.addEventListener('click', () => {
-        const val = opt.dataset.val;
-        if (val === 'specific') return;
-        dateOptions.forEach(d => d.classList.remove('active'));
-        opt.classList.add('active');
-        if(specificDateInput) specificDateInput.disabled = true;
-        filterConfig.dateType = val;
-        renderTasks();
-    });
+// 4. Hàm xử lý khi chọn một chip (Thời gian, Trạng thái, Sắp xếp)
+function handleFilterChipClick(options, configKey) {
+    options.forEach(opt => {
+        opt.addEventListener('click', () => {
+            // Reset active class cho tất cả
+            options.forEach(d => d.classList.remove('active'));
+            // Set active class cho chip vừa bấm
+            opt.classList.add('active');
+            
+            filterConfig[configKey] = opt.dataset.val;
+
+            // Xử lý riêng cho Date Filter
+            if (configKey === 'dateType') {
+                if(specificDateInput) {
+                    const isSpecific = opt.dataset.val === 'specific';
+                    specificDateInput.disabled = !isSpecific;
+                    if (!isSpecific) {
+                        filterConfig.dateValue = todayStr(); // Reset giá trị ngày cụ thể khi chuyển mode
+                    }
+                }
+            }
+
+            // Bấm vào chip thì đóng menu (Tùy chọn)
+            // filterDropdown.classList.remove('show'); 
+            
+            // Render lại danh sách
+            renderTasks();
+            playSound('click'); // (Tuỳ chọn: Thêm âm thanh click)
+        });
     });
 }
 
+// Gắn sự kiện cho các nhóm
+if (dateOptions) handleFilterChipClick(dateOptions, 'dateType');
+if (statusOptions) handleFilterChipClick(statusOptions, 'status');
+if (sortOptions) handleFilterChipClick(sortOptions, 'sort');
+
 // 5. Xử lý chọn Ngày cụ thể
-const specificLabel = document.querySelector('.filter-chip[data-val="specific"]');
-if (specificLabel && specificDateInput) {
-    specificLabel.addEventListener('click', () => {
-        dateOptions.forEach(d => d.classList.remove('active'));
-        specificLabel.classList.add('active');
-        specificDateInput.disabled = false;
-        specificDateInput.focus();
-        filterConfig.dateType = 'specific';
-        if(specificDateInput.value) {
-            filterConfig.dateValue = specificDateInput.value;
+if (specificDateInput) {
+    specificDateInput.addEventListener('change', (e) => {
+        if (filterConfig.dateType === 'specific') {
+            filterConfig.dateValue = e.target.value;
             renderTasks();
         }
     });
-    specificDateInput.addEventListener('change', (e) => {
-        filterConfig.dateValue = e.target.value;
-        renderTasks();
-    });
 }
 
-// 6. Xử lý chọn Trạng thái
-if (statusOptions) {
-    statusOptions.forEach(opt => {
-    opt.addEventListener('click', () => {
-        statusOptions.forEach(s => s.classList.remove('active'));
-        opt.classList.add('active');
-        filterConfig.status = opt.dataset.val;
-        renderTasks();
-    });
-    });
+// Hàm cập nhật nhãn nút "⚡ Bộ lọc: ..."
+function updateFilterButtonLabel() {
+    let dateLabel = '';
+    const dateType = filterConfig.dateType;
+    if (dateType === 'today') dateLabel = 'Hôm nay';
+    else if (dateType === 'week') dateLabel = 'Tuần này';
+    else if (dateType === 'month') dateLabel = 'Tháng này';
+    else if (dateType === 'all') dateLabel = 'Tất cả';
+    else if (dateType === 'specific') dateLabel = 'Ngày cụ thể';
+
+    if(filterToggleBtn) {
+        filterToggleBtn.innerHTML = `⚡ Bộ lọc: ${dateLabel}`;
+    }
+
+    // [MỚI] Thêm/Xóa class active cho nút Toggle dựa trên Filter đang là Mặc định hay không
+    const isDefault = dateType === 'today' && filterConfig.status === 'all' && filterConfig.sort === 'desc';
+    if(filterToggleBtn) {
+        if (isDefault) filterToggleBtn.classList.remove('active');
+        else filterToggleBtn.classList.add('active');
+    }
 }
 
-// 7. Xử lý chọn Sắp xếp (MỚI THÊM)
-if (sortOptions) {
-    sortOptions.forEach(opt => {
-    opt.addEventListener('click', () => {
-        sortOptions.forEach(s => s.classList.remove('active'));
-        opt.classList.add('active');
-        filterConfig.sort = opt.dataset.val; // 'desc' hoặc 'asc'
-        renderTasks(); // Vẽ lại bảng ngay
-    });
-    });
-}
 
-// Helper ngày tháng
+// Helper ngày tháng (KHÔNG CẦN THAY THẾ, CHỈ ĐỂ BẠN KIỂM TRA)
 function isDateInThisWeek(d) {
-const today = new Date();
-const currentDay = today.getDay(); 
-const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1); 
-const monday = new Date(today.setDate(diff));
-monday.setHours(0,0,0,0);
-const sunday = new Date(monday);
-sunday.setDate(monday.getDate() + 6);
-sunday.setHours(23,59,59,999);
-const check = new Date(d);
-return check >= monday && check <= sunday;
+    const today = new Date();
+    const currentDay = today.getDay(); 
+    const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1); 
+    const monday = new Date(today.setDate(diff));
+    monday.setHours(0,0,0,0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23,59,59,999);
+    const check = new Date(d);
+    return check >= monday && check <= sunday;
 }
 function isDateInThisMonth(d) {
-const today = new Date();
-const check = new Date(d);
-return check.getMonth() === today.getMonth() && check.getFullYear() === today.getFullYear();
+    const today = new Date();
+    const check = new Date(d);
+    return check.getMonth() === today.getMonth() && check.getFullYear() === today.getFullYear();
 }
-
-// --- HÀM RENDER TASKS (CÓ SẮP XẾP) ---
+// END OF LOGIC FILTER
 function renderTasks() {
     // ======================================================================
 // FIX LOGIC: TỰ ĐỘNG DỪNG CÁC CÔNG VIỆC ĐANG CHẠY ĐÃ QUÁ HẠN (PERSISTENT FIX)
@@ -328,17 +342,18 @@ function renderTasks() {
 })();
 // ----------------------------------------------------------------------
 const container = document.getElementById('tasksContainer');
-if (!tasks.length) {
-    container.innerHTML = `
-    <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
-        <div style="font-size: 4rem; margin-bottom: 10px; opacity: 0.6;">📝</div>
-        <h3 style="margin: 0; color: #475569;">Danh sách trống trơn!</h3>
-        <p style="margin-top: 5px; font-size: 0.9rem;">Hãy thêm một công việc nhỏ để bắt đầu ngày mới năng suất nhé.</p>
-    </div>
-    `;
-    if(document.getElementById('taskSummary')) document.getElementById('taskSummary').textContent = '';
-    return;
-}
+    if (!tasks.length) {
+        container.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+            <div style="font-size: 4rem; margin-bottom: 10px; opacity: 0.6;">📝</div>
+            <h3 style="margin: 0; color: #475569;">Danh sách trống trơn!</h3>
+            <p style="margin-top: 5px; font-size: 0.9rem;">Hãy thêm một công việc nhỏ để bắt đầu ngày mới năng suất nhé.</p>
+        </div>
+        `;
+        if(document.getElementById('taskSummary')) document.getElementById('taskSummary').textContent = '';
+        updateFilterButtonLabel(); // <--- GỌI HÀM CẬP NHẬT NHÃN NÚT
+        return;
+    }
 
 // --- LỌC ---
 let filtered = tasks.filter(t => {
