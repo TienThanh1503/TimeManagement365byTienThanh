@@ -2130,19 +2130,15 @@ table thead th {
 .table-wrapper::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
-//* ================================================= */
-/* --- BỘ LỌC NÂNG CAO (ULTIMATE - FIX MÀU) --- */
-/* ================================================= */
-
 .filter-container {
-    position: relative;
-    margin-bottom: 12px;
-    z-index: 200; 
-    /* ĐẢM BẢO CÁC NÚT THẲNG HÀNG */
+    /* ĐẢM BẢO CÁC NÚT VÀ SUMMARY THẲNG HÀNG */
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     gap: 12px; 
+    position: relative; /* Giúp menu thả xuống căn chỉnh đúng */
+    margin-bottom: 15px !important; /* Tạo khoảng cách với bảng bên dưới */
+    z-index: 200; 
 }
 
 /* Nút mở bộ lọc */
@@ -2168,23 +2164,36 @@ table thead th {
     box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
 }
 
-/* Khung Menu Lọc (Ẩn/Hiện) */
 .filter-dropdown {
+    /* 1. Ẩn mặc định */
     display: none; 
+    
+    /* 2. Định vị tuyệt đối */
     position: absolute;
-    top: 110%; 
-    right: 0; /* Căn lề phải để không bị tràn màn hình */
-    left: auto; /* Tự động tính lề trái */
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.5);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    border-radius: 16px;
-    padding: 20px;
-    width: clamp(300px, 90vw, 650px); /* Tăng chiều rộng để chứa 3 cột */
-    animation: slideDownFilter 0.3s ease;
+    top: 100%; 
+    right: 0; 
+    left: auto;
+    margin-top: 8px; /* Giảm khoảng cách xuống 1 chút cho gọn */
+    
+    /* 3. Giao diện khung */
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.1);
+    /* Bóng đổ đậm hơn để nổi hẳn lên trên footer */
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3); 
+    border-radius: 14px;
+    padding: 12px; 
+    width: 600px; 
+    z-index: 99999; /* Đảm bảo cao hơn tất cả mọi thứ */
+
+    /* 4. [FIX TRÀN]: GIẢM CHIỀU CAO XUỐNG CÒN 220px */
+    max-height: 220px !important; 
+    overflow-y: auto !important;  
+    overscroll-behavior: contain; 
 }
-.filter-dropdown.show { display: block; }
+.filter-dropdown.show {
+    display: block !important;
+    animation: slideDownShort 0.2s ease forwards;
+}
 
 @keyframes slideDownFilter {
     from { opacity: 0; transform: translateY(-10px); }
@@ -2380,17 +2389,21 @@ border: 1px solid #334155;
 }
 /* Mobile: Nếu màn hình nhỏ thì quay về căn giữa cho dễ nhìn */
 @media (max-width: 600px) {
-    #taskModal {
-        display: none;
-        justify-content: center !important;
-        align-items: center !important;
-        background: rgba(0,0,0,0.5) !important;
+    .filter-container {
+        flex-direction: column !important;
+        align-items: stretch !important; 
+        gap: 10px;
     }
-    #taskModal.show { display: flex !important; }
-    .task-modal-content {
-        position: relative !important;
-        top: auto !important; left: auto !important;
-        width: 90% !important;
+    #openTaskModalBtn, #filterToggleBtn, .filter-container > div {
+        width: 100% !important;
+        justify-content: center;
+    }
+    /* Đảm bảo Summary và nút Thêm công việc vẫn đi chung một hàng trên mobile */
+    .filter-container > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
     }
 }
 
@@ -4233,4 +4246,158 @@ flex-shrink: 0;
     width: 100% !important;
     justify-content: center;
 }
+}
+/* --- LÀM ĐẸP THANH CUỘN CHO MENU BỘ LỌC --- */
+
+/* 1. Độ rộng thanh cuộn */
+.filter-dropdown::-webkit-scrollbar {
+    width: 6px; 
+}
+
+/* 2. Nền của rãnh cuộn */
+.filter-dropdown::-webkit-scrollbar-track {
+    background: transparent; 
+    margin: 5px 0; /* Cách 2 đầu ra 1 chút */
+}
+
+/* 3. Thanh kéo (cục di chuyển) */
+.filter-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* Màu xám nhạt */
+    border-radius: 10px;
+}
+
+/* 4. Khi di chuột vào thanh kéo */
+.filter-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* Đậm hơn chút */
+}
+
+/* DARK MODE: Đổi màu thanh cuộn */
+body.dark-mode .filter-dropdown::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+/* ================================================= */
+/* --- CẬP NHẬT FORM ĐẸP & CÂN ĐỐI (FIX LINK) --- */
+/* ================================================= */
+
+/* 1. Thiết lập lưới (Grid) chuẩn */
+#taskForm {
+    display: grid !important;
+    grid-template-columns: repeat(12, 1fr) !important; /* Chia làm 12 cột */
+    gap: 16px 16px !important; /* Khoảng cách dọc và ngang */
+    align-items: start !important;
+}
+
+/* 2. Quy định độ rộng các ô */
+.form-group.full-width {
+    grid-column: span 12 !important; /* Chiếm hết dòng */
+}
+.form-group.col-4 {
+    grid-column: span 4 !important; /* Chiếm 1/3 dòng */
+}
+.form-group.col-8 {
+    grid-column: span 8 !important; /* Chiếm 2/3 dòng */
+}
+
+/* Mobile: Tất cả về 1 dòng cho dễ nhìn */
+@media (max-width: 768px) {
+    .form-group.col-4, .form-group.col-8 {
+        grid-column: span 12 !important;
+    }
+}
+
+/* 3. LÀM ĐẸP Ô INPUT (Quan trọng để không bị ngắn) */
+#taskForm input, 
+#taskForm select, 
+.reward-trigger {
+    width: 100% !important; /* Bắt buộc rộng 100% khung chứa */
+    height: 46px !important; /* Tăng chiều cao lên chút cho đẹp */
+    border-radius: 12px !important;
+    padding: 0 14px !important;
+    box-sizing: border-box !important; /* Để padding không làm vỡ khung */
+    font-size: 0.95rem !important;
+}
+
+/* 4. Riêng ô Link: Thêm chút điểm nhấn */
+#taskLink {
+    background-color: #f0f9ff !important; /* Màu xanh siêu nhạt cho dễ nhận biết */
+    border: 1px solid #bae6fd !important;
+    color: #0369a1 !important;
+    font-weight: 500;
+}
+#taskLink::placeholder {
+    color: #7dd3fc !important;
+    font-style: italic;
+}
+
+/* Dark Mode cho ô Link */
+body.dark-mode #taskLink {
+    background-color: #0c4a6e !important;
+    border-color: #075985 !important;
+    color: #e0f2fe !important;
+}
+
+/* 5. Chỉnh lại nút Phần thưởng cho khớp chiều cao */
+.reward-trigger {
+    display: flex !important;
+    align-items: center !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* --- SỬA NÚT LINK CHO ĐẸP & TRÒN --- */
+.btn-link-action {
+    /* 1. Xóa gạch chân xấu xí mặc định của link */
+    text-decoration: none !important; 
+    border-bottom: none !important;
+    
+    /* 2. Ép kích thước tròn xoe giống nút bên cạnh (btn-small) */
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    
+    /* 3. Căn giữa icon cái xích */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    
+    /* 4. Màu sắc (Xanh dương cho nổi) */
+    background: #eff6ff; 
+    color: #2563eb;
+    border: 1px solid #bfdbfe !important;
+    font-size: 1.2rem; /* Icon to rõ */
+    
+    /* 5. Căn chỉnh vị trí */
+    margin-right: 4px; /* Cách nút Sửa một chút */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Hiệu ứng khi di chuột vào */
+.btn-link-action:hover {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb !important;
+    transform: scale(1.15) rotate(-10deg); /* Xoay nhẹ cho vui mắt */
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+/* ================================================= */
+/* --- FIX LỖI NÚT BẤM BỊ LỆCH KHI QUÁ HẠN --- */
+/* ================================================= */
+
+/* Áp dụng cho cả nút Button (Sửa, Xóa) và thẻ A (Link) trong dòng quá hạn */
+tr.task-overdue .task-actions button,
+tr.task-overdue .task-actions .btn-link-action {
+    /* 1. Quan trọng nhất: Bỏ in nghiêng, bắt buộc icon đứng thẳng */
+    font-style: normal !important;
+
+    /* 2. Đảm bảo sử dụng Flexbox để căn giữa icon */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    /* 3. Reset chiều cao dòng để tránh icon bị đẩy lên/xuống */
+    line-height: 1 !important;
+    
+    /* Đảm bảo độ mờ là 100% để nút trông rõ ràng */
+    opacity: 1 !important;
 }

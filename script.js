@@ -312,37 +312,37 @@ function isDateInThisMonth(d) {
     return check.getMonth() === today.getMonth() && check.getFullYear() === today.getFullYear();
 }
 // END OF LOGIC FILTER
+// --- HÀM RENDER TASKS (CÓ SẮP XẾP) ---
 function renderTasks() {
     // ======================================================================
-// FIX LOGIC: TỰ ĐỘNG DỪNG CÁC CÔNG VIỆC ĐANG CHẠY ĐÃ QUÁ HẠN (PERSISTENT FIX)
-// Lệnh này chạy trước khi lọc để đảm bảo dữ liệu trong mảng tasks là chính xác.
-// ======================================================================
+    // FIX LOGIC: TỰ ĐỘNG DỪNG CÁC CÔNG VIỆC ĐANG CHẠY ĐÃ QUÁ HẠN
+    // ======================================================================
 
-(function() {
-    let tasksUpdated = false;
-    const now = new Date();
+    (function() {
+        let tasksUpdated = false;
+        const now = new Date();
 
-    tasks = tasks.map(t => {
-        if (t.done || !t.endTime) return t; // Bỏ qua nếu đã xong hoặc không có giờ kết thúc
+        tasks = tasks.map(t => {
+            if (t.done || !t.endTime) return t; // Bỏ qua nếu đã xong hoặc không có giờ kết thúc
+            const endDateTime = buildDateTime(t.date, t.endTime);
+            if (t.started && endDateTime && now.getTime() >= endDateTime.getTime()) {
+                t.started = false; // BUỘC PHẢI DỪNG
+                tasksUpdated = true;
+            }
+            return t;
+        });
 
-        const endDateTime = buildDateTime(t.date, t.endTime);
-
-        // Nếu task ĐANG CHẠY (started=true) VÀ giờ hiện tại >= giờ kết thúc
-        if (t.started && endDateTime && now.getTime() >= endDateTime.getTime()) {
-            t.started = false; // BUỘC PHẢI DỪNG
-            tasksUpdated = true;
+        if (tasksUpdated) {
+            saveTasks(); // Lưu trạng thái đã sửa vào localStorage
         }
-        return t;
-    });
+    })();
+    // ----------------------------------------------------------------------
+    const container = document.getElementById('tasksContainer');
+    const totalTaskCount = tasks.length;
+    let filtered = [];
 
-    if (tasksUpdated) {
-        saveTasks(); // Lưu trạng thái đã sửa vào localStorage
-        // Không gọi renderTasks() ở đây để không tạo vòng lặp vô tận
-    }
-})();
-// ----------------------------------------------------------------------
-const container = document.getElementById('tasksContainer');
-    if (!tasks.length) {
+    // Nếu không có công việc nào trong DB, hiển thị thông báo trống.
+    if (!totalTaskCount) {
         container.innerHTML = `
         <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
             <div style="font-size: 4rem; margin-bottom: 10px; opacity: 0.6;">📝</div>
@@ -350,121 +350,121 @@ const container = document.getElementById('tasksContainer');
             <p style="margin-top: 5px; font-size: 0.9rem;">Hãy thêm một công việc nhỏ để bắt đầu ngày mới năng suất nhé.</p>
         </div>
         `;
-        if(document.getElementById('taskSummary')) document.getElementById('taskSummary').textContent = '';
-        updateFilterButtonLabel(); // <--- GỌI HÀM CẬP NHẬT NHÃN NÚT
-        return;
+        // Cập nhật nhãn TỔNG và nhãn NÚT LỌC
+        const sumEl = document.getElementById('taskSummary');
+        if(sumEl) sumEl.textContent = `Hiển thị: 0 / Tổng: 0`;
+        updateFilterButtonLabel();
+        return; // DỪNG Ở ĐÂY NẾU KHÔNG CÓ CÔNG VIỆC NÀO
     }
+    
+    // --- LỌC (Chỉ chạy nếu có task trong DB) ---
+    filtered = tasks.filter(t => {
+        // Lọc thời gian
+        let dateMatch = false;
+        if (filterConfig.dateType === 'all') dateMatch = true;
+        else if (filterConfig.dateType === 'today') dateMatch = t.date === todayStr();
+        else if (filterConfig.dateType === 'specific') dateMatch = t.date === filterConfig.dateValue;
+        else if (filterConfig.dateType === 'week') dateMatch = isDateInThisWeek(t.date);
+        else if (filterConfig.dateType === 'month') dateMatch = isDateInThisMonth(t.date);
 
-// --- LỌC ---
-let filtered = tasks.filter(t => {
-    // Lọc thời gian
-    let dateMatch = false;
-    if (filterConfig.dateType === 'all') dateMatch = true;
-    else if (filterConfig.dateType === 'today') dateMatch = t.date === todayStr();
-    else if (filterConfig.dateType === 'specific') dateMatch = t.date === filterConfig.dateValue;
-    else if (filterConfig.dateType === 'week') dateMatch = isDateInThisWeek(t.date);
-    else if (filterConfig.dateType === 'month') dateMatch = isDateInThisMonth(t.date);
+        // Lọc trạng thái
+        let statusMatch = false;
+        const now = new Date();
+        const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
+        const isOverdue = end && now > end;
 
-    // Lọc trạng thái
-    let statusMatch = false;
-    const now = new Date();
-    const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
-    const isOverdue = end && now > end;
+        if (filterConfig.status === 'all') statusMatch = true;
+        else if (filterConfig.status === 'done') statusMatch = t.done;
+        else if (filterConfig.status === 'pending') statusMatch = !t.done && !t.started && !isOverdue;
+        else if (filterConfig.status === 'in-progress') statusMatch = t.started && !t.done;
 
-    if (filterConfig.status === 'all') statusMatch = true;
-    else if (filterConfig.status === 'done') statusMatch = t.done;
-    else if (filterConfig.status === 'pending') statusMatch = !t.done && !t.started && !isOverdue;
-    else if (filterConfig.status === 'in-progress') statusMatch = t.started && !t.done;
+        return dateMatch && statusMatch;
+    });
 
-    return dateMatch && statusMatch;
-});
+    // --- SẮP XẾP ---
+    filtered.sort((a, b) => {
+        const timeA = new Date(`${a.date}T${a.startTime}`).getTime();
+        const timeB = new Date(`${b.date}T${b.startTime}`).getTime();
 
-// --- SẮP XẾP (LOGIC MỚI) ---
-filtered.sort((a, b) => {
-    // Tạo chuỗi thời gian đầy đủ để so sánh (YYYY-MM-DD HH:MM)
-    const timeA = new Date(`${a.date}T${a.startTime}`).getTime();
-    const timeB = new Date(`${b.date}T${b.startTime}`).getTime();
+        if (filterConfig.sort === 'desc') {
+            return timeB - timeA; // Giảm dần (Lớn -> Nhỏ)
+        } else {
+            return timeA - timeB; // Tăng dần (Nhỏ -> Lớn)
+        }
+    });
 
-    if (filterConfig.sort === 'desc') {
-        return timeB - timeA; // Giảm dần (Lớn -> Nhỏ)
+    // Cập nhật nhãn nút bộ lọc
+    updateFilterButtonLabel();
+
+    // 💡 SỬA LỖI #3: HIỂN THỊ NẾU CÓ CÔNG VIỆC NHƯNG KHÔNG CÓ CÔNG VIỆC NÀO PHÙ HỢP
+    if (!filtered.length) {
+        container.innerHTML = '<p class="tasks-empty" style="text-align:center; padding: 20px 0;">Không có công việc nào phù hợp với bộ lọc hiện tại.</p>';
     } else {
-        return timeA - timeB; // Tăng dần (Nhỏ -> Lớn)
+        let html = '<div class="table-wrapper"><table><thead><tr>' +
+        '<th>Công việc</th>' +
+        '<th>Ngày</th>' +
+        '<th>Bắt đầu</th>' +
+        '<th>Kết thúc</th>' +
+        '<th>🏆 Phần thưởng</th>' +
+        '<th>Nhắc trước</th>' +
+        '<th>Trạng thái</th>' +
+        '<th>Hành động</th>' +
+        '</tr></thead><tbody>';
+
+        const now = new Date();
+
+        for (const t of filtered) { 
+        const start = buildDateTime(t.date, t.startTime);
+        const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
+        
+        const isOverDue = end && now > end && !t.done; 
+        
+        let rowClass = '';
+        if (t.done) {
+            rowClass = 'task-done';
+        } else if (isOverDue) {
+            rowClass = 'task-overdue';
+        }
+        let statusContent = ''; 
+        if (t.done) statusContent = '<span class="badge badge-done">ĐÃ HOÀN THÀNH</span>';
+        else if (t.started) statusContent = '<span class="badge badge-in-progress">ĐANG THỰC HIỆN</span>';
+        else if (end && now > end) statusContent = '<span class="badge badge-late">QUÁ HẠN</span>';
+        else statusContent = '<span class="badge badge-pending">CHƯA BẮT ĐẦU</span>';
+
+        let actionButtons = '';
+        actionButtons += `<button class="btn-small btn-outline" onclick="loadTaskForEdit(${t.id})" title="Sửa công việc">✏️</button>`;
+        if (t.link) {
+            // Kiểm tra link có http chưa, nếu chưa thì thêm vào để tránh lỗi
+            let safeLink = t.link.startsWith('http') ? t.link : 'https://' + t.link;
+            actionButtons += `<a href="${safeLink}" target="_blank" class="btn-link-action" title="Mở link học tập">🔗</a>`;
+        }
+        const isOverdue = end && now > end; 
+        if (!t.done) {
+            if (!isOverdue && !t.started) actionButtons += `<button class="btn-small btn-start" onclick="startTask(${t.id})" title="Bắt đầu">▶</button>`;
+            if (!isOverdue) actionButtons += `<button class="btn-small btn-success" onclick="markDone(${t.id})" title="Hoàn thành">✓</button>`;
+        }
+        actionButtons += `<button class="btn-small btn-danger" onclick="deleteTask(${t.id})" title="Xóa">✕</button>`;
+
+        html += `<tr class="${rowClass} task-item" draggable="true" data-id="${t.id}"
+            ondragstart="onDragStart(event)" ondragend="onDragEnd(event)"
+            ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <td><div style="font-weight:600;">${t.title}</div></td>
+            <td>${getFriendlyDate(t.date) || '-'}</td>
+            <td>${t.startTime || '-'}</td>
+            <td>${t.endTime || '-'}</td>
+            <td><div class="reward-box" title="${t.reward || 'Chưa chọn'}">${t.reward || '-'}</div></td>
+            <td>${t.reminderMinutes} phút</td>
+            <td>${statusContent}</td>
+            <td><div class="task-actions">${actionButtons}</div></td>
+        </tr>`;
+        }
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
     }
-});
 
-// Cập nhật nhãn nút
-let filterLabel = "Bộ lọc: ";
-filterLabel += (filterConfig.dateType === 'today') ? 'Hôm nay' : 
-                (filterConfig.dateType === 'all') ? 'Tất cả' : 
-                (filterConfig.dateType === 'week') ? 'Tuần này' : 'Khác';
-if(filterToggleBtn) filterToggleBtn.innerHTML = `⚡ ${filterLabel}`;
-
-if (!filtered.length) {
-    container.innerHTML = '<p class="tasks-empty">Không có công việc phù hợp.</p>';
-} else {
-    let html = '<div class="table-wrapper"><table><thead><tr>' +
-    '<th>Công việc</th>' +
-    '<th>Ngày</th>' +
-    '<th>Bắt đầu</th>' +
-    '<th>Kết thúc</th>' +
-    '<th>🏆 Phần thưởng</th>' +
-    '<th>Nhắc trước</th>' +
-    '<th>Trạng thái</th>' +
-    '<th>Hành động</th>' +
-    '</tr></thead><tbody>';
-
-    const now = new Date();
-
-    for (const t of filtered) { 
-    const start = buildDateTime(t.date, t.startTime);
-    const end = t.endTime ? buildDateTime(t.date, t.endTime) : null;
-    
-    const isOverDue = end && now > end && !t.done; // Xác định: Quá hạn VÀ Chưa xong
-    
-    let rowClass = '';
-    if (t.done) {
-        rowClass = 'task-done';
-    } else if (isOverDue) {
-        rowClass = 'task-overdue'; // Áp dụng class mới
-    }
-    let statusContent = ''; 
-    if (t.done) statusContent = '<span class="badge badge-done">ĐÃ HOÀN THÀNH</span>';
-    else if (t.started) statusContent = '<span class="badge badge-in-progress">ĐANG THỰC HIỆN</span>';
-    else if (end && now > end) statusContent = '<span class="badge badge-late">QUÁ HẠN</span>';
-    else statusContent = '<span class="badge badge-pending">CHƯA BẮT ĐẦU</span>';
-
-    let actionButtons = '';
-    /* --- TRƯỚC HÀM XÓA CŨ (DÁN NÚT SỬA VÀO ĐÂY) --- */
-    actionButtons += `<button class="btn-small btn-outline" onclick="loadTaskForEdit(${t.id})" title="Sửa công việc">✏️</button>`;
-
-// Luôn nhớ kiểm tra xem bạn đã thêm CSS cho nút này chưa (dùng btn-outline)
-    const isOverdue = end && now > end; 
-    if (!t.done) {
-        if (!isOverdue && !t.started) actionButtons += `<button class="btn-small btn-start" onclick="startTask(${t.id})" title="Bắt đầu">▶</button>`;
-        if (!isOverdue) actionButtons += `<button class="btn-small btn-success" onclick="markDone(${t.id})" title="Hoàn thành">✓</button>`;
-    }
-    actionButtons += `<button class="btn-small btn-danger" onclick="deleteTask(${t.id})" title="Xóa">✕</button>`;
-
-    html += `<tr class="${rowClass} task-item" draggable="true" data-id="${t.id}"
-        ondragstart="onDragStart(event)" ondragend="onDragEnd(event)"
-        ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
-        <td><div style="font-weight:600;">${t.title}</div></td>
-        <td>${getFriendlyDate(t.date) || '-'}</td>
-        <td>${t.startTime || '-'}</td>
-        <td>${t.endTime || '-'}</td>
-        <td><div class="reward-box" title="${t.reward || 'Chưa chọn'}">${t.reward || '-'}</div></td>
-        <td>${t.reminderMinutes} phút</td>
-        <td>${statusContent}</td>
-        <td><div class="task-actions">${actionButtons}</div></td>
-    </tr>`;
-    }
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
-}
-
-const doneCount = tasks.filter(t => t.done).length;
-const sumEl = document.getElementById('taskSummary');
-if(sumEl) sumEl.textContent = `Hiển thị: ${filtered.length} / Tổng: ${tasks.length}`;
+    // Cập nhật nhãn TỔNG
+    const sumEl = document.getElementById('taskSummary');
+    if(sumEl) sumEl.textContent = `Hiển thị: ${filtered.length} / Tổng: ${totalTaskCount}`;
 }
 
 function markDone(id) {
@@ -756,12 +756,14 @@ e.preventDefault();
 // (Giữ nguyên phần gọi playSound nếu có)
 
 const title = document.getElementById('title').value.trim();
+const taskLink = document.getElementById('taskLink').value.trim(); // <--- MỚI: Lấy Link
 const date = document.getElementById('date').value;
 const startTime = document.getElementById('startTime').value;
 const endTime = document.getElementById('endTime').value;
 const reminderVal = document.getElementById('reminder').value;
 const customRewardInput = document.getElementById('customRewardInput');
 const rewardTrigger = document.getElementById('rewardTrigger');
+
 
 // Kiểm tra dữ liệu bắt buộc (Title, Date, StartTime)
 if (!title || !date || !startTime) {
@@ -782,7 +784,9 @@ if (finalReward === 'Chọn phần thưởng' || finalReward.trim() === '') {
 // --------------------------------------
 
 const taskData = {
-    title, date, startTime, endTime: endTime || '', reminderMinutes,
+    title, 
+    link: taskLink, // <--- MỚI: Lưu Link vào data
+    date, startTime, endTime: endTime || '', reminderMinutes,
     reward: finalReward,
 };
 
@@ -1565,38 +1569,42 @@ function stopAmbience() {
 window.toggleAmbience = toggleAmbience;
 window.stopAmbience = stopAmbience;
 // Hàm: Nạp dữ liệu công việc lên Form để sửa
+// Tìm hàm loadTaskForEdit cũ và thay thế bằng hàm này:
 function loadTaskForEdit(id) {
-const task = tasks.find(t => t.id === id);
-if (!task) return;
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
 
-// 1. Gán ID của task này vào biến toàn cục
-editingId = id;
+    // 1. Gán ID đang sửa
+    editingId = id;
 
-// 2. Nạp dữ liệu vào Form
-document.getElementById('title').value = task.title;
-document.getElementById('date').value = task.date;
-document.getElementById('startTime').value = task.startTime;
-document.getElementById('endTime').value = task.endTime;
-document.getElementById('reminder').value = task.reminderMinutes;
+    // 2. Nạp dữ liệu vào các ô Input
+    document.getElementById('title').value = task.title;
+    document.getElementById('date').value = task.date;
+    document.getElementById('startTime').value = task.startTime;
+    document.getElementById('endTime').value = task.endTime;
+    document.getElementById('reminder').value = task.reminderMinutes;
+    document.getElementById('taskLink').value = task.link || '';
 
-// 3. Nạp dữ liệu Phần thưởng
-const rewardTrigger = document.getElementById('rewardTrigger');
-const customRewardInput = document.getElementById('customRewardInput');
+    // 3. Xử lý phần thưởng (nạp vào ô custom hoặc hiển thị text)
+    const rewardTrigger = document.getElementById('rewardTrigger');
+    const customRewardInput = document.getElementById('customRewardInput');
+    
+    customRewardInput.value = ''; // Reset ô nhập tay
+    rewardTrigger.textContent = task.reward; // Hiển thị phần thưởng cũ
 
-// Nạp reward vào input custom hoặc nút trigger
-customRewardInput.value = '';
-rewardTrigger.textContent = task.reward;
+    // 4. Đổi nút "Thêm" thành nút "Lưu thay đổi"
+    const submitBtn = document.querySelector('#taskForm button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = '💾 Lưu thay đổi';
+        submitBtn.classList.add('btn-warning'); 
+        submitBtn.classList.remove('btn-primary');
+    }
 
-// 4. Đổi nút "Thêm" thành nút "Lưu"
-const submitBtn = document.querySelector('#taskForm button[type="submit"]');
-if (submitBtn) {
-    submitBtn.textContent = '💾 Lưu thay đổi';
-    submitBtn.classList.add('btn-warning'); 
-    submitBtn.classList.remove('btn-primary');
-}
-
-// Cuộn lên đầu trang cho người dùng dễ chỉnh sửa
-window.scrollTo({ top: 0, behavior: 'smooth' });
+    // --- [QUAN TRỌNG NHẤT] MỞ MODAL LÊN ---
+    const modal = document.getElementById('taskModal');
+    if (modal) {
+        modal.classList.add('show'); // <--- Dòng này giúp Pop-up hiện ra
+    }
 }
 window.loadTaskForEdit = loadTaskForEdit;
 
@@ -1608,6 +1616,7 @@ document.getElementById('startTime').value = '';
 document.getElementById('endTime').value = '';
 document.getElementById('reminder').value = '10';
 document.getElementById('date').value = todayStr();
+document.getElementById('taskLink').value = '';
 
 const customRewardInput = document.getElementById('customRewardInput');
 const rewardTrigger = document.getElementById('rewardTrigger');
