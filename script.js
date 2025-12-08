@@ -511,32 +511,65 @@ confetti({
 }
 window.markDone = markDone;
 
-function deleteTask(id) {
-playSound('trash');
-if (!confirm('Xoá công việc này?')) return;
+/* ================================================= */
+/* --- CẬP NHẬT: XÓA CÔNG VIỆC VỚI MODAL XỊN --- */
+/* ================================================= */
 
-// Tìm dòng cần xóa trong bảng để thêm hiệu ứng
-const btn = document.querySelector(`button[onclick="deleteTask(${id})"]`);
-if (btn) {
-    const row = btn.closest('tr');
-    if (row) {
-        row.classList.add('slide-out'); // Kích hoạt hiệu ứng CSS
+function deleteTask(id) {
+    // 1. Tìm tên công việc để hiển thị cho rõ ràng
+    const task = tasks.find(t => t.id === id);
+    const taskTitle = task ? task.title : 'công việc này';
+
+    // 2. Thay thế lệnh confirm() cũ bằng showConfirmDialog() mới
+    showConfirmDialog(
+        "🗑️ Xóa công việc?", 
+        `Bạn có chắc chắn muốn xóa "${taskTitle}"? Hành động này không thể hoàn tác.`,
         
-        // Đợi 400ms cho hiệu ứng chạy xong rồi mới xóa dữ liệu thật
-        setTimeout(() => {
-            tasks = tasks.filter(t => t.id !== id);
-            saveTasks();
-            renderTasks();
-        }, 350);
-        return;
+        // --- NẾU CHỌN "CÓ" (YES) ---
+        () => {
+            playSound('trash');
+            
+            // Tìm dòng cần xóa trong bảng để thêm hiệu ứng trượt
+            const btn = document.querySelector(`button[onclick="deleteTask(${id})"]`);
+            
+            // Logic xóa có hiệu ứng
+            if (btn) {
+                const row = btn.closest('tr');
+                if (row) {
+                    row.classList.add('slide-out'); // Kích hoạt hiệu ứng bay màu
+                    
+                    // Đợi 350ms cho hiệu ứng chạy xong rồi mới xóa dữ liệu thật
+                    setTimeout(() => {
+                        performDelete(id);
+                    }, 350);
+                    return;
+                }
+            }
+
+            // Fallback: Xóa ngay nếu không tìm thấy dòng (tránh lỗi)
+            performDelete(id);
+        },
+        
+        // --- NẾU CHỌN "KHÔNG" (NO) ---
+        () => {
+            // Không làm gì cả, chỉ đóng modal
+        }
+    );
+}
+
+// Hàm phụ để thực hiện xóa dữ liệu (tách ra cho gọn)
+function performDelete(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+    renderTasks();
+    
+    // Hiện thông báo Toast nhỏ góc màn hình
+    if(typeof showToast === 'function') {
+        showToast('Đã xóa', 'Công việc đã được loại bỏ khỏi danh sách.', 'warning');
     }
 }
 
-// Fallback nếu không tìm thấy dòng (xóa ngay)
-tasks = tasks.filter(t => t.id !== id);
-saveTasks();
-renderTasks();
-}
+// Đảm bảo window gọi được hàm này
 window.deleteTask = deleteTask;
 // [CẬP NHẬT] Hàm Bắt đầu công việc -> Kích hoạt Tab Công việc
 function startTask(id) {
