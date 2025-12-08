@@ -4401,3 +4401,269 @@ tr.task-overdue .task-actions .btn-link-action {
     /* Đảm bảo độ mờ là 100% để nút trông rõ ràng */
     opacity: 1 !important;
 }
+/* ================================================= */
+/* --- UPDATE: STYLE CHO NÚT LINK TỰ ĐỘNG (AUTO) --- */
+/* ================================================= */
+
+.btn-link-action.auto-link {
+    background: #fffbeb !important; /* Nền vàng kem */
+    color: #d97706 !important;      /* Tia sét màu cam đậm */
+    border: 1px solid #fcd34d !important; /* Viền vàng */
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4) !important; /* Hiệu ứng phát sáng nhẹ */
+    animation: pulseLink 2s infinite; /* Nhấp nháy nhẹ */
+}
+
+/* Hiệu ứng nhấp nháy cho tia sét thêm sinh động */
+@keyframes pulseLink {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    70% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.btn-link-action.auto-link:hover {
+    background: #f59e0b !important; /* Hover vào thì chuyển cam rực */
+    color: white !important;
+    transform: scale(1.15) rotate(10deg) !important;
+}
+/* ================================================= */
+/* --- HỆ THỐNG THÔNG BÁO (TOAST) CHUYÊN NGHIỆP --- */
+/* ================================================= */
+
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-left: 5px solid;
+    border-radius: 8px;
+    padding: 16px 20px;
+    min-width: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transform: translateX(120%); /* Ẩn bên phải */
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Hiệu ứng nảy */
+    animation: slideInToast 0.5s forwards;
+    cursor: pointer;
+}
+
+/* Các loại thông báo */
+.toast.success { border-color: #22c55e; }
+.toast.success .toast-icon { color: #22c55e; background: #dcfce7; }
+
+.toast.error { border-color: #ef4444; }
+.toast.error .toast-icon { color: #ef4444; background: #fee2e2; }
+
+.toast.info { border-color: #3b82f6; }
+.toast.info .toast-icon { color: #3b82f6; background: #dbeafe; }
+
+.toast.warning { border-color: #f59e0b; }
+.toast.warning .toast-icon { color: #f59e0b; background: #fef3c7; }
+
+/* Icon tròn đẹp */
+.toast-icon {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 15px;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #1f2937;
+    margin-bottom: 2px;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* Animation trượt vào */
+@keyframes slideInToast {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Animation trượt ra khi đóng */
+@keyframes slideOutToast {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(120%); opacity: 0; }
+}
+
+/* Dark Mode support */
+body.dark-mode .toast {
+    background: rgba(30, 41, 59, 0.95);
+    color: #fff;
+}
+body.dark-mode .toast-title { color: #f1f5f9; }
+body.dark-mode .toast-message { color: #cbd5e1; }
+/* ================================================= */
+/* --- HỘP THOẠI XÁC NHẬN (CUSTOM CONFIRM) --- */
+/* ================================================= */
+
+.confirm-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 200000; /* Cao hơn cả Toast */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.confirm-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.confirm-content {
+    background: #fff;
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.confirm-modal.show .confirm-content {
+    transform: scale(1);
+}
+
+.confirm-title {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin-bottom: 10px;
+}
+
+.confirm-desc {
+    color: #6b7280;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.confirm-actions button {
+    min-width: 120px;
+    padding: 12px 20px;
+    border-radius: 12px;
+}
+
+/* Dark Mode */
+body.dark-mode .confirm-content {
+    background: #1e293b;
+    color: #fff;
+    border: 1px solid #334155;
+}
+body.dark-mode .confirm-title { color: #f1f5f9; }
+body.dark-mode .confirm-desc { color: #cbd5e1; }
+/* --- GAMIFICATION: LEVEL SYSTEM --- */
+.level-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 6px 12px 6px 6px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    cursor: help;
+    transition: all 0.3s;
+}
+
+.level-badge:hover {
+    transform: translateY(-2px);
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+}
+
+.level-circle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+    border: 2px solid #fff;
+}
+
+.xp-bar-container {
+    display: flex; flex-direction: column; justify-content: center;
+}
+
+.xp-text {
+    font-size: 0.7rem; font-weight: 800; color: #4b5563;
+    text-transform: uppercase; letter-spacing: 1px;
+    line-height: 1; margin-bottom: 3px;
+}
+
+.xp-track {
+    width: 80px; height: 6px;
+    background: #e5e7eb; border-radius: 10px; overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%; background: #6366f1;
+    border-radius: 10px; transition: width 0.5s ease;
+}
+
+/* Dark mode */
+body.dark-mode .level-badge { background: rgba(30, 41, 59, 0.6); border-color: #475569; }
+body.dark-mode .xp-text { color: #cbd5e1; }
+body.dark-mode .xp-track { background: #334155; }
+/* --- APP LOADER --- */
+#app-loader {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.loader-content {
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+/* Class để ẩn loader */
+.loader-hidden {
+    opacity: 0;
+    visibility: hidden;
+}

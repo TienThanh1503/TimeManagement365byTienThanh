@@ -434,9 +434,21 @@ function renderTasks() {
         let actionButtons = '';
         actionButtons += `<button class="btn-small btn-outline" onclick="loadTaskForEdit(${t.id})" title="Sửa công việc">✏️</button>`;
         if (t.link) {
-            // Kiểm tra link có http chưa, nếu chưa thì thêm vào để tránh lỗi
             let safeLink = t.link.startsWith('http') ? t.link : 'https://' + t.link;
-            actionButtons += `<a href="${safeLink}" target="_blank" class="btn-link-action" title="Mở link học tập">🔗</a>`;
+            
+            // [UPDATE MỚI] Kiểm tra xem có chế độ Auto Open không
+            let linkIcon = '🔗'; // Mặc định là cái xích
+            let linkTitle = 'Mở tài liệu';
+            let extraClass = '';
+
+            if (t.autoOpen) {
+                linkIcon = '⚡'; // Nếu tự động mở -> Đổi thành tia sét
+                linkTitle = 'Link này sẽ TỰ ĐỘNG mở khi đến giờ!';
+                extraClass = 'auto-link'; // Thêm class để tô màu vàng
+            }
+
+            // Thêm class ${extraClass} vào thẻ a
+            actionButtons += `<a href="${safeLink}" target="_blank" class="btn-link-action ${extraClass}" title="${linkTitle}">${linkIcon}</a>`;
         }
         const isOverdue = end && now > end; 
         if (!t.done) {
@@ -472,6 +484,8 @@ function markDone(id) {
 tasks = tasks.map(t => t.id === id ? { ...t, done: true } : t);
 saveTasks();
 renderTasks();
+
+gainXP(20);
 
 // 2. KÍCH HOẠT PHÁO HOA
 // Bắn bên trái
@@ -751,75 +765,136 @@ if (!rewardTrigger.contains(e.target) && !rewardMenu.contains(e.target)) {
 }
 });
 
-taskForm.addEventListener('submit', function (e) {
-e.preventDefault();
-// (Giữ nguyên phần gọi playSound nếu có)
+/* ================================================= */
+/* --- HÀM HIỂN THỊ HỘP THOẠI XÁC NHẬN (NEW) --- */
+/* ================================================= */
+function showConfirmDialog(title, message, onYes, onNo) {
+    const modal = document.getElementById('confirmModal');
+    const titleEl = modal.querySelector('.confirm-title');
+    const msgEl = document.getElementById('confirmMessage');
+    const btnYes = document.getElementById('btnConfirmYes');
+    const btnNo = document.getElementById('btnConfirmNo');
 
-const title = document.getElementById('title').value.trim();
-const taskLink = document.getElementById('taskLink').value.trim(); // <--- MỚI: Lấy Link
-const date = document.getElementById('date').value;
-const startTime = document.getElementById('startTime').value;
-const endTime = document.getElementById('endTime').value;
-const reminderVal = document.getElementById('reminder').value;
-const customRewardInput = document.getElementById('customRewardInput');
-const rewardTrigger = document.getElementById('rewardTrigger');
+    // 1. Điền nội dung
+    if(title) titleEl.textContent = title;
+    if(msgEl) msgEl.textContent = message;
 
+    // 2. Hiện Modal
+    modal.classList.add('show');
 
-// Kiểm tra dữ liệu bắt buộc (Title, Date, StartTime)
-if (!title || !date || !startTime) {
-    alert("Vui lòng nhập tên công việc, ngày và giờ bắt đầu!");
-    return;
-}
+    // 3. Xử lý sự kiện (Dùng cloneNode để xóa sạch event cũ tránh bị lặp)
+    const newYes = btnYes.cloneNode(true);
+    const newNo = btnNo.cloneNode(true);
+    btnYes.parentNode.replaceChild(newYes, btnYes);
+    btnNo.parentNode.replaceChild(newNo, btnNo);
 
-const reminderMinutes = Math.max(0, Number(reminderVal) || 0);
-
-// --- [LOGIC MỚI] XỬ LÝ PHẦN THƯỞNG ---
-// 1. Lấy giá trị từ ô nhập tay HOẶC nút chọn
-let finalReward = customRewardInput.value.trim() || rewardTrigger.textContent;
-
-// 2. Nếu vẫn là chữ mặc định "Chọn phần thưởng" hoặc rỗng -> Gán thành "Không có thưởng"
-if (finalReward === 'Chọn phần thưởng' || finalReward.trim() === '') {
-    finalReward = 'Không có thưởng';
-}
-// --------------------------------------
-
-const taskData = {
-    title, 
-    link: taskLink, // <--- MỚI: Lưu Link vào data
-    date, startTime, endTime: endTime || '', reminderMinutes,
-    reward: finalReward,
-};
-
-if (editingId) {
-    // --- CHẾ ĐỘ LƯU THAY ĐỔI (EDIT MODE) ---
-    tasks = tasks.map(t => {
-        if (t.id === editingId) {
-            // Giữ nguyên trạng thái done/started/notified cũ, chỉ cập nhật nội dung
-            return { ...t, ...taskData };
-        }
-        return t;
+    // Nút YES
+    newYes.addEventListener('click', () => {
+        modal.classList.remove('show');
+        if (onYes) onYes();
     });
-    alert('Đã lưu thay đổi thành công!');
-} else {
-    // --- CHẾ ĐỘ THÊM MỚI (ADD MODE) ---
-    const newTask = {
-        id: Date.now() + Math.random(), 
-        ...taskData,
-        done: false,
-        started: false,
-        notified: false
-    };
-    tasks.push(newTask);
-    // (Giữ nguyên playSound nếu cần)
+
+    // Nút NO
+    newNo.addEventListener('click', () => {
+        modal.classList.remove('show');
+        if (onNo) onNo();
+    });
 }
 
-saveTasks();
-renderTasks();
 
-// --- RESET UI VỀ TRẠNG THÁI THÊM MỚI ---
-resetTaskFormUI(); 
+/* ================================================= */
+/* --- XỬ LÝ FORM: SỬ DỤNG CONFIRM MỚI --- */
+/* ================================================= */
+taskForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // 1. Lấy dữ liệu từ Form
+    const title = document.getElementById('title').value.trim();
+    const taskLink = document.getElementById('taskLink').value.trim();
+    const date = document.getElementById('date').value;
+    const startTime = document.getElementById('startTime').value;
+    const endTime = document.getElementById('endTime').value;
+    const reminderVal = document.getElementById('reminder').value;
+    const customRewardInput = document.getElementById('customRewardInput');
+    const rewardTrigger = document.getElementById('rewardTrigger');
+
+    // 2. Validate cơ bản
+    if (!title || !date || !startTime) {
+        if(typeof showToast === 'function') showToast('Thiếu thông tin', 'Vui lòng nhập tên, ngày và giờ!', 'error');
+        else alert("Thiếu thông tin!");
+        return;
+    }
+
+    const reminderMinutes = Math.max(0, Number(reminderVal) || 0);
+
+    // 3. Xử lý phần thưởng
+    let finalReward = customRewardInput.value.trim() || rewardTrigger.textContent;
+    if (finalReward === 'Chọn phần thưởng' || finalReward.trim() === '') {
+        finalReward = 'Không có thưởng';
+    }
+
+    // --- HÀM CON ĐỂ LƯU DỮ LIỆU (Được gọi sau khi người dùng chọn Yes/No) ---
+    const processSaveTask = (autoOpenChoice) => {
+        const taskData = {
+            title, 
+            link: taskLink,
+            autoOpen: autoOpenChoice, // True/False tùy người dùng chọn
+            linkOpened: false,
+            date, startTime, endTime: endTime || '', reminderMinutes,
+            reward: finalReward,
+        };
+
+        if (editingId) {
+            // Chế độ Sửa
+            tasks = tasks.map(t => {
+                if (t.id === editingId) {
+                    // Nếu link hoặc giờ thay đổi -> Reset trạng thái đã mở link
+                    const isLinkChanged = (t.link !== taskLink) || (t.startTime !== startTime);
+                    return { 
+                        ...t, 
+                        ...taskData, 
+                        linkOpened: isLinkChanged ? false : t.linkOpened 
+                    };
+                }
+                return t;
+            });
+            if(typeof showToast === 'function') showToast('Thành công', 'Đã cập nhật công việc!', 'success');
+        } else {
+            // Chế độ Thêm mới
+            const newTask = {
+                id: Date.now() + Math.random(), 
+                ...taskData,
+                done: false, 
+                started: false, 
+                notified: false
+            };
+            tasks.push(newTask);
+            if(typeof showToast === 'function') showToast('Thành công', 'Đã thêm công việc mới!', 'success');
+        }
+
+        saveTasks();
+        renderTasks();
+        resetTaskFormUI(); 
+        
+        // Đóng Modal nhập liệu
+        const taskModal = document.getElementById('taskModal');
+        if(taskModal) taskModal.classList.remove('show');
+    };
+
+    // 4. LOGIC QUYẾT ĐỊNH: CÓ HIỆN CONFIRM KHÔNG?
+    // Nếu có nhập Link -> Hiện Confirm Dialog xịn
+    if (taskLink) {
+        showConfirmDialog(
+            "Tự động mở Link?", 
+            "Bạn có muốn hệ thống TỰ ĐỘNG mở tab mới tới link này khi đến giờ học không?",
+            () => { processSaveTask(true); },  // Bấm YES -> Lưu với autoOpen = true
+            () => { processSaveTask(false); }  // Bấm NO -> Lưu với autoOpen = false
+        );
+    } else {
+        // Không có link -> Lưu luôn (autoOpen = false)
+        processSaveTask(false);
+    }
 });
-
 // ==========================
 // Xử lý nhiệm vụ quan trọng
 // ==========================
@@ -2317,4 +2392,217 @@ document.addEventListener('DOMContentLoaded', () => {
 // 👇👇👇 GỌI HÀM MỚI TẠI ĐÂY 👇👇👇
 setupTaskModalListeners();
 // ... (Các lệnh khởi tạo khác của bạn)
+});
+
+/* ================================================= */
+/* --- TÍNH NĂNG TỰ ĐỘNG MỞ LINK (AUTO OPEN) --- */
+/* ================================================= */
+
+function checkAutoOpenLinks() {
+    const now = new Date();
+    // Tạo chuỗi ngày giờ hiện tại để so sánh: "YYYY-MM-DD HH:mm"
+    const currentYMD = todayStr(); // Hàm có sẵn lấy YYYY-MM-DD
+    const currentH = String(now.getHours()).padStart(2, '0');
+    const currentM = String(now.getMinutes()).padStart(2, '0');
+    const currentTimeStr = `${currentH}:${currentM}`;
+
+    let hasChanges = false;
+
+    tasks.forEach(task => {
+        // 1. Chỉ kiểm tra task chưa xong, có link, và người dùng ĐÃ CHỌN tự động mở
+        if (!task.done && task.link && task.autoOpen && !task.linkOpened) {
+            
+            // 2. Kiểm tra đúng ngày và đúng giờ (hoặc quá giờ trong vòng 1 phút)
+            if (task.date === currentYMD) {
+                // So sánh giờ: Nếu giờ hiện tại >= giờ bắt đầu
+                // (Để chắc chắn không bị lỡ nhịp đếm giây)
+                if (currentTimeStr === task.startTime) {
+                    
+                    // 3. THỰC HIỆN MỞ LINK
+                    // Thêm https nếu thiếu
+                    let safeLink = task.link.startsWith('http') ? task.link : 'https://' + task.link;
+                    
+                    // Mở tab mới
+                    const newWindow = window.open(safeLink, '_blank');
+                    
+                    // Kiểm tra xem trình duyệt có chặn không
+                    if (newWindow) {
+                        console.log(`🚀 Đã tự động mở link cho task: ${task.title}`);
+                        task.linkOpened = true; // Đánh dấu đã mở để không mở lại lần nữa
+                        hasChanges = true;
+                        
+                        // Gửi thông báo
+                        sendNotification("🚀 ĐANG MỞ LINK HỌC", `Đã mở link cho "${task.title}". Chúc bạn học tốt!`);
+                        
+                        // Nếu đang ở Zen Mode, có thể bạn muốn thoát ra hoặc giữ nguyên (tùy chọn)
+                    } else {
+                        // Nếu bị chặn
+                        console.warn("⚠️ Trình duyệt đã chặn Pop-up mở link.");
+                        sendNotification("⚠️ KHÔNG THỂ MỞ LINK", `Trình duyệt đã chặn. Vui lòng bấm vào link thủ công trong danh sách.`);
+                    }
+                }
+            }
+        }
+    });
+
+    if (hasChanges) {
+        saveTasks();
+    }
+}
+
+// Chạy kiểm tra mỗi 5 giây (đủ nhanh để bắt kịp phút, không quá nặng máy)
+setInterval(checkAutoOpenLinks, 5000);
+
+/* ================================================= */
+/* --- HÀM THÔNG BÁO TOAST (THAY THẾ ALERT) --- */
+/* ================================================= */
+
+function showToast(title, message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    // 1. Tạo phần tử HTML
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    // Chọn icon dựa trên loại thông báo
+    let icon = 'ℹ️';
+    if (type === 'success') icon = '✅';
+    if (type === 'error') icon = '❌';
+    if (type === 'warning') icon = '⚠️';
+
+    toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+
+    // 2. Thêm vào giao diện
+    container.appendChild(toast);
+    
+    // Phát âm thanh nhẹ (nếu muốn)
+    if (type === 'success') playSound('click');
+    if (type === 'error') playSound('trash');
+
+    // 3. Tự động xóa sau 3.5 giây
+    const autoRemoveId = setTimeout(() => {
+        removeToast(toast);
+    }, 3500);
+
+    // 4. Click để xóa ngay lập tức
+    toast.onclick = () => {
+        clearTimeout(autoRemoveId);
+        removeToast(toast);
+    };
+}
+
+function removeToast(toast) {
+    toast.style.animation = 'slideOutToast 0.4s forwards';
+    toast.addEventListener('animationend', () => {
+        toast.remove();
+    });
+}
+
+// Thay thế hàm alert mặc định (Optional - để bắt các alert cũ nếu còn sót)
+// window.alert = (msg) => showToast('Thông báo', msg, 'info');
+
+/* ================================================= */
+/* --- HỆ THỐNG GAMIFICATION (LEVEL UP) --- */
+/* ================================================= */
+
+let userXP = 0;
+let userLevel = 1;
+const XP_PER_LEVEL = 100; // Cứ 100 XP là lên cấp
+
+function loadGamification() {
+    const savedXP = localStorage.getItem('timefocus_xp');
+    const savedLevel = localStorage.getItem('timefocus_level');
+    
+    if (savedXP) userXP = parseInt(savedXP);
+    if (savedLevel) userLevel = parseInt(savedLevel);
+    
+    updateLevelUI();
+}
+
+function updateLevelUI() {
+    document.getElementById('userLevel').textContent = userLevel;
+    document.getElementById('userLevelText').textContent = userLevel;
+    
+    // Tính % thanh XP
+    const percent = (userXP / XP_PER_LEVEL) * 100;
+    document.getElementById('xpFill').style.width = `${percent}%`;
+    document.getElementById('levelBadge').title = `XP: ${userXP} / ${XP_PER_LEVEL}`;
+}
+
+function gainXP(amount) {
+    userXP += amount;
+    
+    // Kiểm tra lên cấp
+    if (userXP >= XP_PER_LEVEL) {
+        userLevel++;
+        userXP = userXP - XP_PER_LEVEL; // Reset XP dư
+        
+        // Hiệu ứng lên cấp
+        playSound('success');
+        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+        
+        // Thông báo Toast xịn
+        if(typeof showToast === 'function') {
+            showToast('LÊN CẤP ĐỘ ' + userLevel + '! 🚀', 'Bạn đã trở nên năng suất hơn!', 'success');
+        }
+    }
+    
+    // Lưu và cập nhật
+    localStorage.setItem('timefocus_xp', userXP);
+    localStorage.setItem('timefocus_level', userLevel);
+    updateLevelUI();
+}
+
+// KHỞI CHẠY GAMIFICATION
+loadGamification();
+
+/* ================================================= */
+/* --- PHÍM TẮT (KEYBOARD SHORTCUTS) --- */
+/* ================================================= */
+
+document.addEventListener('keydown', (e) => {
+    // Nếu đang nhập liệu trong ô input thì KHÔNG kích hoạt phím tắt
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    // Phím N: Thêm công việc mới (New)
+    if (e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        document.getElementById('openTaskModalBtn').click();
+    }
+
+    // Phím Space: Bắt đầu/Tạm dừng Pomodoro
+    if (e.code === 'Space') {
+        e.preventDefault();
+        togglePomodoro();
+    }
+    
+    // Phím Esc: Đóng tất cả Modal
+    if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.task-modal.show, .notice-modal.show, .settings-dropdown.show, .confirm-modal.show');
+        modals.forEach(m => m.classList.remove('show'));
+    }
+    
+    // Phím Z: Bật/Tắt Zen Mode
+    if (e.key.toLowerCase() === 'z') {
+        toggleZenMode();
+    }
+});
+// Tắt màn hình chờ sau khi tải xong
+window.addEventListener('load', () => {
+    const loader = document.getElementById('app-loader');
+    if (loader) {
+        // Đợi 0.8 giây cho ngầu rồi mới tắt
+        setTimeout(() => {
+            loader.classList.add('loader-hidden');
+            // Xóa hẳn khỏi DOM sau khi hiệu ứng mờ kết thúc
+            setTimeout(() => { loader.remove(); }, 500);
+        }, 800);
+    }
 });
